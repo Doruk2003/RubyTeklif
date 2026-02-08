@@ -1,0 +1,43 @@
+<%= form_with model: company, class: "space-y-6" do |f| %>
+  <% if company.errors.any? %>
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+      <div class="mb-2 font-semibold">Formda hata var:</div>
+      <ul class="list-disc pl-5">
+        <% company.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div>
+      <%= f.label :name, "Firma Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
+      <%= f.text_field :name, class: "form-input", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :tax_number, "Vergi No", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
+      <%= f.text_field :tax_number, class: "form-input", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :authorized_person, "Yetkili Kişi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
+      <%= f.text_field :authorized_person, class: "form-input" %>
+    </div>
+
+    <div>
+      <%= f.label :phone, "Telefon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
+      <%= f.telephone_field :phone, class: "form-input" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :address, "Adres", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
+    <%= f.text_area :address, rows: 3, class: "form-textarea" %>
+  </div>
+
+  <div>
+    <%= f.submit class: "btn-primary w-full" %>
+  </div>
+<% end %>

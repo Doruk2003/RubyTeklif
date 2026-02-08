@@ -1,0 +1,95 @@
+﻿<div class="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-3">
+  <div class="w-full space-y-4">
+    <div class="mt-1.5 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900"><%= @company.name %></h1>
+          <p class="text-sm text-slate-500">Müşteri Detayı</p>
+        </div>
+
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <%= link_to "Düzenle", edit_company_path(@company), class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Sil", company_path(@company), method: :delete, data: { confirm: "Bu müşteriyi silmek istediğinize emin misiniz?" }, class: "btn-danger w-full sm:w-auto" %>
+          <%= link_to "Listeye Dön", companies_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+        </div>
+      </div>
+
+      <div class="mt-5 rounded-2xl bg-white shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="table-head">
+              <tr>
+                <th class="table-th">Yetkili Kişi</th>
+                <th class="table-th">Telefon</th>
+                <th class="table-th">Vergi No</th>
+                <th class="table-th">Adres</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+                <td class="px-5 py-3 text-slate-700"><%= @company.authorized_person.presence || "-" %></td>
+                <td class="px-5 py-3 text-slate-700"><%= @company.phone.presence || "-" %></td>
+                <td class="px-5 py-3 text-slate-700"><%= @company.tax_number %></td>
+                <td class="px-5 py-3 text-slate-700 whitespace-pre-line"><%= @company.address.presence || "-" %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="rounded-2xl bg-white shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Bu firmaya ait teklifler</h2>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="table-head">
+              <tr>
+                <th class="table-th">Teklif No</th>
+                <th class="table-th">Tarih</th>
+                <th class="table-th text-right">Net</th>
+                <th class="table-th text-right">Toplam</th>
+                <th class="table-th text-right">Aksiyon</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-200 bg-white">
+              <% @offers.each do |offer| %>
+                <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+                  <td class="px-5 py-3 font-medium text-slate-900"><%= offer.offer_number %></td>
+                  <td class="px-5 py-3 text-slate-700"><%= offer.offer_date %></td>
+                  <td class="px-5 py-3 text-right text-slate-700"><%= offer.net_total %></td>
+                  <td class="px-5 py-3 text-right text-slate-700"><%= offer.gross_total %></td>
+                  <td class="px-5 py-3 text-right">
+                    <%= link_to "Gör", offer_path(offer), class: "text-sky-700" %>
+                  </td>
+                </tr>
+              <% end %>
+
+              <% if @offers.empty? %>
+                <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+                  <td colspan="5" class="px-5 py-10 text-center">
+                    <div class="mx-auto max-w-sm">
+                      <div class="mb-2 text-sm font-semibold text-slate-700">Bu firmaya ait teklif yok</div>
+                      <div class="text-sm text-slate-500">Yeni teklif oluşturarak başlayabilirsiniz.</div>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <%= link_to "Yeni Teklif", new_offer_path(company_id: @company.id), class: "btn-primary w-full" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+

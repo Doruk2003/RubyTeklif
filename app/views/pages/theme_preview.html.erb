@@ -1,0 +1,56 @@
+﻿<div class="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-3">
+  <div class="w-full space-y-4">
+    <div class="mt-1.5 rounded-2xl bg-slate-100/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.55)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Tema Ã–nizleme</h1>
+          <p class="text-sm text-slate-500">BeÄŸendiÄŸin temayÄ± sÃ¶yle, tÃ¼m sayfalara uygulayayÄ±m.</p>
+        </div>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-slate-100/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.55)]">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <% @themes.each do |t| %>
+          <div class="rounded-2xl <%= t[:bg] %> p-4 shadow-sm">
+            <div class="rounded-xl <%= t[:card] %> p-4 shadow-sm">
+              <div class="mb-3 h-2 w-full rounded-full <%= t[:accent_bg] %>"></div>
+              <div class="flex items-start justify-between">
+                <div>
+                  <h2 class="text-lg font-semibold <%= t[:accent] %>"><%= t[:name] %></h2>
+                  <p class="text-sm text-slate-500"><%= t[:desc] %></p>
+                </div>
+                <span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold <%= t[:chip] %>">Preview</span>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="h-2 rounded bg-slate-200"></div>
+                  <div class="h-2 rounded bg-slate-200"></div>
+                  <div class="h-2 rounded bg-slate-200"></div>
+                </div>
+
+                <div class="rounded-lg bg-white/60 p-3">
+                  <div class="flex items-center justify-between">
+                    <div class="text-xs text-slate-500">Ã–rnek Kart</div>
+                    <div class="text-xs text-slate-400">#1024</div>
+                  </div>
+                  <div class="mt-1 h-2 w-3/4 rounded bg-slate-200"></div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <button class="rounded-lg px-3 py-2 text-xs font-semibold <%= t[:button] %>">Birincil</button>
+                  <button class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700">Ä°kincil</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
