@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-3">
+  <div class="w-full space-y-2">
+    <div class="mt-1 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Doviz Kurlari</h1>
+          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @currencies.size %></span> kur</p>
+        </div>
+
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <%= link_to "Yeni Kur", new_currency_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="table-head">
+            <tr>
+              <th class="table-th">Kod</th>
+              <th class="table-th">Ad</th>
+              <th class="table-th">Sembol</th>
+              <th class="table-th text-right">1 Doviz = TL</th>
+              <th class="table-th text-center">Aktif</th>
+              <th class="table-th text-right">Aksiyon</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-200 bg-white">
+            <% @currencies.each do |currency| %>
+              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+                <td class="px-5 py-3 font-medium text-slate-900"><%= currency["code"].to_s %></td>
+                <td class="px-5 py-3 text-slate-700"><%= currency["name"].to_s %></td>
+                <td class="px-5 py-3 text-slate-700"><%= currency["symbol"].to_s %></td>
+                <td class="px-5 py-3 text-right text-slate-700"><%= number_to_currency(currency["rate_to_try"], unit: "TL ", format: "%u%n") %></td>
+                <td class="px-5 py-3 text-center">
+                  <% if currency["active"] %>
+                    <span class="badge-success">Aktif</span>
+                  <% else %>
+                    <span class="badge-info">Pasif</span>
+                  <% end %>
+                </td>
+                <td class="px-5 py-3 text-right">
+                  <div class="inline-flex items-center gap-2">
+                    <%= link_to edit_currency_path(currency["id"]),
+                          title: "Duzenle",
+                          aria: { label: "Duzenle" },
+                          class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-amber-600" do %>
+                      <svg viewBox="0 0 24 24" class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 20h5l9-9-5-5-9 9v5z"/>
+                        <path d="M14 6l4 4"/>
+                      </svg>
+                    <% end %>
+
+                    <%= link_to currency_path(currency["id"]),
+                          method: :delete,
+                          data: { confirm: "Bu kuru silmek istediginize emin misiniz?" },
+                          title: "Sil",
+                          aria: { label: "Sil" },
+                          class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
+                      <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 7h14"/>
+                        <path d="M10 5h4"/>
+                        <path d="M8 7l1 12h6l1-12"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+
+            <% if @currencies.empty? %>
+              <tr>
+                <td colspan="6" class="px-5 py-12 text-center">
+                  <div class="mx-auto max-w-sm">
+                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kur tanimlanmadi</div>
+                    <div class="text-sm text-slate-500">Ilk kuru eklemek icin sag ustteki butonu kullanin.</div>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

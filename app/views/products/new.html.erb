@@ -1,0 +1,62 @@
+<div class="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-3">
+  <div class="w-full space-y-4">
+    <div class="mt-1.5 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Yeni Ürün</h1>
+          <p class="text-sm text-slate-500">Ürün kartýný oluþturun.</p>
+        </div>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <%= link_to "Ürün Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="rounded-2xl bg-white p-6 shadow-sm">
+        <%= form_with url: products_path, scope: :product, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
+          <div>
+            <%= f.label :company_id, "Müþteri", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :company_id,
+                  options_for_select(@companies.map { |c| [c["name"], c["id"]] }, @product[:company_id]),
+                  { prompt: "Müþteri seçin" },
+                  class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :name, "Ürün Adý", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.text_field :name, value: @product[:name], placeholder: "Örn: Çelik Kapý", class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :item_type, "Tip", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :item_type,
+                  options_for_select([["Ürün", "product"], ["Demonte", "demonte"], ["Hizmet", "service"]], @product[:item_type] || "product"),
+                  {},
+                  class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :price, "Birim Fiyat", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.number_field :price, value: @product[:price], step: "0.01", class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :vat_rate, "KDV Oraný (%)", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.number_field :vat_rate, value: @product[:vat_rate] || 0, step: "0.01", class: "form-input" %>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <%= f.check_box :active, { checked: @product.key?(:active) ? @product[:active] : true, class: "h-4 w-4 rounded border-slate-300" }, "1", "0" %>
+            <%= f.label :active, "Aktif", class: "text-sm text-slate-700" %>
+          </div>
+
+          <div class="md:col-span-2">
+            <%= f.submit "Kaydet", class: "btn-primary w-full" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

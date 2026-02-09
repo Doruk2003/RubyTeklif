@@ -22,10 +22,25 @@ module Supabase
       request(req, with_response: true)
     end
 
-    def post(path, body:)
+    def post(path, body:, headers: {})
       req = Net::HTTP::Post.new(uri(path))
+      headers.each { |k, v| req[k] = v }
       req.body = body.to_json
       req["Content-Type"] = "application/json"
+      request(req)
+    end
+
+    def patch(path, body:, headers: {})
+      req = Net::HTTP::Patch.new(uri(path))
+      headers.each { |k, v| req[k] = v }
+      req.body = body.to_json
+      req["Content-Type"] = "application/json"
+      request(req)
+    end
+
+    def delete(path, headers: {})
+      req = Net::HTTP::Delete.new(uri(path))
+      headers.each { |k, v| req[k] = v }
       request(req)
     end
 
