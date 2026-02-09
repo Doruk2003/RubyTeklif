@@ -45,12 +45,12 @@ class ProductsController < ApplicationController
     product_id = extract_id(created)
 
     if product_id
-      redirect_to product_path(product_id), notice: "Ürün oluþturuldu."
+      redirect_to product_path(product_id), notice: "ÃœrÃ¼n oluÅŸturuldu."
     else
-      raise "Ürün ID alýnamadý."
+      raise "ÃœrÃ¼n ID alÄ±namadÄ±."
     end
   rescue StandardError => e
-    flash.now[:alert] = "Ürün oluþturulamadý: #{e.message}"
+    flash.now[:alert] = "ÃœrÃ¼n oluÅŸturulamadÄ±: #{e.message}"
     @product = payload || {}
     @companies = load_companies
     render :new, status: :unprocessable_entity
@@ -68,9 +68,9 @@ class ProductsController < ApplicationController
     updated = client.patch("products?id=eq.#{params[:id]}", body: payload, headers: { "Prefer" => "return=representation" })
     product_id = extract_id(updated) || params[:id]
 
-    redirect_to product_path(product_id), notice: "Ürün güncellendi."
+    redirect_to product_path(product_id), notice: "ÃœrÃ¼n gÃ¼ncellendi."
   rescue StandardError => e
-    flash.now[:alert] = "Ürün güncellenemedi: #{e.message}"
+    flash.now[:alert] = "ÃœrÃ¼n gÃ¼ncellenemedi: #{e.message}"
     @product = payload.merge("id" => params[:id])
     @companies = load_companies
     render :edit, status: :unprocessable_entity
@@ -78,9 +78,9 @@ class ProductsController < ApplicationController
 
   def destroy
     client.delete("products?id=eq.#{params[:id]}", headers: { "Prefer" => "return=minimal" })
-    redirect_to products_path, notice: "Ürün silindi."
+    redirect_to products_path, notice: "ÃœrÃ¼n silindi."
   rescue StandardError => e
-    redirect_to products_path, alert: "Ürün silinemedi: #{e.message}"
+    redirect_to products_path, alert: "ÃœrÃ¼n silinemedi: #{e.message}"
   end
 
   private

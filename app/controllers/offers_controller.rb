@@ -44,12 +44,12 @@ class OffersController < ApplicationController
 
     if offer_id
       insert_items(offer_id, items)
-      redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
+      redirect_to offer_path(offer_id), notice: "Teklif oluÅŸturuldu."
     else
-      raise "Teklif ID alınamadı."
+      raise "Teklif ID alÄ±namadÄ±."
     end
   rescue StandardError => e
-    flash.now[:alert] = "Teklif oluşturulamadı: #{e.message}"
+    flash.now[:alert] = "Teklif oluÅŸturulamadÄ±: #{e.message}"
     @offer = payload || {}
     @items = items || []
     render :new, status: :unprocessable_entity
