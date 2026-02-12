@@ -1,10 +1,10 @@
-﻿<div class="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-3">
-  <div class="w-full space-y-4">
-    <div class="mt-1.5 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-5">
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Teklifler</h1>
-          <p class="text-sm text-slate-500">Teklif listesi bir sonraki adımda gerçek veriye bağlanacak.</p>
+          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @offers.size %></span> teklif</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Yeni Teklif", new_offer_path, class: "btn-primary w-full sm:w-auto" %>
@@ -13,12 +13,46 @@
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
-      <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <p class="text-sm text-slate-700">Şimdilik ana sayfadaki “Son Teklifler” tablosu demo verilerle gösteriliyor.</p>
+    <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="sticky top-0 z-10">
+            <tr>
+              <th>Teklif No</th>
+              <th>Müşteri</th>
+              <th>Tarih</th>
+              <th class="text-right">Toplam</th>
+              <th class="text-right">Durum</th>
+              <th class="text-right">Aksiyon</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 bg-white">
+            <% @offers.each do |offer| %>
+              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+                <td class="font-medium text-slate-900"><%= offer["offer_number"].to_s %></td>
+                <td><%= offer.dig("companies", "name").to_s.presence || "-" %></td>
+                <td><%= offer["offer_date"].to_s %></td>
+                <td class="text-right"><%= offer["gross_total"].to_s %></td>
+                <td class="text-right"><%= offer["status"].to_s %></td>
+                <td class="text-right">
+                  <%= link_to "Gor", offer_path(offer["id"]), class: "btn-secondary" %>
+                </td>
+              </tr>
+            <% end %>
+
+            <% if @offers.empty? %>
+              <tr>
+                <td colspan="6" class="py-12 text-center">
+                  <div class="mx-auto max-w-sm">
+                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı teklif yok</div>
+                    <div class="text-sm text-slate-500">Ilk teklifi olusturmak icin yukaridaki butonu kullanin.</div>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
-
-

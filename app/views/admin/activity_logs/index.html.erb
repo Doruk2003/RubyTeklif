@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-5">
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Aktivite Kayitlari</h1>
+          <p class="text-sm text-slate-500">Rol degisiklikleri ve admin aksiyonlari</p>
+        </div>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <%= link_to "Admin Panel", admin_users_path, class: "btn-secondary w-full sm:w-auto" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="p-4">
+        <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-6" do |f| %>
+          <div>
+            <%= f.label :action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :action,
+                  options_for_select([
+                    ["Tumu", ""],
+                    ["Rol Degisikligi", "role_change"]
+                  ], params[:action].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :actor, "Islem Yapan", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :actor,
+                  options_for_select([["Tumu", ""]] + @users_index.map { |id, email| [email, id] }, params[:actor].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :target, "Hedef Kullanici", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :target,
+                  options_for_select([["Tumu", ""]] + @users_index.map { |id, email| [email, id] }, params[:target].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :from, "Baslangic", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.date_field :from, value: params[:from], class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :to, "Bitis", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.date_field :to, value: params[:to], class: "form-input" %>
+          </div>
+          <div class="flex items-end gap-2">
+            <%= f.submit "Filtrele", class: "btn-primary w-full" %>
+            <%= link_to "Temizle", admin_activity_logs_path, class: "btn-secondary w-full" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="sticky top-0 z-10">
+            <tr>
+              <th>Tarih</th>
+              <th>Aksiyon</th>
+              <th>Islem Yapan</th>
+              <th>Hedef Kullanici</th>
+              <th>Detay</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 bg-white">
+            <% @logs.each do |log| %>
+              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+                <td><%= log["created_at"].to_s %></td>
+                <td><%= log["action"].to_s %></td>
+                <td><%= @users_index[log["actor_id"].to_s].presence || log["actor_id"].to_s %></td>
+                <td><%= @users_index[log["target_id"].to_s].presence || log["target_id"].to_s %></td>
+                <td class="text-slate-600"><%= log["metadata"].to_s %></td>
+              </tr>
+            <% end %>
+
+            <% if @logs.empty? %>
+              <tr>
+                <td colspan="5" class="py-12 text-center text-slate-500">Kayit yok.</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

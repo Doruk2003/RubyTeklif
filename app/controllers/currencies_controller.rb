@@ -1,6 +1,7 @@
 require "bigdecimal"
 
 class CurrenciesController < ApplicationController
+  before_action :authorize_currencies!
   def index
     data = client.get("currencies?select=id,code,name,symbol,rate_to_try,active&order=code.asc")
     @currencies = data.is_a?(Array) ? data : []
@@ -100,5 +101,9 @@ class CurrenciesController < ApplicationController
     BigDecimal(value.to_s)
   rescue ArgumentError
     BigDecimal("0")
+  end
+
+  def authorize_currencies!
+    require_role!(Roles::ADMIN, Roles::FINANCE)
   end
 end

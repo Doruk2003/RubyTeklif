@@ -2,6 +2,7 @@ require "bigdecimal"
 
 class ProductsController < ApplicationController
   ALLOWED_TYPES = %w[product demonte service].freeze
+  before_action :authorize_products!
 
   def index
     data = client.get("products?select=id,name,price,vat_rate,item_type,active,companies(name)&order=created_at.desc")
@@ -130,5 +131,9 @@ class ProductsController < ApplicationController
     BigDecimal(value.to_s)
   rescue ArgumentError
     BigDecimal("0")
+  end
+
+  def authorize_products!
+    require_role!(Roles::ADMIN, Roles::SALES)
   end
 end

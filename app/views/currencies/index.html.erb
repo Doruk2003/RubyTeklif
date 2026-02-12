@@ -17,32 +17,32 @@
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
-          <thead class="table-head">
+          <thead>
             <tr>
-              <th class="table-th">Kod</th>
-              <th class="table-th">Ad</th>
-              <th class="table-th">Sembol</th>
-              <th class="table-th text-right">1 Doviz = TL</th>
-              <th class="table-th text-center">Aktif</th>
-              <th class="table-th text-right">Aksiyon</th>
+              <th>Kod</th>
+              <th>Ad</th>
+              <th>Sembol</th>
+              <th class="text-right">1 Doviz = TL</th>
+              <th class="text-center">Aktif</th>
+              <th class="text-right">Aksiyon</th>
             </tr>
           </thead>
 
           <tbody class="divide-y divide-slate-200 bg-white">
             <% @currencies.each do |currency| %>
               <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
-                <td class="px-5 py-3 font-medium text-slate-900"><%= currency["code"].to_s %></td>
-                <td class="px-5 py-3 text-slate-700"><%= currency["name"].to_s %></td>
-                <td class="px-5 py-3 text-slate-700"><%= currency["symbol"].to_s %></td>
-                <td class="px-5 py-3 text-right text-slate-700"><%= number_to_currency(currency["rate_to_try"], unit: "TL ", format: "%u%n") %></td>
-                <td class="px-5 py-3 text-center">
+                <td class="font-medium text-slate-900"><%= currency["code"].to_s %></td>
+                <td><%= currency["name"].to_s %></td>
+                <td><%= currency["symbol"].to_s %></td>
+                <td class="text-right"><%= number_to_currency(currency["rate_to_try"], unit: "TL ", format: "%u%n") %></td>
+                <td class="text-center">
                   <% if currency["active"] %>
                     <span class="badge-success">Aktif</span>
                   <% else %>
                     <span class="badge-info">Pasif</span>
                   <% end %>
                 </td>
-                <td class="px-5 py-3 text-right">
+                <td class="text-right">
                   <div class="inline-flex items-center gap-2">
                     <%= link_to edit_currency_path(currency["id"]),
                           title: "Duzenle",
@@ -73,7 +73,7 @@
 
             <% if @currencies.empty? %>
               <tr>
-                <td colspan="6" class="px-5 py-12 text-center">
+                <td colspan="6" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
                     <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kur tanimlanmadi</div>
                     <div class="text-sm text-slate-500">Ilk kuru eklemek icin sag ustteki butonu kullanin.</div>

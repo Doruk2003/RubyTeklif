@@ -1,36 +1,60 @@
 @import "tailwindcss";
 
+@layer base {
+  input,
+  textarea,
+  select {
+    @apply focus:outline-none focus:ring-0 focus:border-transparent;
+    box-shadow: none;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow: 0 0 10px 2px rgba(124, 58, 237, 0.35);
+  }
+
+  table thead {
+    @apply bg-slate-800;
+  }
+
+  table thead th {
+    @apply px-4 py-3 text-left text-xs font-normal uppercase tracking-wider text-slate-200;
+  }
+
+  table tbody td {
+    @apply px-4 py-2 text-sm text-slate-700;
+  }
+
+}
+
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-900;
+    @apply inline-flex items-center justify-center rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-normal text-white shadow-sm hover:bg-slate-900;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-100;
+    @apply inline-flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-normal text-slate-700 shadow-sm hover:bg-slate-100;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-rose-700;
-  }
-
-  .table-head {
-    @apply bg-slate-50;
-  }
-
-  .table-th {
-    @apply px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600;
+    @apply inline-flex items-center justify-center rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-normal text-white shadow-sm hover:bg-rose-700;
   }
 
   .form-input {
-    @apply mt-2 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm shadow-sm placeholder-slate-400 focus:border-slate-600 focus:ring-slate-600;
+    @apply mt-2 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm shadow-sm placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-0 focus:shadow-[0_0_10px_2px_rgba(124,58,237,0.35)];
   }
 
   .form-textarea {
-    @apply mt-2 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm shadow-sm placeholder-slate-400 focus:border-slate-600 focus:ring-slate-600;
+    @apply mt-2 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm shadow-sm placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-0 focus:shadow-[0_0_10px_2px_rgba(124,58,237,0.35)];
   }
 
   .badge-info {
-    @apply inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700;
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-200;
+  }
+
+  .badge-approve {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-600 text-[11px] font-semibold text-white;
   }
 
   .badge-warn {
@@ -39,5 +63,17 @@
 
   .badge-success {
     @apply inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700;
+  }
+
+  .status-circle {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold;
+  }
+
+  .status-circle-success {
+    @apply bg-emerald-500 text-white;
+  }
+
+  .status-circle-warn {
+    @apply bg-amber-500 text-white;
   }
 }

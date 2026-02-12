@@ -18,26 +18,26 @@
       <div class="mt-5 rounded-2xl bg-white shadow-sm">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="table-head">
+            <thead>
               <tr>
-                <th class="table-th">Yetkili Kişi</th>
-                <th class="table-th">Telefon</th>
-                <th class="table-th">Mail</th>
-                <th class="table-th">Vergi No</th>
-                <th class="table-th">Vergi Dairesi</th>
-                <th class="table-th">Durum</th>
-                <th class="table-th">Adres</th>
+                <th>Yetkili Kişi</th>
+                <th>Telefon</th>
+                <th>Mail</th>
+                <th>Vergi No</th>
+                <th>Vergi Dairesi</th>
+                <th>Durum</th>
+                <th>Adres</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 bg-white">
               <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
-                <td class="px-5 py-3 text-slate-700"><%= @company.authorized_person.presence || "-" %></td>
-                <td class="px-5 py-3 text-slate-700"><%= @company.phone.presence || "-" %></td>
-                <td class="px-5 py-3 text-slate-700"><%= @company.email.presence || "-" %></td>
-                <td class="px-5 py-3 text-slate-700"><%= @company.tax_number %></td>
-                <td class="px-5 py-3 text-slate-700"><%= @company.tax_office.presence || "-" %></td>
-                <td class="px-5 py-3 text-slate-700"><%= @company.active ? "Aktif" : "Pasif" %></td>
-                <td class="px-5 py-3 text-slate-700 whitespace-pre-line"><%= @company.address.presence || "-" %></td>
+                <td><%= @company.authorized_person.presence || "-" %></td>
+                <td><%= @company.phone.presence || "-" %></td>
+                <td><%= @company.email.presence || "-" %></td>
+                <td><%= @company.tax_number %></td>
+                <td><%= @company.tax_office.presence || "-" %></td>
+                <td><%= @company.active ? "Aktif" : "Pasif" %></td>
+                <td class="whitespace-pre-line"><%= @company.address.presence || "-" %></td>
               </tr>
             </tbody>
           </table>
@@ -53,24 +53,24 @@
 
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="table-head">
+            <thead>
               <tr>
-                <th class="table-th">Teklif No</th>
-                <th class="table-th">Tarih</th>
-                <th class="table-th text-right">Net</th>
-                <th class="table-th text-right">Toplam</th>
-                <th class="table-th text-right">Aksiyon</th>
+                <th>Teklif No</th>
+                <th>Tarih</th>
+                <th class="text-right">Net</th>
+                <th class="text-right">Toplam</th>
+                <th class="text-right">Aksiyon</th>
               </tr>
             </thead>
 
             <tbody class="divide-y divide-slate-200 bg-white">
               <% @offers.each do |offer| %>
                 <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
-                  <td class="px-5 py-3 font-medium text-slate-900"><%= offer.offer_number %></td>
-                  <td class="px-5 py-3 text-slate-700"><%= offer.offer_date %></td>
-                  <td class="px-5 py-3 text-right text-slate-700"><%= offer.net_total %></td>
-                  <td class="px-5 py-3 text-right text-slate-700"><%= offer.gross_total %></td>
-                  <td class="px-5 py-3 text-right">
+                  <td class="font-medium text-slate-900"><%= offer.offer_number %></td>
+                  <td><%= offer.offer_date %></td>
+                  <td class="text-right"><%= offer.net_total %></td>
+                  <td class="text-right"><%= offer.gross_total %></td>
+                  <td class="text-right">
                     <%= link_to "Gör", offer_path(offer), class: "text-sky-700" %>
                   </td>
                 </tr>
@@ -78,7 +78,7 @@
 
               <% if @offers.empty? %>
                 <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
-                  <td colspan="5" class="px-5 py-10 text-center">
+                  <td colspan="5" class="py-10 text-center">
                     <div class="mx-auto max-w-sm">
                       <div class="mb-2 text-sm font-semibold text-slate-700">Bu firmaya ait teklif yok</div>
                       <div class="text-sm text-slate-500">Yeni teklif oluşturarak başlayabilirsiniz.</div>

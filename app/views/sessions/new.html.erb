@@ -1,0 +1,20 @@
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center">
+    <div class="rounded-2xl bg-slate-50/90 p-6 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Giris Yap</h1>
+      <p class="mt-1 text-sm text-slate-500">Supabase Auth ile giris</p>
+
+      <%= form_with url: login_path, method: :post, local: true, class: "mt-5 space-y-4" do |f| %>
+        <div>
+          <%= f.label :email, "E-posta", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+          <%= f.email_field :email, class: "form-input", required: true, autocomplete: "email" %>
+        </div>
+        <div>
+          <%= f.label :password, "Sifre", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+          <%= f.password_field :password, class: "form-input", required: true, autocomplete: "current-password" %>
+        </div>
+        <%= f.submit "Giris", class: "btn-primary w-full" %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,8 @@
 class CompaniesController < ApplicationController
+  before_action :authorize_companies!
+
   def index
-    @companies = apply_filters(load_companies)
+    @companies = apply_sort(apply_filters(load_companies))
   rescue Supabase::Client::ConfigurationError
     @companies = []
     flash.now[:alert] = "Supabase ayarlari eksik oldugu icin musteriler yuklenemedi."
@@ -45,6 +47,12 @@ class CompaniesController < ApplicationController
     if company_id.present? && company_exists?(company_id)
       company_name = payload[:name].to_s.strip
       notice_message = company_name.present? ? "#{company_name} musterisi olusturuldu." : "Musteri olusturuldu."
+      AuditLog.new.log(
+        action: "companies.create",
+        actor_id: current_user&.id,
+        target_id: company_id,
+        metadata: { name: company_name }
+      )
       redirect_to companies_path, notice: notice_message
     else
       raise "Insert yaniti alindi ancak kayit dogrulanamadi. Supabase proje ayarlarini kontrol edin."
@@ -74,6 +82,12 @@ class CompaniesController < ApplicationController
       raise "Musteri bulunamadi veya guncellenemedi."
     end
 
+    AuditLog.new.log(
+      action: "companies.update",
+      actor_id: current_user&.id,
+      target_id: params[:id],
+      metadata: { name: payload[:name].to_s }
+    )
     redirect_to company_path(params[:id]), notice: "Musteri guncellendi."
   rescue StandardError => e
     flash.now[:alert] = "Musteri guncellenemedi: #{e.message}"
@@ -85,6 +99,12 @@ class CompaniesController < ApplicationController
     deleted = client.delete("companies?id=eq.#{params[:id]}", headers: { "Prefer" => "return=minimal" })
     raise response_error(deleted, fallback: "Musteri silinemedi.") if response_has_error?(deleted)
 
+    AuditLog.new.log(
+      action: "companies.delete",
+      actor_id: current_user&.id,
+      target_id: params[:id],
+      metadata: {}
+    )
     redirect_to companies_path, notice: "Musteri silindi."
   rescue StandardError => e
     redirect_to companies_path, alert: "Musteri silinemedi: #{e.message}"
@@ -152,6 +172,33 @@ class CompaniesController < ApplicationController
     end
 
     result
+  end
+
+  def authorize_companies!
+    require_role!(Roles::ADMIN, Roles::SALES)
+  end
+
+  def apply_sort(companies)
+    sort = params[:sort].to_s
+    dir = params[:dir].to_s == "asc" ? "asc" : "desc"
+    return companies if sort.blank?
+
+    allowed = {
+      "name" => ->(c) { c.name.to_s.downcase },
+      "authorized_person" => ->(c) { c.authorized_person.to_s.downcase },
+      "phone" => ->(c) { c.phone.to_s.downcase },
+      "email" => ->(c) { c.email.to_s.downcase },
+      "tax_number" => ->(c) { c.tax_number.to_s.downcase },
+      "tax_office" => ->(c) { c.tax_office.to_s.downcase },
+      "active" => ->(c) { c.active ? 1 : 0 },
+      "offers_count" => ->(c) { c.offers_count.to_i }
+    }
+
+    key = allowed[sort]
+    return companies unless key
+
+    sorted = companies.sort_by(&key)
+    dir == "asc" ? sorted : sorted.reverse
   end
 
   def find_company
