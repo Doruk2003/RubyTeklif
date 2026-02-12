@@ -2,6 +2,8 @@
 
 require "net/http"
 require "json"
+require "zlib"
+require "stringio"
 
 module Supabase
   class Client
@@ -49,13 +51,28 @@ module Supabase
     def request(req, with_response: false)
       req["apikey"] = api_key
       req["Authorization"] = "Bearer #{api_key}"
+      req["Accept-Encoding"] = "gzip"
 
       http = Net::HTTP.new(req.uri.host, req.uri.port)
       http.use_ssl = true
 
       response = http.request(req)
-      body = JSON.parse(response.body) rescue response.body
+      body = parse_response_body(response)
       with_response ? [body, response] : body
+    end
+
+    def parse_response_body(response)
+      raw_body = response.body.to_s
+      decoded_body =
+        if response["content-encoding"].to_s.downcase.include?("gzip")
+          Zlib::GzipReader.new(StringIO.new(raw_body)).read
+        else
+          raw_body
+        end
+
+      JSON.parse(decoded_body)
+    rescue JSON::ParserError, Zlib::GzipFile::Error
+      response.body
     end
 
     def uri(path)

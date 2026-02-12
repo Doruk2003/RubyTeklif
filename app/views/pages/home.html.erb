@@ -342,89 +342,154 @@
         <aside class="lg:col-span-4">
           <%
             perf_source = @monthly_performance || {}
-            paid_value = (perf_source[:paid] || perf_source["paid"] || 473).to_f
-            overdue_value = (perf_source[:overdue] || perf_source["overdue"] || 367).to_f
-            unpaid_value = (perf_source[:unpaid] || perf_source["unpaid"] || 314).to_f
-            total_orders = (perf_source[:total] || perf_source["total"] || 1154).to_i
-            total_label = (perf_source[:total_label] || perf_source["total_label"] || "Orders").to_s
+            raw_segments = perf_source[:segments] || perf_source["segments"]
 
-            sw_paid = (perf_source[:sw_paid] || perf_source["sw_paid"] || 50).to_i
-            sw_overdue = (perf_source[:sw_overdue] || perf_source["sw_overdue"] || 40).to_i
-            sw_unpaid = (perf_source[:sw_unpaid] || perf_source["sw_unpaid"] || 40).to_i
+            segments =
+              if raw_segments.respond_to?(:map) && raw_segments.any?
+                raw_segments.map.with_index do |entry, idx|
+                  seg = entry.respond_to?(:to_h) ? entry.to_h : {}
+                  value = (seg[:value] || seg["value"] || 0).to_f
+                  next if value <= 0
+                  {
+                    label: (seg[:label] || seg["label"] || "Segment #{idx + 1}").to_s,
+                    value: value,
+                    color: (seg[:color] || seg["color"] || "#cbd5e1").to_s,
+                    text_color: (seg[:text_color] || seg["text_color"]).to_s,
+                    kind: (seg[:kind] || seg["kind"]).to_s
+                  }
+                end.compact
+              else
+                [
+                  { label: "Total paid", value: (perf_source[:paid] || perf_source["paid"] || 473).to_f, color: "#b1b4ec", kind: "paid" },
+                  { label: "Total Unpaid", value: (perf_source[:unpaid] || perf_source["unpaid"] || 314).to_f, color: "#6950f2", kind: "unpaid" },
+                  { label: "Total Overdue", value: (perf_source[:overdue] || perf_source["overdue"] || 367).to_f, color: "#010101", kind: "overdue" }
+                ]
+              end
+            segments = segments.select { |seg| seg[:value].to_f > 0 }
+            if segments.empty?
+              segments = [{ label: "Total", value: 1.0, color: "#cbd5e1", text_color: "#1a1a1a" }]
+            end
 
-            donut_total = [paid_value + overdue_value + unpaid_value, 1.0].max
-            pct_paid_f = (paid_value / donut_total) * 100.0
-            pct_overdue_f = (overdue_value / donut_total) * 100.0
-            pct_unpaid_f = (unpaid_value / donut_total) * 100.0
+            total_value = [segments.sum { |seg| seg[:value].to_f }, 1.0].max
+            total_orders = (perf_source[:total] || perf_source["total"] || total_value).to_i
+            total_label = (perf_source[:total_label] || perf_source["total_label"] || "Sistem").to_s
 
-            pct_paid = pct_paid_f.round
-            pct_overdue = pct_overdue_f.round
-            pct_unpaid = pct_unpaid_f.round
+            max_val = segments.map { |seg| seg[:value].to_f }.max || 0.0
+            segment_gap = segments.length > 1 ? 2.8 : 0.0
+            gap_unpaid_overdue = (perf_source[:gap_unpaid_overdue] || perf_source["gap_unpaid_overdue"] || 0.6).to_f
+            label_min_pct = (perf_source[:label_min_pct] || perf_source["label_min_pct"] || 6.0).to_f
+            min_len = segments.length >= 5 ? 1.0 : 2.0
 
-            segment_gap = 3.0
-            min_len = 8.0
-            len_paid = [pct_paid_f - segment_gap, min_len].max
-            len_overdue = [pct_overdue_f - segment_gap, min_len].max
-            len_unpaid = [pct_unpaid_f - segment_gap, min_len].max
+            color_luminance = lambda do |hex|
+              clean = hex.to_s.delete("#")
+              if clean.length == 3
+                clean = clean.chars.map { |ch| ch * 2 }.join
+              end
+              if clean.match?(/\A[0-9a-fA-F]{6}\z/)
+                r = clean[0, 2].to_i(16) / 255.0
+                g = clean[2, 2].to_i(16) / 255.0
+                b = clean[4, 2].to_i(16) / 255.0
+                (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
+              else
+                1.0
+              end
+            end
 
-            off_paid = 0.0
-            off_overdue = -pct_paid_f
-            off_unpaid = -(pct_paid_f + pct_overdue_f)
+            auto_label_color = lambda do |hex|
+              color_luminance.call(hex) < 0.45 ? "#ffffff" : "#1a1a1a"
+            end
 
-            paid_start = 0.0
-            overdue_start = pct_paid_f
-            unpaid_start = pct_paid_f + pct_overdue_f
+            segments_layout = []
+            current_start = 0.0
+            segments.each_with_index do |seg, idx|
+              value = seg[:value].to_f
+              pct_f = (value / total_value) * 100.0
+              next_seg = idx < segments.length - 1 ? segments[idx + 1] : nil
+              extra_pair_gap = 0.0
+              if next_seg
+                current_kind = seg[:kind].to_s.downcase
+                next_kind = next_seg[:kind].to_s.downcase
+                current_label = seg[:label].to_s.downcase
+                next_label = next_seg[:label].to_s.downcase
+                unpaid_to_overdue =
+                  (current_kind == "unpaid" && next_kind == "overdue") ||
+                  (current_kind.empty? && next_kind.empty? && current_label.include?("unpaid") && next_label.include?("overdue"))
+                if unpaid_to_overdue
+                  extra_pair_gap = gap_unpaid_overdue
+                end
+              end
+              gap_for_segment = idx < segments.length - 1 ? (segment_gap + extra_pair_gap) : 0.0
+              len = [pct_f - gap_for_segment, min_len].max
+              stroke_width = (value == max_val && segments.length > 1) ? 23 : 18
 
-            ang_paid = -90.0 + ((paid_start + (len_paid / 2.0)) * 3.6)
-            ang_overdue = -90.0 + ((overdue_start + (len_overdue / 2.0)) * 3.6)
-            ang_unpaid = -90.0 + ((unpaid_start + (len_unpaid / 2.0)) * 3.6)
+              angle = -90.0 + ((current_start + (pct_f / 2.0)) * 3.6)
+              radius = 79.0 + (stroke_width / 2.0) + 1.0
+              rad = angle * Math::PI / 180.0
+              x = Math.cos(rad)
+              y = Math.sin(rad)
+              radius -= 10 if x < -0.72
+              radius -= 8 if x > 0.72
+              radius -= 8 if y > 0.78
+              radius -= 3 if y < -0.82
 
-            # Push labels to the outer side of the ring.
-            ring_center_radius = 66.0
-            outer_label_gap = 22.0
-            rad_paid = (ring_center_radius + (sw_paid / 2.0) + outer_label_gap).round
-            rad_overdue = (ring_center_radius + (sw_overdue / 2.0) + outer_label_gap).round
-            rad_unpaid = (ring_center_radius + (sw_unpaid / 2.0) + outer_label_gap).round
+              label_color = seg[:text_color].to_s.strip
+              label_color = auto_label_color.call(seg[:color]) if label_color.empty?
+              dark_segment = color_luminance.call(seg[:color]) < 0.45
+              y_nudge = 0
+              if dark_segment
+                y_nudge += 5 if x < -0.35
+                y_nudge += 3 if y < -0.10
+              end
+
+              segments_layout << {
+                idx: idx,
+                label: seg[:label].to_s,
+                value: value,
+                color: seg[:color].to_s,
+                pct: pct_f.round,
+                len: len,
+                off: -current_start,
+                sw: stroke_width,
+                angle: angle,
+                radius: radius.round,
+                text_color: label_color,
+                y_nudge: y_nudge,
+                show_label: pct_f >= label_min_pct
+              }
+              current_start += pct_f + gap_for_segment
+            end
+
+            render_segments = segments_layout.sort_by { |seg| [seg[:sw], seg[:idx]] }
+            aria_percentages = segments_layout.map { |seg| "#{seg[:pct]} percent #{seg[:label]}" }.join(", ")
+            compact_mode = segments_layout.length > 3
           %>
-          <div class="monthly-performance-card rounded-[22px] border border-[#e5e7eb] bg-[#f8f8f9] px-6 py-5 shadow-[0_2px_8px_rgba(15,23,42,0.06)] lg:min-h-[407px]">
-            <div class="performance-head">
-              <div>
-                <div class="performance-title">Analitycal Performance</div>
-                <div class="performance-subtitle">Your monthly performance data</div>
+          <div class="monthly-performance-card rounded-3xl bg-white py-5 pl-6 pr-5 shadow-sm lg:min-h-[407px]">
+            <div class="mp-title text-lg font-semibold text-slate-900">Tekliflerin Sistem Dağılımı</div>
+            <div class="mp-wrap <%= 'mp-wrap-compact' if compact_mode %>">
+              <div class="mp-donut" role="img" aria-label="Performance chart: <%= aria_percentages %>.">
+                <svg viewBox="0 0 120 120" class="mp-donut-svg" aria-hidden="true">
+                  <circle class="mp-track" cx="60" cy="60" r="42" pathLength="100"></circle>
+                  <% render_segments.each do |seg| %>
+                    <circle class="mp-segment" cx="60" cy="60" r="42" pathLength="100" style="stroke: <%= seg[:color] %>; stroke-width: <%= seg[:sw] %>; stroke-dasharray: <%= format('%.2f', seg[:len]) %> calc(100 - <%= format('%.2f', seg[:len]) %>); stroke-dashoffset: <%= format('%.2f', seg[:off]) %>;"></circle>
+                  <% end %>
+                </svg>
+                <% segments_layout.each do |seg| %>
+                  <% if seg[:show_label] %>
+                    <span class="mp-pct" style="--angle: <%= format('%.2f', seg[:angle]) %>deg; --radius: <%= seg[:radius] %>px; --dy: <%= seg[:y_nudge] %>px; color: <%= seg[:text_color] %>;"><%= seg[:pct] %>%</span>
+                  <% end %>
+                <% end %>
+                <div class="mp-center">
+                  <div class="mp-total"><%= number_with_delimiter(total_orders, delimiter: ".") %></div>
+                  <div class="mp-total-label"><%= total_label %></div>
+                </div>
               </div>
-              <button type="button" class="performance-menu-btn" aria-label="More actions">•••</button>
-            </div>
-            <div class="performance-body">
-              <div class="performance-donut-wrap">
-                <div class="performance-donut" style="--sw-paid: <%= sw_paid %>; --sw-overdue: <%= sw_overdue %>; --sw-unpaid: <%= sw_unpaid %>; --dash-paid: <%= format('%.2f', len_paid) %>; --dash-overdue: <%= format('%.2f', len_overdue) %>; --dash-unpaid: <%= format('%.2f', len_unpaid) %>; --off-paid: <%= format('%.2f', off_paid) %>; --off-overdue: <%= format('%.2f', off_overdue) %>; --off-unpaid: <%= format('%.2f', off_unpaid) %>;" role="img" aria-label="Performance chart: <%= pct_paid %> percent total paid, <%= pct_overdue %> percent total overdue, <%= pct_unpaid %> percent total unpaid.">
-                  <svg class="performance-donut-svg" viewBox="0 0 120 120" aria-hidden="true">
-                    <circle class="donut-track" cx="60" cy="60" r="42" pathLength="100"></circle>
-                    <circle class="donut-segment donut-segment-paid" cx="60" cy="60" r="42" pathLength="100"></circle>
-                    <circle class="donut-segment donut-segment-overdue" cx="60" cy="60" r="42" pathLength="100"></circle>
-                    <circle class="donut-segment donut-segment-unpaid" cx="60" cy="60" r="42" pathLength="100"></circle>
-                  </svg>
-                  <span class="segment-label segment-label-top" style="--label-angle: <%= format('%.2f', ang_paid) %>deg; --label-radius: <%= rad_paid %>px;"><%= pct_paid %>%</span>
-                  <span class="segment-label segment-label-left" style="--label-angle: <%= format('%.2f', ang_overdue) %>deg; --label-radius: <%= rad_overdue %>px;"><%= pct_overdue %>%</span>
-                  <span class="segment-label segment-label-bottom" style="--label-angle: <%= format('%.2f', ang_unpaid) %>deg; --label-radius: <%= rad_unpaid %>px;"><%= pct_unpaid %>%</span>
-                  <div class="performance-donut-inner">
-                    <div class="performance-total"><%= number_with_delimiter(total_orders, delimiter: ".") %></div>
-                    <div class="performance-total-label"><%= total_label %></div>
+              <div class="mp-legend">
+                <% segments_layout.each do |seg| %>
+                  <div class="mp-legend-item">
+                    <div class="mp-legend-label"><%= seg[:label] %></div>
+                    <div class="mp-legend-value"><span class="mp-dot" style="background: <%= seg[:color] %>;"></span><%= seg[:value].to_i %></div>
                   </div>
-                </div>
-              </div>
-              <div class="performance-legend">
-                <div class="legend-item">
-                  <div class="legend-label">Total paid</div>
-                  <div class="legend-value"><span class="legend-dot legend-dot-paid"></span><%= paid_value.to_i %></div>
-                </div>
-                <div class="legend-item">
-                  <div class="legend-label">Total Overdue</div>
-                  <div class="legend-value"><span class="legend-dot legend-dot-overdue"></span><%= overdue_value.to_i %></div>
-                </div>
-                <div class="legend-item">
-                  <div class="legend-label">Total Unpaid</div>
-                  <div class="legend-value"><span class="legend-dot legend-dot-unpaid"></span><%= unpaid_value.to_i %></div>
-                </div>
+                <% end %>
               </div>
             </div>
           </div>
@@ -631,218 +696,186 @@
       transform: translate(-50%, -12px);
     }
     .monthly-performance-card {
-      border: 1px solid #e5e7eb;
-      background: #f8f8f9;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
     }
-    .performance-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
+    .mp-title {
+      display: inline-block;
+      padding-left: 4px;
     }
-    .performance-title {
-      font-size: 21px;
-      line-height: 1.1;
-      font-weight: 500;
-      color: #101010;
-      letter-spacing: -0.01em;
-    }
-    .performance-subtitle {
-      margin-top: 4px;
-      font-size: 13px;
-      line-height: 1.3;
-      color: #9ca3af;
-      font-weight: 400;
-    }
-    .performance-menu-btn {
-      border: 0;
-      background: transparent;
-      color: #111827;
-      font-size: 16px;
-      line-height: 1;
-      padding: 0;
-      cursor: pointer;
-      letter-spacing: 0;
-    }
-    .performance-body {
-      margin-top: 12px;
+    .mp-wrap {
+      min-height: 321px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 52px;
-      width: 100%;
-      padding-left: 12px;
-      padding-right: 12px;
-      flex: 1 1 auto;
-      transform: translateX(14px);
+      gap: 34px;
+      margin-top: 10px;
     }
-    .performance-donut-wrap {
-      flex: 0 0 auto;
-      position: relative;
-      width: 204px;
-      height: 204px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .mp-wrap-compact {
+      gap: 20px;
     }
-    .performance-donut {
+    .mp-wrap-compact .mp-legend {
+      min-width: 130px;
+      gap: 12px;
+    }
+    .mp-wrap-compact .mp-legend-label {
+      font-size: 12px;
+    }
+    .mp-wrap-compact .mp-legend-value {
+      font-size: 33px;
+    }
+    .mp-wrap-compact .mp-dot {
+      width: 12px;
+      height: 12px;
+    }
+    .mp-donut {
+      width: 226px;
+      height: 226px;
       position: relative;
-      width: 188px;
-      height: 188px;
       border-radius: 9999px;
-      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.16);
+      background: transparent;
+      flex: 0 0 auto;
     }
-    .performance-donut-svg {
+    .mp-donut::after {
+      content: "";
+      position: absolute;
+      right: -10px;
+      bottom: -9px;
+      width: 108px;
+      height: 108px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(15, 23, 42, 0.16) 0%, rgba(15, 23, 42, 0) 72%);
+      filter: blur(7px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mp-donut-svg {
       width: 100%;
       height: 100%;
-      transform: rotate(-90deg);
       overflow: visible;
+      transform: rotate(-90deg);
+      position: relative;
+      z-index: 1;
     }
-    .donut-track {
+    .mp-track {
       fill: none;
-      stroke-width: 14;
+      stroke: #eaedf0;
+      stroke-width: 17;
     }
-    .donut-track {
-      stroke: #edf0f2;
-    }
-    .donut-segment {
+    .mp-segment {
       fill: none;
+      stroke-width: 18;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .donut-segment-paid {
-      stroke: #b2b4ee;
-      stroke-width: var(--sw-paid, 50);
-      stroke-dasharray: var(--dash-paid, 37) calc(100 - var(--dash-paid, 37));
-      stroke-dashoffset: var(--off-paid, 0);
-    }
-    .donut-segment-overdue {
-      stroke: #050505;
-      stroke-width: var(--sw-overdue, 40);
-      stroke-dasharray: var(--dash-overdue, 31) calc(100 - var(--dash-overdue, 31));
-      stroke-dashoffset: var(--off-overdue, -31);
-    }
-    .donut-segment-unpaid {
-      stroke: #dde2e6;
-      stroke-width: var(--sw-unpaid, 40);
-      stroke-dasharray: var(--dash-unpaid, 23) calc(100 - var(--dash-unpaid, 23));
-      stroke-dashoffset: var(--off-unpaid, -62);
-    }
-    .performance-donut-inner {
+    .mp-center {
       position: absolute;
-      inset: 22px;
+      inset: 64px;
       border-radius: 9999px;
+      background: #e7eaed;
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.28), 0 10px 22px -14px rgba(15, 23, 42, 0.45), inset 0 1px 2px rgba(148, 163, 184, 0.24);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #f4f5f7;
-      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
     }
-    .performance-total {
-      font-size: 31px;
+    .mp-total {
+      font-size: 26px;
       line-height: 1;
-      font-weight: 500;
+      font-weight: 400;
       color: #161616;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
     }
-    .performance-total-label {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #b8bec5;
-      font-weight: 500;
-    }
-    .segment-label {
-      position: absolute;
-      font-size: 11px;
+    .mp-total-label {
+      margin-top: 7px;
+      font-size: 13px;
       line-height: 1;
-      font-weight: 700;
-      color: #111827;
-      z-index: 3;
+      font-weight: 500;
+      color: #838c95;
+    }
+    .mp-pct {
+      position: absolute;
       left: 50%;
       top: 50%;
-      --label-radius: 52px;
-      transform: translate(-50%, -50%) rotate(var(--label-angle)) translateX(var(--label-radius)) rotate(calc(-1 * var(--label-angle)));
+      transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(var(--dy, 0px));
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 700;
+      color: #1a1a1a;
+      z-index: 2;
+      pointer-events: none;
     }
-    .segment-label-top {
-      --label-angle: -10deg;
-    }
-    .segment-label-left {
-      --label-angle: 198deg;
-    }
-    .segment-label-bottom {
-      --label-angle: 90deg;
-    }
-    .performance-legend {
+    .mp-legend {
+      min-width: 158px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      min-width: 132px;
+      gap: 18px;
+      flex: 0 0 auto;
+      margin-left: 10px;
     }
-    .legend-item {
+    .mp-legend-item {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
-    .legend-label {
+    .mp-legend-label {
       font-size: 13px;
       line-height: 1.2;
-      color: #b6bcc3;
-      font-weight: 500;
+      font-weight: 400;
+      color: #adb3ba;
     }
-    .legend-value {
-      font-size: 24px;
-      line-height: 1;
-      color: #111827;
-      font-weight: 500;
+    .mp-legend-value {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
+      font-size: 28px;
+      line-height: 0.95;
+      font-weight: 500;
+      color: #171717;
     }
-    .legend-dot {
-      width: 12px;
-      height: 12px;
+    .mp-dot {
+      width: 16px;
+      height: 16px;
       border-radius: 9999px;
       display: inline-block;
       flex: 0 0 auto;
     }
-    .legend-dot-paid {
-      background: #b7b9f3;
-    }
-    .legend-dot-overdue {
-      background: #050505;
-    }
-    .legend-dot-unpaid {
-      background: #dde2e6;
-    }
     @media (max-width: 520px) {
-      .performance-body {
+      .mp-wrap {
+        min-height: 228px;
         gap: 14px;
-        padding-left: 0;
-        padding-right: 0;
-        transform: none;
       }
-      .performance-donut-wrap {
-        width: 150px;
-        height: 150px;
+      .mp-donut {
+        width: 160px;
+        height: 160px;
       }
-      .performance-donut {
-        width: 140px;
-        height: 140px;
+      .mp-center {
+        inset: 45px;
       }
-      .performance-donut-inner {
-        inset: 16px;
+      .mp-total {
+        font-size: 15px;
       }
-      .performance-total {
-        font-size: 27px;
+      .mp-total-label {
+        font-size: 12px;
       }
-      .segment-label {
-        --label-radius: 54px;
+      .mp-pct {
+        font-size: 11px;
       }
-      .legend-value {
-        font-size: 20px;
+      .mp-legend {
+        min-width: 102px;
+        gap: 10px;
+      }
+      .mp-legend-label {
+        font-size: 11px;
+      }
+      .mp-legend-value {
+        font-size: 11px;
+        gap: 6px;
+      }
+      .mp-dot {
+        width: 10px;
+        height: 10px;
       }
     }
     .sidebar-modern {

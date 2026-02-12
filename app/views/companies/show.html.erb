@@ -22,7 +22,10 @@
               <tr>
                 <th class="table-th">Yetkili Kişi</th>
                 <th class="table-th">Telefon</th>
+                <th class="table-th">Mail</th>
                 <th class="table-th">Vergi No</th>
+                <th class="table-th">Vergi Dairesi</th>
+                <th class="table-th">Durum</th>
                 <th class="table-th">Adres</th>
               </tr>
             </thead>
@@ -30,7 +33,10 @@
               <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
                 <td class="px-5 py-3 text-slate-700"><%= @company.authorized_person.presence || "-" %></td>
                 <td class="px-5 py-3 text-slate-700"><%= @company.phone.presence || "-" %></td>
+                <td class="px-5 py-3 text-slate-700"><%= @company.email.presence || "-" %></td>
                 <td class="px-5 py-3 text-slate-700"><%= @company.tax_number %></td>
+                <td class="px-5 py-3 text-slate-700"><%= @company.tax_office.presence || "-" %></td>
+                <td class="px-5 py-3 text-slate-700"><%= @company.active ? "Aktif" : "Pasif" %></td>
                 <td class="px-5 py-3 text-slate-700 whitespace-pre-line"><%= @company.address.presence || "-" %></td>
               </tr>
             </tbody>

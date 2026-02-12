@@ -28,7 +28,17 @@
 
   <body class="m-0 p-0 bg-[#f6f3ee]" style="margin:0; padding:0;">
     <main class="min-h-screen m-0 p-0 bg-transparent">
-<%#  %>      <%= yield %>
+      <% if notice.present? || alert.present? %>
+        <div class="mx-4 mt-4 space-y-2">
+          <% if notice.present? %>
+            <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"><%= notice %></div>
+          <% end %>
+          <% if alert.present? %>
+            <div class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"><%= alert %></div>
+          <% end %>
+        </div>
+      <% end %>
+      <%= yield %>
     </main>
   </body>
 </html>

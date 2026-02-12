@@ -14,7 +14,7 @@
       </div>
 
       <div class="mt-5">
-        <%= form_with url: companies_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-5" do |f| %>
+        <%= form_with url: companies_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-6" do |f| %>
           <div class="md:col-span-2">
             <%= f.label :q, "Firma Adı / Yetkili", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.search_field :q,
@@ -43,13 +43,25 @@
                   class: "form-input" %>
           </div>
 
+          <div>
+            <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :active,
+                  options_for_select([
+                    ["Tumu", ""],
+                    ["Aktif", "1"],
+                    ["Pasif", "0"]
+                  ], params[:active]),
+                  {},
+                  class: "form-input" %>
+          </div>
+
           <div class="flex items-end gap-2 md:col-span-1">
             <%= link_to "Temizle", companies_path, class: "btn-secondary w-full rounded-md" %>
           </div>
-          <div class="md:col-span-5">
+          <div class="md:col-span-6">
             <span class="text-xs text-slate-400">İpucu: Filtreler URL ile paylaşılabilir.</span>
           </div>
-          <div class="md:col-span-5">
+          <div class="md:col-span-6">
             <%= f.submit "Filtrele", class: "btn-primary w-full rounded-md" %>
           </div>
         <% end %>
@@ -65,7 +77,10 @@
               <th class="table-th">Firma Adı</th>
               <th class="table-th">Yetkili Kişi</th>
               <th class="table-th">Telefon</th>
+              <th class="table-th">Mail</th>
               <th class="table-th">Vergi No</th>
+              <th class="table-th">Vergi Dairesi</th>
+              <th class="table-th text-center">Durum</th>
               <th class="table-th text-center">Teklif</th>
               <th class="table-th text-right">Aksiyon</th>
             </tr>
@@ -87,7 +102,23 @@
                 </td>
 
                 <td class="px-5 py-3 text-slate-700">
+                  <%= company.email.presence || "-" %>
+                </td>
+
+                <td class="px-5 py-3 text-slate-700">
                   <%= company.tax_number %>
+                </td>
+
+                <td class="px-5 py-3 text-slate-700">
+                  <%= company.tax_office.presence || "-" %>
+                </td>
+
+                <td class="px-5 py-3 text-center">
+                  <% if company.active %>
+                    <span class="badge-success">Aktif</span>
+                  <% else %>
+                    <span class="badge-warn">Pasif</span>
+                  <% end %>
                 </td>
 
                 <td class="px-5 py-3 text-center">
@@ -137,7 +168,7 @@
 
             <% if @companies.empty? %>
               <tr>
-                <td colspan="6" class="px-5 py-12 text-center">
+                <td colspan="9" class="px-5 py-12 text-center">
                   <div class="mx-auto max-w-sm">
                     <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı müşteri yok</div>
                     <div class="text-sm text-slate-500">İlk müşterinizi eklemek için sağ üstteki butonu kullanın.</div>
