@@ -43,8 +43,7 @@ class OffersController < ApplicationController
     @selected_category_id = payload.delete(:product_category_id).to_s.presence
     payload[:items] = Array(payload[:items]).map { |item| item.to_h.deep_symbolize_keys }
 
-    repository = Offers::Repository.new(client: supabase_user_client)
-    offer_id = Offers::Create.new(repository: repository).call(payload: payload, user_id: current_user.id)
+    offer_id = Offers::CreateOffer.new(client: supabase_user_client).call(payload: payload, user_id: current_user.id)
     redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
   rescue ServiceErrors::Base => e
     flash.now[:alert] = "Teklif oluşturulamadı: #{e.user_message}"

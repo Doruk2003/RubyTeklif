@@ -38,7 +38,7 @@ class ProductsController < ApplicationController
 
   def create
     payload = product_params
-    product_id = Products::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    product_id = Products::CreateProduct.new(client: client).call(form_payload: payload, actor_id: current_user.id)
     redirect_to product_path(product_id), notice: "Ürün oluşturuldu."
   rescue ServiceErrors::Base => e
     flash.now[:alert] = "Ürün oluşturulamadı: #{e.user_message}"
@@ -48,7 +48,7 @@ class ProductsController < ApplicationController
 
   def update
     payload = product_params
-    result = Products::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    result = Products::UpdateProduct.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to product_path(result[:id]), notice: "Ürün güncellendi."
   rescue ServiceErrors::Base => e
     flash.now[:alert] = "Ürün güncellenemedi: #{e.user_message}"
