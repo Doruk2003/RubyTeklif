@@ -11,6 +11,7 @@
   attribute :email, :string
   attribute :address, :string
   attribute :active, :boolean, default: true
+  attribute :deleted_at, :datetime
   attribute :offers_count, :integer, default: 0
 
   def persisted?

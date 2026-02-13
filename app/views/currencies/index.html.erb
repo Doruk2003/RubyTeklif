@@ -12,6 +12,29 @@
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
       </div>
+
+      <div class="mt-4">
+        <%= form_with url: currencies_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+          <div>
+            <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+            <%= f.select :scope,
+                  options_for_select([
+                    ["Aktif", "active"],
+                    ["Arsiv", "archived"],
+                    ["Tum Kayitlar", "all"]
+                  ], @scope || params[:scope] || "active"),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.hidden_field :per_page, value: @per_page %>
+            <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
+          </div>
+          <div>
+            <%= link_to "Temizle", currencies_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
@@ -54,17 +77,31 @@
                       </svg>
                     <% end %>
 
-                    <%= link_to currency_path(currency["id"]),
-                          method: :delete,
-                          data: { confirm: "Bu kuru arşivlemek istediğinize emin misiniz?" },
-                          title: "Arşivle",
-                          aria: { label: "Arşivle" },
-                          class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
-                      <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 7h14"/>
-                        <path d="M10 5h4"/>
-                        <path d="M8 7l1 12h6l1-12"/>
-                      </svg>
+                    <% if currency["deleted_at"].present? %>
+                      <%= link_to restore_currency_path(currency["id"]),
+                            method: :patch,
+                            data: { confirm: "Bu kuru geri yuklemek istediginize emin misiniz?" },
+                            title: "Geri Yukle",
+                            aria: { label: "Geri Yukle" },
+                            class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-emerald-700" do %>
+                        <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                          <path d="M3 4v5h5"/>
+                        </svg>
+                      <% end %>
+                    <% else %>
+                      <%= link_to currency_path(currency["id"]),
+                            method: :delete,
+                            data: { confirm: "Bu kuru arşivlemek istediğinize emin misiniz?" },
+                            title: "Arşivle",
+                            aria: { label: "Arşivle" },
+                            class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
+                        <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M5 7h14"/>
+                          <path d="M10 5h4"/>
+                          <path d="M8 7l1 12h6l1-12"/>
+                        </svg>
+                      <% end %>
                     <% end %>
                   </div>
                 </td>

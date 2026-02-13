@@ -20,9 +20,21 @@ Rails.application.routes.draw do
   get "home", to: "pages#home"
   get "theme-preview", to: "pages#theme_preview"
 
-  resources :companies
+  resources :companies do
+    member do
+      patch :restore
+    end
+  end
   resources :offers, only: [:index, :new, :create, :show]
-  resources :products, only: [:index, :new, :create, :show, :edit, :update, :destroy]
-  resources :currencies, only: [:index, :new, :create, :edit, :update, :destroy]
+  resources :products, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
+    member do
+      patch :restore
+    end
+  end
+  resources :currencies, only: [:index, :new, :create, :edit, :update, :destroy] do
+    member do
+      patch :restore
+    end
+  end
   resources :categories, only: [:index, :new, :create]
 end

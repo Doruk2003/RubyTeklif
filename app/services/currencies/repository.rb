@@ -45,5 +45,16 @@ module Currencies
         headers: { "Prefer" => "return=representation" }
       )
     end
+
+    def restore_with_audit_atomic(currency_id:, actor_id:)
+      @client.post(
+        "rpc/restore_currency_with_audit_atomic",
+        body: {
+          p_actor_id: actor_id,
+          p_currency_id: currency_id
+        },
+        headers: { "Prefer" => "return=representation" }
+      )
+    end
   end
 end

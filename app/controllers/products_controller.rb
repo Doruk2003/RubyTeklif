@@ -5,6 +5,7 @@
   def index
     result = Products::IndexQuery.new(client: client).call(params: params)
     @products = result[:items]
+    @scope = result[:scope]
     @category = params[:category].to_s.presence
     @page = result[:page]
     @per_page = result[:per_page]
@@ -12,6 +13,7 @@
     @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @products = []
+    @scope = "active"
     @category = nil
     @page = 1
     @per_page = 50
@@ -59,11 +61,19 @@
   end
 
   def destroy
-    Products::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Products::ArchiveProduct.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to products_path, notice: "ÃœrÃ¼n arÅŸivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#destroy")
     redirect_to products_path, alert: "ÃœrÃ¼n arÅŸivlenemedi: #{e.user_message}"
+  end
+
+  def restore
+    Products::RestoreProduct.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to products_path(scope: "archived"), notice: "Urun geri yuklendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "products#restore")
+    redirect_to products_path(scope: "archived"), alert: "Urun geri yuklenemedi: #{e.user_message}"
   end
 
   private

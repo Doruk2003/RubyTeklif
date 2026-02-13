@@ -86,6 +86,30 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeProductsArchiveUseCase
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, actor_id:)
+      raise @error if @error
+
+      true
+    end
+  end
+
+  class FakeProductsRestoreUseCase
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, actor_id:)
+      raise @error if @error
+
+      true
+    end
+  end
+
   class FakeOffersCreateUseCase
     def initialize(error: nil)
       @error = error
@@ -212,6 +236,20 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
                }
              }
         assert_response :unprocessable_entity
+      end
+    end
+  end
+
+  test "operator can archive and restore product" do
+    with_authenticated_context(role: Roles::OPERATOR) do
+      with_stubbed_constructor(Products::ArchiveProduct, FakeProductsArchiveUseCase.new) do
+        delete product_path("prd-1")
+        assert_redirected_to products_path
+      end
+
+      with_stubbed_constructor(Products::RestoreProduct, FakeProductsRestoreUseCase.new) do
+        patch restore_product_path("prd-1")
+        assert_redirected_to products_path(scope: "archived")
       end
     end
   end

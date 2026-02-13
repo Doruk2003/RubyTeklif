@@ -15,11 +15,22 @@
     </div>
 
     <div class="rounded-2xl bg-slate-50/90 p-4 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
-      <%= form_with url: products_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+      <%= form_with url: products_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end" do |f| %>
         <div class="md:col-span-2">
           <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
           <%= f.select :category,
                 options_for_select([["TÃ¼m Kategoriler", ""]] + @category_options, @category),
+                {},
+                class: "form-input" %>
+        </div>
+        <div>
+          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+          <%= f.select :scope,
+                options_for_select([
+                  ["Aktif", "active"],
+                  ["Arsiv", "archived"],
+                  ["Tum Kayitlar", "all"]
+                ], @scope || params[:scope] || "active"),
                 {},
                 class: "form-input" %>
         </div>
@@ -85,17 +96,31 @@
                       </svg>
                     <% end %>
 
-                    <%= link_to product_path(product["id"]),
-                          method: :delete,
-                          data: { confirm: "Bu Ã¼rÃ¼nÃ¼ silmek istediÄŸinize emin misiniz?" },
-                          title: "Arşivle",
-                          aria: { label: "Arşivle" },
-                          class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
-                      <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 7h14"/>
-                        <path d="M10 5h4"/>
-                        <path d="M8 7l1 12h6l1-12"/>
-                      </svg>
+                    <% if product["deleted_at"].present? %>
+                      <%= link_to restore_product_path(product["id"]),
+                            method: :patch,
+                            data: { confirm: "Bu urunu geri yuklemek istediginize emin misiniz?" },
+                            title: "Geri Yukle",
+                            aria: { label: "Geri Yukle" },
+                            class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-emerald-700" do %>
+                        <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                          <path d="M3 4v5h5"/>
+                        </svg>
+                      <% end %>
+                    <% else %>
+                      <%= link_to product_path(product["id"]),
+                            method: :delete,
+                            data: { confirm: "Bu Ã¼rÃ¼nÃ¼ silmek istediÄŸinize emin misiniz?" },
+                            title: "Arşivle",
+                            aria: { label: "Arşivle" },
+                            class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
+                        <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M5 7h14"/>
+                          <path d="M10 5h4"/>
+                          <path d="M8 7l1 12h6l1-12"/>
+                        </svg>
+                      <% end %>
                     <% end %>
                   </div>
                 </td>

@@ -51,5 +51,16 @@ module Companies
         headers: { "Prefer" => "return=representation" }
       )
     end
+
+    def restore_with_audit_atomic(company_id:, actor_id:)
+      @client.post(
+        "rpc/restore_company_with_audit_atomic",
+        body: {
+          p_actor_id: actor_id,
+          p_company_id: company_id
+        },
+        headers: { "Prefer" => "return=representation" }
+      )
+    end
   end
 end

@@ -62,6 +62,18 @@ class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeCompaniesRestoreUseCase
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, actor_id:)
+      raise @error if @error
+
+      true
+    end
+  end
+
   private def with_stubbed_constructor(klass, instance)
     original_new = klass.method(:new)
     klass.singleton_class.send(:define_method, :new) do |*args, **kwargs, &blk|
@@ -115,6 +127,15 @@ class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
       with_stubbed_constructor(Companies::CreateCompany, fake_use_case) do
         post companies_path, params: { company: { name: "", tax_number: "12345678", active: "1" } }
         assert_response :unprocessable_entity
+      end
+    end
+  end
+
+  test "operator can restore archived company" do
+    with_authenticated_context(role: Roles::OPERATOR) do
+      with_stubbed_constructor(Companies::RestoreCompany, FakeCompaniesRestoreUseCase.new) do
+        patch restore_company_path("cmp-1")
+        assert_redirected_to companies_path(scope: "archived")
       end
     end
   end

@@ -15,6 +15,7 @@ module Products
 
       {
         items: rows.first(per_page),
+        scope: normalized_scope(params),
         page: page,
         per_page: per_page,
         has_prev: page > 1,
@@ -25,12 +26,12 @@ module Products
     private
 
     def build_query(params, page:, per_page:)
-      filters = ["deleted_at=is.null"]
+      filters = [deleted_scope_filter(params)].compact
       if params[:category].present?
         filters << "category_id=eq.#{Supabase::FilterValue.eq(params[:category])}"
       end
 
-      base = "products?select=id,name,category_id,price,vat_rate,item_type,active,categories(name)&order=created_at.desc"
+      base = "products?select=id,name,category_id,price,vat_rate,item_type,active,deleted_at,categories(name)&order=created_at.desc"
       query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
       "#{query}&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
     end
@@ -45,6 +46,25 @@ module Products
     def page(params)
       raw = params[:page].to_i
       raw.positive? ? raw : 1
+    end
+
+    def normalized_scope(params)
+      scope = params[:scope].to_s
+      return "archived" if scope == "archived"
+      return "all" if scope == "all"
+
+      "active"
+    end
+
+    def deleted_scope_filter(params)
+      case normalized_scope(params)
+      when "archived"
+        "deleted_at=not.is.null"
+      when "all"
+        nil
+      else
+        "deleted_at=is.null"
+      end
     end
   end
 end

@@ -62,6 +62,18 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeCurrenciesRestoreUseCase
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, actor_id:)
+      raise @error if @error
+
+      true
+    end
+  end
+
   class FakeAdminUsersIndexQuery
     def call(params:)
       {
@@ -139,6 +151,15 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
       with_stubbed_constructor(Currencies::CreateCurrency, fake_use_case) do
         post currencies_path, params: { currency: { code: "", name: "USD", symbol: "$", rate_to_try: "35", active: "1" } }
         assert_response :unprocessable_entity
+      end
+    end
+  end
+
+  test "manager can restore archived currency" do
+    with_authenticated_context(role: Roles::MANAGER) do
+      with_stubbed_constructor(Currencies::RestoreCurrency, FakeCurrenciesRestoreUseCase.new) do
+        patch restore_currency_path("cur-1")
+        assert_redirected_to currencies_path(scope: "archived")
       end
     end
   end

@@ -1,12 +1,12 @@
-module Products
-  class Destroy
-    def initialize(client: nil, repository: nil, audit_log: nil)
-      @repository = repository || Products::Repository.new(client: client)
+module Companies
+  class Restore
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Companies::Repository.new(client: client)
     end
 
     def call(id:, actor_id:)
-      archived = @repository.archive_with_audit_atomic(product_id: id, actor_id: actor_id)
-      raise_from_response!(archived, fallback: "Urun arsivlenemedi.")
+      restored = @repository.restore_with_audit_atomic(company_id: id, actor_id: actor_id)
+      raise_from_response!(restored, fallback: "Musteri geri yuklenemedi.")
     end
 
     private

@@ -4,12 +4,14 @@
   def index
     result = Currencies::IndexQuery.new(client: client).call(params: params)
     @currencies = result[:items]
+    @scope = result[:scope]
     @page = result[:page]
     @per_page = result[:per_page]
     @has_prev = result[:has_prev]
     @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @currencies = []
+    @scope = "active"
     @page = 1
     @per_page = 50
     @has_prev = false
@@ -54,6 +56,14 @@
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#destroy")
     redirect_to currencies_path, alert: "Kur arşivlenemedi: #{e.user_message}"
+  end
+
+  def restore
+    Currencies::RestoreCurrency.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to currencies_path(scope: "archived"), notice: "Kur geri yüklendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "currencies#restore")
+    redirect_to currencies_path(scope: "archived"), alert: "Kur geri yüklenemedi: #{e.user_message}"
   end
 
   private

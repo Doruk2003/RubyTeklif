@@ -4,12 +4,14 @@
   def index
     result = Companies::IndexQuery.new(client: client).call(params: params)
     @companies = result[:items]
+    @scope = result[:scope]
     @page = result[:page]
     @per_page = result[:per_page]
     @has_prev = result[:has_prev]
     @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @companies = []
+    @scope = "active"
     @page = 1
     @per_page = 50
     @has_prev = false
@@ -67,6 +69,14 @@
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#destroy")
     redirect_to companies_path, alert: "Müşteri arşivlenemedi: #{e.user_message}"
+  end
+
+  def restore
+    Companies::RestoreCompany.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to companies_path(scope: "archived"), notice: "Müşteri geri yüklendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "companies#restore")
+    redirect_to companies_path(scope: "archived"), alert: "Müşteri geri yüklenemedi: #{e.user_message}"
   end
 
   private

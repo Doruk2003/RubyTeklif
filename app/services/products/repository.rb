@@ -36,5 +36,27 @@ module Products
         headers: { "Prefer" => "return=representation" }
       )
     end
+
+    def archive_with_audit_atomic(product_id:, actor_id:)
+      @client.post(
+        "rpc/archive_product_with_audit_atomic",
+        body: {
+          p_actor_id: actor_id,
+          p_product_id: product_id
+        },
+        headers: { "Prefer" => "return=representation" }
+      )
+    end
+
+    def restore_with_audit_atomic(product_id:, actor_id:)
+      @client.post(
+        "rpc/restore_product_with_audit_atomic",
+        body: {
+          p_actor_id: actor_id,
+          p_product_id: product_id
+        },
+        headers: { "Prefer" => "return=representation" }
+      )
+    end
   end
 end

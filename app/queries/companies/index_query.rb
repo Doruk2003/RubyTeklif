@@ -24,6 +24,7 @@
 
       {
         items: companies,
+        scope: normalized_scope(params),
         page: page,
         per_page: per_page,
         has_prev: page > 1,
@@ -44,7 +45,7 @@
 
     def build_companies_query(params)
       query_parts = []
-      query_parts << "select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active"
+      query_parts << "select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active,deleted_at"
       query_parts << sort_clause(params)
       query_parts << "limit=#{per_page(params) + 1}"
       query_parts << "offset=#{offset(params)}"
@@ -63,9 +64,9 @@
         query_parts << "active=eq.#{active}"
       end
 
-      query_parts << "deleted_at=is.null"
+      query_parts << deleted_scope_filter(params)
 
-      "companies?#{query_parts.join('&')}"
+      "companies?#{query_parts.compact.join('&')}"
     end
 
     def sort_clause(params)
@@ -100,6 +101,25 @@
 
     def offset(params)
       (page(params) - 1) * per_page(params)
+    end
+
+    def normalized_scope(params)
+      scope = params[:scope].to_s
+      return "archived" if scope == "archived"
+      return "all" if scope == "all"
+
+      "active"
+    end
+
+    def deleted_scope_filter(params)
+      case normalized_scope(params)
+      when "archived"
+        "deleted_at=not.is.null"
+      when "all"
+        nil
+      else
+        "deleted_at=is.null"
+      end
     end
 
     def escape_like_value(value)
@@ -163,6 +183,7 @@
         email: row["email"],
         address: row["address"],
         active: row.key?("active") ? row["active"] : true,
+        deleted_at: row["deleted_at"],
         offers_count: offers_count
       )
     end

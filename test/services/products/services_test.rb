@@ -76,7 +76,7 @@ module Products
     end
 
     test "destroy raises system error for generic failure" do
-      client = FakeClient.new(delete_response: { "message" => "boom" })
+      client = FakeClient.new(post_response: { "message" => "boom" })
       service = Products::Destroy.new(client: client, audit_log: FakeAuditLog.new)
 
       assert_raises(ServiceErrors::System) do
