@@ -77,6 +77,6 @@ class CompaniesController < ApplicationController
   end
 
   def authorize_companies!
-    require_role!(Roles::ADMIN, Roles::SALES)
+    authorize_with_policy!(CompaniesPolicy)
   end
 end

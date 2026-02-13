@@ -74,7 +74,7 @@ class ProductsController < ApplicationController
   end
 
   def authorize_products!
-    require_role!(Roles::ADMIN, Roles::SALES)
+    authorize_with_policy!(ProductsPolicy)
   end
 
   def load_category_options

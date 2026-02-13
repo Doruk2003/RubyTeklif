@@ -49,6 +49,6 @@ class CategoriesController < ApplicationController
   end
 
   def authorize_categories!
-    require_role!(Roles::ADMIN, Roles::SALES)
+    authorize_with_policy!(CategoriesPolicy)
   end
 end

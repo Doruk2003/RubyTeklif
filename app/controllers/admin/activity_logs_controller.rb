@@ -31,7 +31,7 @@ module Admin
     end
 
     def authorize_admin!
-      require_role!(Roles::ADMIN)
+      authorize_with_policy!(AdminActivityLogsPolicy)
     end
 
     def load_users_index

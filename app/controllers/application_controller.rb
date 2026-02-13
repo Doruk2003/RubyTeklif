@@ -60,6 +60,14 @@ class ApplicationController < ActionController::Base
     redirect_to root_path, alert: "Bu işlem için yetkiniz yok."
   end
 
+  def authorize_with_policy!(policy_class, query: :access?)
+    authenticate_user! unless current_user
+    policy = policy_class.new(current_user)
+    return if policy.public_send(query)
+
+    redirect_to root_path, alert: "Bu işlem için yetkiniz yok."
+  end
+
   def load_current_user(auth_user)
     db_user = Users::Repository.new.find_by_id(auth_user["id"])
     if db_user && db_user.key?("active") && db_user["active"] == false

@@ -95,6 +95,6 @@ class OffersController < ApplicationController
   end
 
   def authorize_offers!
-    require_role!(Roles::ADMIN, Roles::SALES)
+    authorize_with_policy!(OffersPolicy)
   end
 end

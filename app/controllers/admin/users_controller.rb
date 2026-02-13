@@ -75,7 +75,7 @@
     end
 
     def authorize_admin!
-      require_role!(Roles::ADMIN)
+      authorize_with_policy!(AdminUsersPolicy)
     end
 
   end

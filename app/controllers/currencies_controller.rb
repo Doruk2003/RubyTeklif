@@ -64,6 +64,6 @@
   end
 
   def authorize_currencies!
-    require_role!(Roles::ADMIN, Roles::FINANCE)
+    authorize_with_policy!(CurrenciesPolicy)
   end
 end
