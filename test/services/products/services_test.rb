@@ -3,7 +3,7 @@ require "test_helper"
 module Products
   class ServicesTest < ActiveSupport::TestCase
     class FakeClient
-      attr_reader :last_post_body, :last_patch_body
+      attr_reader :last_post_path, :last_post_body, :last_patch_path, :last_patch_body
 
       def initialize(post_response: nil, patch_response: nil, delete_response: nil)
         @post_response = post_response
@@ -11,12 +11,14 @@ module Products
         @delete_response = delete_response
       end
 
-      def post(_path, body:, headers:)
+      def post(path, body:, headers:)
+        @last_post_path = path
         @last_post_body = body
         @post_response
       end
 
-      def patch(_path, body:, headers:)
+      def patch(path, body:, headers:)
+        @last_patch_path = path
         @last_patch_body = body
         @patch_response
       end
@@ -27,11 +29,7 @@ module Products
     end
 
     class FakeAuditLog
-      attr_reader :payload
-
-      def log(**kwargs)
-        @payload = kwargs
-      end
+      def log(**kwargs); end
     end
 
     def valid_payload
@@ -45,20 +43,19 @@ module Products
       }
     end
 
-    test "create returns id and writes audit log" do
-      client = FakeClient.new(post_response: [{ "id" => "prd-1" }])
-      audit = FakeAuditLog.new
-      service = Products::Create.new(client: client, audit_log: audit)
+    test "create returns id via rpc" do
+      client = FakeClient.new(post_response: [{ "product_id" => "prd-1" }])
+      service = Products::Create.new(client: client)
 
       id = service.call(form_payload: valid_payload, actor_id: "usr-1")
 
       assert_equal "prd-1", id
-      assert_equal "usr-1", client.last_post_body[:user_id]
-      assert_equal "products.create", audit.payload[:action]
+      assert_equal "rpc/create_product_with_audit_atomic", client.last_post_path
+      assert_equal "usr-1", client.last_post_body[:p_actor_id]
     end
 
     test "create raises validation for invalid payload" do
-      service = Products::Create.new(client: FakeClient.new(post_response: [{ "id" => "prd-1" }]), audit_log: FakeAuditLog.new)
+      service = Products::Create.new(client: FakeClient.new(post_response: [{ "product_id" => "prd-1" }]))
 
       assert_raises(ServiceErrors::Validation) do
         service.call(form_payload: valid_payload.merge(name: "", price: "-1"), actor_id: "usr-1")
@@ -66,7 +63,7 @@ module Products
     end
 
     test "create raises validation when category is missing" do
-      service = Products::Create.new(client: FakeClient.new(post_response: [{ "id" => "prd-1" }]), audit_log: FakeAuditLog.new)
+      service = Products::Create.new(client: FakeClient.new(post_response: [{ "product_id" => "prd-1" }]))
 
       assert_raises(ServiceErrors::Validation) do
         service.call(form_payload: valid_payload.merge(category_id: ""), actor_id: "usr-1")
@@ -74,8 +71,8 @@ module Products
     end
 
     test "update raises policy error for forbidden response" do
-      client = FakeClient.new(patch_response: { "code" => "42501", "message" => "forbidden" })
-      service = Products::Update.new(client: client, audit_log: FakeAuditLog.new)
+      client = FakeClient.new(post_response: { "code" => "42501", "message" => "forbidden" })
+      service = Products::Update.new(client: client)
 
       assert_raises(ServiceErrors::Policy) do
         service.call(id: "prd-1", form_payload: valid_payload, actor_id: "usr-1")

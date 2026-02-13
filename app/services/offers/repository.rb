@@ -24,27 +24,29 @@ module Offers
       end
     end
 
-    def create_offer(payload)
-      @client.post("offers", body: payload, headers: { "Prefer" => "return=representation" })
-    end
+    def create_offer_with_items(offer_body:, items:, user_id:)
+      payload = {
+        p_actor_id: user_id,
+        p_company_id: offer_body[:company_id],
+        p_offer_number: offer_body[:offer_number],
+        p_offer_date: offer_body[:offer_date],
+        p_status: offer_body[:status],
+        p_net_total: offer_body[:net_total],
+        p_vat_total: offer_body[:vat_total],
+        p_gross_total: offer_body[:gross_total],
+        p_items: items.map do |item|
+          {
+            product_id: item[:product_id],
+            description: item[:description],
+            quantity: item[:quantity].to_s,
+            unit_price: item[:unit_price].to_s,
+            discount_rate: item[:discount_rate].to_s,
+            line_total: item[:line_total].to_s
+          }
+        end
+      }
 
-    def create_items(offer_id, items, user_id:)
-      return [] if items.empty?
-
-      payload = items.map do |item|
-        {
-          user_id: user_id,
-          offer_id: offer_id,
-          product_id: item[:product_id],
-          description: item[:description],
-          quantity: item[:quantity],
-          unit_price: item[:unit_price],
-          discount_rate: item[:discount_rate],
-          line_total: item[:line_total]
-        }
-      end
-
-      @client.post("offer_items", body: payload, headers: { "Prefer" => "return=minimal" })
+      @client.post("rpc/create_offer_with_items_atomic", body: payload, headers: { "Prefer" => "return=representation" })
     end
 
     private

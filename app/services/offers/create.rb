@@ -1,9 +1,8 @@
-﻿module Offers
+module Offers
   class Create
-    def initialize(repository:, totals: Offers::TotalsCalculator.new, audit_log: AuditLog.new(client: repository.client))
+    def initialize(repository:, totals: Offers::TotalsCalculator.new)
       @repository = repository
       @totals = totals
-      @audit_log = audit_log
     end
 
     def call(payload:, user_id:)
@@ -25,22 +24,15 @@
         gross_total: totals[:gross_total]
       )
 
-      created = @repository.create_offer(offer_body)
+      created = @repository.create_offer_with_items(
+        offer_body: offer_body,
+        items: built_items,
+        user_id: user_id
+      )
       raise_from_response!(created, fallback: "Teklif olusturulamadi.")
 
-      offer_id = extract_id(created)
+      offer_id = extract_offer_id(created)
       raise ServiceErrors::System.new(user_message: "Teklif ID alinmadi.") if offer_id.blank?
-
-      items_response = @repository.create_items(offer_id, built_items, user_id: user_id)
-      raise_from_response!(items_response, fallback: "Teklif kalemleri kaydedilemedi.")
-
-      @audit_log.log(
-        action: "offers.create",
-        actor_id: user_id,
-        target_id: offer_id,
-        target_type: "offer",
-        metadata: { offer_number: offer_body[:offer_number].to_s }
-      )
 
       offer_id
     end
@@ -64,9 +56,15 @@
       raise ServiceErrors::System.new(user_message: parts.presence&.join(" | ") || fallback)
     end
 
-    def extract_id(response)
-      return response.first["id"].to_s if response.is_a?(Array) && response.first.is_a?(Hash)
-      return response["id"].to_s if response.is_a?(Hash)
+    def extract_offer_id(response)
+      if response.is_a?(Array) && response.first.is_a?(Hash)
+        row = response.first
+        return row["offer_id"].to_s if row["offer_id"].present?
+        return row["id"].to_s if row["id"].present?
+      end
+      return response["offer_id"].to_s if response.is_a?(Hash) && response["offer_id"].present?
+      return response["id"].to_s if response.is_a?(Hash) && response["id"].present?
+      return response.to_s if response.is_a?(String)
 
       nil
     end

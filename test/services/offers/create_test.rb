@@ -5,9 +5,8 @@ module Offers
     class FakeRepository
       attr_reader :offer_payload, :items_payload
 
-      def initialize(create_offer_response:, create_items_response: [])
-        @create_offer_response = create_offer_response
-        @create_items_response = create_items_response
+      def initialize(create_offer_with_items_response:)
+        @create_offer_with_items_response = create_offer_with_items_response
       end
 
       def client
@@ -20,29 +19,16 @@ module Offers
         end
       end
 
-      def create_offer(payload)
-        @offer_payload = payload
-        @create_offer_response
-      end
-
-      def create_items(offer_id, items, user_id:)
-        @items_payload = { offer_id: offer_id, items: items, user_id: user_id }
-        @create_items_response
+      def create_offer_with_items(offer_body:, items:, user_id:)
+        @offer_payload = offer_body
+        @items_payload = { items: items, user_id: user_id }
+        @create_offer_with_items_response
       end
     end
 
-    class FakeAuditLog
-      attr_reader :payload
-
-      def log(**kwargs)
-        @payload = kwargs
-      end
-    end
-
-    test "creates offer and logs audit record" do
-      repository = FakeRepository.new(create_offer_response: [{ "id" => "off-1" }])
-      audit_log = FakeAuditLog.new
-      service = Offers::Create.new(repository: repository, audit_log: audit_log)
+    test "creates offer via atomic repository call" do
+      repository = FakeRepository.new(create_offer_with_items_response: [{ "offer_id" => "off-1" }])
+      service = Offers::Create.new(repository: repository)
 
       offer_id = service.call(
         payload: {
@@ -57,15 +43,12 @@ module Offers
 
       assert_equal "off-1", offer_id
       assert_equal "usr-1", repository.offer_payload[:user_id]
-      assert_equal "offers.create", audit_log.payload[:action]
-      assert_equal "offer", audit_log.payload[:target_type]
-      assert_equal "TK-100", audit_log.payload[:metadata][:offer_number]
       assert_equal BigDecimal("0"), repository.items_payload[:items][0][:discount_rate]
     end
 
     test "raises validation error when items are empty" do
-      repository = FakeRepository.new(create_offer_response: [{ "id" => "off-1" }])
-      service = Offers::Create.new(repository: repository, audit_log: FakeAuditLog.new)
+      repository = FakeRepository.new(create_offer_with_items_response: [{ "offer_id" => "off-1" }])
+      service = Offers::Create.new(repository: repository)
 
       assert_raises(ServiceErrors::Validation) do
         service.call(
@@ -82,8 +65,8 @@ module Offers
     end
 
     test "raises policy error when repository returns forbidden" do
-      repository = FakeRepository.new(create_offer_response: { "code" => "42501", "message" => "forbidden" })
-      service = Offers::Create.new(repository: repository, audit_log: FakeAuditLog.new)
+      repository = FakeRepository.new(create_offer_with_items_response: { "code" => "42501", "message" => "forbidden" })
+      service = Offers::Create.new(repository: repository)
 
       assert_raises(ServiceErrors::Policy) do
         service.call(
@@ -100,8 +83,8 @@ module Offers
     end
 
     test "supports multiple items in one offer" do
-      repository = FakeRepository.new(create_offer_response: [{ "id" => "off-9" }])
-      service = Offers::Create.new(repository: repository, audit_log: FakeAuditLog.new)
+      repository = FakeRepository.new(create_offer_with_items_response: [{ "offer_id" => "off-9" }])
+      service = Offers::Create.new(repository: repository)
 
       offer_id = service.call(
         payload: {
@@ -125,8 +108,8 @@ module Offers
     end
 
     test "raises validation error when discount rate is invalid" do
-      repository = FakeRepository.new(create_offer_response: [{ "id" => "off-1" }])
-      service = Offers::Create.new(repository: repository, audit_log: FakeAuditLog.new)
+      repository = FakeRepository.new(create_offer_with_items_response: [{ "offer_id" => "off-1" }])
+      service = Offers::Create.new(repository: repository)
 
       assert_raises(ServiceErrors::Validation) do
         service.call(
