@@ -3,35 +3,31 @@ require "test_helper"
 module Companies
   class DestroyTest < ActiveSupport::TestCase
     class FakeClient
+      attr_reader :last_post_path, :last_post_body
+
       def initialize(response:)
         @response = response
       end
 
-      def patch(_path, body:, headers:)
+      def post(path, body:, headers:)
+        @last_post_path = path
+        @last_post_body = body
         @response
       end
     end
 
-    class FakeAuditLog
-      attr_reader :payload
-
-      def log(**kwargs)
-        @payload = kwargs
-      end
-    end
-
-    test "archives and logs action" do
-      audit_log = FakeAuditLog.new
-      service = Companies::Destroy.new(client: FakeClient.new(response: []), audit_log: audit_log)
+    test "archives via atomic rpc" do
+      client = FakeClient.new(response: [{ "company_id" => "cmp-1" }])
+      service = Companies::Destroy.new(client: client)
 
       service.call(id: "cmp-1", actor_id: "user-1")
 
-      assert_equal "companies.archive", audit_log.payload[:action]
-      assert_equal "cmp-1", audit_log.payload[:target_id]
+      assert_equal "rpc/archive_company_with_audit_atomic", client.last_post_path
+      assert_equal "cmp-1", client.last_post_body[:p_company_id]
     end
 
     test "raises when response has error payload" do
-      service = Companies::Destroy.new(client: FakeClient.new(response: { "message" => "cannot" }), audit_log: FakeAuditLog.new)
+      service = Companies::Destroy.new(client: FakeClient.new(response: { "message" => "cannot" }))
 
       assert_raises(ServiceErrors::System) do
         service.call(id: "cmp-1", actor_id: "user-1")

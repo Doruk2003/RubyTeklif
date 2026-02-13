@@ -1,31 +1,21 @@
-﻿module Companies
+module Companies
   class Create
-    def initialize(client:, audit_log: AuditLog.new(client: client))
-      @client = client
-      @audit_log = audit_log
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Companies::Repository.new(client: client)
     end
 
     def call(form_payload:, actor_id:)
       form = Companies::UpsertForm.new(form_payload)
       validate_form!(form)
 
-      payload = form.normalized_attributes.merge(user_id: actor_id)
-      created = @client.post("companies", body: payload, headers: { "Prefer" => "return=representation" })
+      payload = form.normalized_attributes
+      created = @repository.create_with_audit_atomic(payload: payload, actor_id: actor_id)
       raise_from_response!(created, fallback: "Musteri olusturulamadi.")
 
       company_id = extract_id(created)
-      company_id = find_company_id_by_tax_number_for_user(payload[:tax_number], payload[:user_id]) if company_id.blank?
-      raise ServiceErrors::System.new(user_message: "Kayit dogrulanamadi. Lutfen tekrar deneyin.") unless company_exists?(company_id)
+      raise ServiceErrors::System.new(user_message: "Kayit dogrulanamadi. Lutfen tekrar deneyin.") if company_id.blank?
 
       company_name = payload[:name].to_s.strip
-      @audit_log.log(
-        action: "companies.create",
-        actor_id: actor_id,
-        target_id: company_id,
-        target_type: "company",
-        metadata: { name: company_name }
-      )
-
       notice = company_name.present? ? "#{company_name} musterisi olusturuldu." : "Musteri olusturuldu."
       { id: company_id, notice: notice }
     end
@@ -39,7 +29,9 @@
     end
 
     def extract_id(response)
+      return response.first["company_id"].to_s if response.is_a?(Array) && response.first.is_a?(Hash) && response.first["company_id"].present?
       return response.first["id"].to_s if response.is_a?(Array) && response.first.is_a?(Hash)
+      return response["company_id"].to_s if response.is_a?(Hash) && response["company_id"].present?
       return response["id"].to_s if response.is_a?(Hash)
 
       nil
@@ -65,26 +57,6 @@
 
       message = response["message"].to_s.downcase
       message.include?("companies_tax_number_idx") || message.include?("companies_user_tax_number_idx")
-    end
-
-    def company_exists?(company_id)
-      return false if company_id.blank?
-
-      data = @client.get("companies?id=eq.#{company_id}&deleted_at=is.null&select=id&limit=1")
-      data.is_a?(Array) && data.first.is_a?(Hash) && data.first["id"].present?
-    rescue StandardError
-      false
-    end
-
-    def find_company_id_by_tax_number_for_user(tax_number, user_id)
-      return nil if tax_number.blank? || user_id.blank?
-
-      data = @client.get("companies?user_id=eq.#{user_id}&tax_number=eq.#{tax_number}&deleted_at=is.null&order=created_at.desc&select=id&limit=1")
-      return nil unless data.is_a?(Array) && data.first.is_a?(Hash)
-
-      data.first["id"].to_s.presence
-    rescue StandardError
-      nil
     end
   end
 end

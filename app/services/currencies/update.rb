@@ -1,8 +1,7 @@
-﻿module Currencies
+module Currencies
   class Update
-    def initialize(client:, audit_log: AuditLog.new(client: client))
-      @client = client
-      @audit_log = audit_log
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Currencies::Repository.new(client: client)
     end
 
     def call(id:, form_payload:, actor_id:)
@@ -10,16 +9,8 @@
       validate_form!(form)
 
       payload = form.normalized_attributes
-      updated = @client.patch("currencies?id=eq.#{id}&deleted_at=is.null", body: payload, headers: { "Prefer" => "return=representation" })
+      updated = @repository.update_with_audit_atomic(currency_id: id, payload: payload, actor_id: actor_id)
       raise_from_response!(updated, fallback: "Kur guncellenemedi.")
-
-      @audit_log.log(
-        action: "currencies.update",
-        actor_id: actor_id,
-        target_id: id,
-        target_type: "currency",
-        metadata: { code: payload[:code].to_s }
-      )
 
       payload
     end

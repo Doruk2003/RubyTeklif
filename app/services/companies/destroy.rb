@@ -1,25 +1,12 @@
-﻿module Companies
+module Companies
   class Destroy
-    def initialize(client:, audit_log: AuditLog.new(client: client))
-      @client = client
-      @audit_log = audit_log
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Companies::Repository.new(client: client)
     end
 
     def call(id:, actor_id:)
-      archived = @client.patch(
-        "companies?id=eq.#{id}&deleted_at=is.null",
-        body: { deleted_at: Time.now.utc.iso8601 },
-        headers: { "Prefer" => "return=minimal" }
-      )
+      archived = @repository.archive_with_audit_atomic(company_id: id, actor_id: actor_id)
       raise_from_response!(archived, fallback: "Musteri arsivlenemedi.")
-
-      @audit_log.log(
-        action: "companies.archive",
-        actor_id: actor_id,
-        target_id: id,
-        target_type: "company",
-        metadata: {}
-      )
     end
 
     private

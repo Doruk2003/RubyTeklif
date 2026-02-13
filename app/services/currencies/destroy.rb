@@ -1,25 +1,12 @@
-﻿module Currencies
+module Currencies
   class Destroy
-    def initialize(client:, audit_log: AuditLog.new(client: client))
-      @client = client
-      @audit_log = audit_log
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Currencies::Repository.new(client: client)
     end
 
     def call(id:, actor_id:)
-      archived = @client.patch(
-        "currencies?id=eq.#{id}&deleted_at=is.null",
-        body: { deleted_at: Time.now.utc.iso8601 },
-        headers: { "Prefer" => "return=minimal" }
-      )
+      archived = @repository.archive_with_audit_atomic(currency_id: id, actor_id: actor_id)
       raise_from_response!(archived, fallback: "Kur arsivlenemedi.")
-
-      @audit_log.log(
-        action: "currencies.archive",
-        actor_id: actor_id,
-        target_id: id,
-        target_type: "currency",
-        metadata: {}
-      )
     end
 
     private

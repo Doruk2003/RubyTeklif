@@ -1,8 +1,7 @@
-﻿module Companies
+module Companies
   class Update
-    def initialize(client:, audit_log: AuditLog.new(client: client))
-      @client = client
-      @audit_log = audit_log
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Companies::Repository.new(client: client)
     end
 
     def call(id:, form_payload:, actor_id:)
@@ -10,19 +9,9 @@
       validate_form!(form)
 
       payload = form.normalized_attributes
-      updated = @client.patch("companies?id=eq.#{id}&deleted_at=is.null", body: payload, headers: { "Prefer" => "return=representation" })
+      updated = @repository.update_with_audit_atomic(company_id: id, payload: payload, actor_id: actor_id)
 
       raise_from_response!(updated, fallback: "Musteri guncellenemedi.")
-      raise ServiceErrors::System.new(user_message: "Musteri bulunamadi veya guncellenemedi.") if updated.is_a?(Array) && updated.empty?
-
-      @audit_log.log(
-        action: "companies.update",
-        actor_id: actor_id,
-        target_id: id,
-        target_type: "company",
-        metadata: { name: payload[:name].to_s }
-      )
-
       payload
     end
 
