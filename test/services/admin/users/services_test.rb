@@ -158,8 +158,22 @@ module Admin
         )
 
         assert_raises(ServiceErrors::Validation) do
-          service.call(id: "usr-2")
+          service.call(id: "usr-2", actor_id: "usr-1")
         end
+      end
+
+      test "reset password logs audit action" do
+        audit = FakeAuditLog.new
+        service = Admin::Users::ResetPassword.new(
+          client: FakeClient.new(get_response: [{ "email" => "user@example.com" }]),
+          auth: FakeAuth.new(create_user_response: {}),
+          audit_log: audit
+        )
+
+        service.call(id: "usr-2", actor_id: "usr-1")
+        assert_equal "users.reset_password", audit.payload[:action]
+        assert_equal "usr-1", audit.payload[:actor_id]
+        assert_equal "usr-2", audit.payload[:target_id]
       end
     end
   end

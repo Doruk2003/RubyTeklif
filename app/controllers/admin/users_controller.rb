@@ -66,7 +66,7 @@
     end
 
     def reset_password
-      Admin::Users::ResetPassword.new(client: client).call(id: params[:id])
+      Admin::Users::ResetPassword.new(client: client).call(id: params[:id], actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Parola sifirlama maili gonderildi."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#reset_password")
