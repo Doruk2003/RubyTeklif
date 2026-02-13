@@ -4,12 +4,14 @@
   def index
     result = Offers::IndexQuery.new(client: supabase_user_client).call(params: params)
     @offers = result[:items]
+    @scope = result[:scope]
     @page = result[:page]
     @per_page = result[:per_page]
     @has_prev = result[:has_prev]
     @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @offers = []
+    @scope = "active"
     @page = 1
     @per_page = 50
     @has_prev = false
@@ -20,6 +22,22 @@
     @offer = Offers::ShowQuery.new(client: supabase_user_client).call(params[:id])
   rescue Supabase::Client::ConfigurationError
     @offer = nil
+  end
+
+  def destroy
+    Offers::ArchiveOffer.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to offers_path, notice: "Teklif arşivlendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers#destroy")
+    redirect_to offers_path, alert: "Teklif arşivlenemedi: #{e.user_message}"
+  end
+
+  def restore
+    Offers::RestoreOffer.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to offers_path(scope: "archived"), notice: "Teklif geri yüklendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers#restore")
+    redirect_to offers_path(scope: "archived"), alert: "Teklif geri yüklenemedi: #{e.user_message}"
   end
 
   def new

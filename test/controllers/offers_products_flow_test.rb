@@ -122,6 +122,30 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeOffersArchiveUseCase
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, actor_id:)
+      raise @error if @error
+
+      true
+    end
+  end
+
+  class FakeOffersRestoreUseCase
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, actor_id:)
+      raise @error if @error
+
+      true
+    end
+  end
+
   class FakeCategoriesOptionsQuery
     def call(active_only: false)
       []
@@ -250,6 +274,20 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
       with_stubbed_constructor(Products::RestoreProduct, FakeProductsRestoreUseCase.new) do
         patch restore_product_path("prd-1")
         assert_redirected_to products_path(scope: "archived")
+      end
+    end
+  end
+
+  test "operator can archive and restore offer" do
+    with_authenticated_context(role: Roles::OPERATOR) do
+      with_stubbed_constructor(Offers::ArchiveOffer, FakeOffersArchiveUseCase.new) do
+        delete offer_path("off-1")
+        assert_redirected_to offers_path
+      end
+
+      with_stubbed_constructor(Offers::RestoreOffer, FakeOffersRestoreUseCase.new) do
+        patch restore_offer_path("off-1")
+        assert_redirected_to offers_path(scope: "archived")
       end
     end
   end

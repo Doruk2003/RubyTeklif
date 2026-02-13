@@ -25,7 +25,11 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
-  resources :offers, only: [:index, :new, :create, :show]
+  resources :offers, only: [:index, :new, :create, :show, :destroy] do
+    member do
+      patch :restore
+    end
+  end
   resources :products, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
     member do
       patch :restore

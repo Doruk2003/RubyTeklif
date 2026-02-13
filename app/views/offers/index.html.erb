@@ -11,6 +11,29 @@
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
       </div>
+
+      <div class="mt-4">
+        <%= form_with url: offers_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+          <div>
+            <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+            <%= f.select :scope,
+                  options_for_select([
+                    ["Aktif", "active"],
+                    ["Arsiv", "archived"],
+                    ["Tum Kayitlar", "all"]
+                  ], @scope || params[:scope] || "active"),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.hidden_field :per_page, value: @per_page %>
+            <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
+          </div>
+          <div>
+            <%= link_to "Temizle", offers_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
@@ -35,7 +58,22 @@
                 <td class="text-right"><%= offer["gross_total"].to_s %></td>
                 <td class="text-right"><%= offer["status"].to_s %></td>
                 <td class="text-right">
-                  <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
+                  <div class="inline-flex items-center gap-2">
+                    <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
+                    <% if offer["deleted_at"].present? %>
+                      <%= link_to "Geri Yukle",
+                            restore_offer_path(offer["id"]),
+                            method: :patch,
+                            data: { confirm: "Bu teklifi geri yuklemek istediginize emin misiniz?" },
+                            class: "btn-secondary" %>
+                    <% else %>
+                      <%= link_to "Arsivle",
+                            offer_path(offer["id"]),
+                            method: :delete,
+                            data: { confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
+                            class: "btn-secondary" %>
+                    <% end %>
+                  </div>
                 </td>
               </tr>
             <% end %>

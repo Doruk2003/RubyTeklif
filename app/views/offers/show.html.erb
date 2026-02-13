@@ -8,6 +8,21 @@
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Listeye Don", offers_path, class: "btn-secondary w-full sm:w-auto" %>
+          <% if @offer.present? %>
+            <% if @offer["deleted_at"].present? %>
+              <%= link_to "Geri Yukle",
+                    restore_offer_path(@offer["id"]),
+                    method: :patch,
+                    data: { confirm: "Bu teklifi geri yuklemek istediginize emin misiniz?" },
+                    class: "btn-secondary w-full sm:w-auto" %>
+            <% else %>
+              <%= link_to "Arsivle",
+                    offer_path(@offer["id"]),
+                    method: :delete,
+                    data: { confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
+                    class: "btn-secondary w-full sm:w-auto" %>
+            <% end %>
+          <% end %>
         </div>
       </div>
     </div>

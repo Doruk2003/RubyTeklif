@@ -49,6 +49,28 @@ module Offers
       @client.post("rpc/create_offer_with_items_atomic", body: payload, headers: { "Prefer" => "return=representation" })
     end
 
+    def archive_with_audit_atomic(offer_id:, actor_id:)
+      @client.post(
+        "rpc/archive_offer_with_items_and_audit_atomic",
+        body: {
+          p_actor_id: actor_id,
+          p_offer_id: offer_id
+        },
+        headers: { "Prefer" => "return=representation" }
+      )
+    end
+
+    def restore_with_audit_atomic(offer_id:, actor_id:)
+      @client.post(
+        "rpc/restore_offer_with_items_and_audit_atomic",
+        body: {
+          p_actor_id: actor_id,
+          p_offer_id: offer_id
+        },
+        headers: { "Prefer" => "return=representation" }
+      )
+    end
+
     private
 
     def decimal(value)
