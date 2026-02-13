@@ -58,9 +58,9 @@ class ProductsController < ApplicationController
 
   def destroy
     Products::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to products_path, notice: "Ürün silindi."
+    redirect_to products_path, notice: "Ürün arşivlendi."
   rescue ServiceErrors::Base => e
-    redirect_to products_path, alert: "Ürün silinemedi: #{e.user_message}"
+    redirect_to products_path, alert: "Ürün arşivlenemedi: #{e.user_message}"
   end
 
   private

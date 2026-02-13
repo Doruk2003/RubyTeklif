@@ -10,7 +10,7 @@
       validate_form!(form)
 
       payload = form.normalized_attributes
-      updated = @client.patch("companies?id=eq.#{id}", body: payload, headers: { "Prefer" => "return=representation" })
+      updated = @client.patch("companies?id=eq.#{id}&deleted_at=is.null", body: payload, headers: { "Prefer" => "return=representation" })
 
       raise_from_response!(updated, fallback: "Musteri guncellenemedi.")
       raise ServiceErrors::System.new(user_message: "Musteri bulunamadi veya guncellenemedi.") if updated.is_a?(Array) && updated.empty?

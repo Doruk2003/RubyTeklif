@@ -19,7 +19,7 @@ where p.category_id is null
   and p.user_id is not null
   and p.category is not null
   and btrim(p.category) <> ''
-on conflict (user_id, code) do nothing;
+on conflict do nothing;
 
 update public.products p
 set category_id = c.id

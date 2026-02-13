@@ -1,4 +1,3 @@
--- Aggregated offer counts per company for faster companies list queries.
 create or replace view public.company_offer_stats
 with (security_invoker = true) as
 select

@@ -10,7 +10,7 @@ module Offers
     def call(params:)
       page = page(params)
       per_page = per_page(params)
-      data = @client.get("offers?select=id,offer_number,offer_date,gross_total,status,companies(name)&order=offer_date.desc&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}")
+      data = @client.get("offers?deleted_at=is.null&select=id,offer_number,offer_date,gross_total,status,companies(name)&order=offer_date.desc&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}")
       rows = data.is_a?(Array) ? data : []
 
       {

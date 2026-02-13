@@ -13,7 +13,7 @@ module Offers
       return {} if ids.empty?
 
       encoded_ids = ids.join(",")
-      data = @client.get("products?select=id,name,vat_rate&id=in.(#{encoded_ids})")
+      data = @client.get("products?deleted_at=is.null&select=id,name,vat_rate&id=in.(#{encoded_ids})")
       return {} unless data.is_a?(Array)
 
       data.each_with_object({}) do |row, acc|

@@ -5,12 +5,12 @@ module Offers
     end
 
     def companies
-      data = @client.get("companies?select=id,name&order=name.asc")
+      data = @client.get("companies?deleted_at=is.null&select=id,name&order=name.asc")
       data.is_a?(Array) ? data : []
     end
 
     def products(category_id:)
-      filters = ["active=eq.true"]
+      filters = ["active=eq.true", "deleted_at=is.null"]
       if category_id.to_s.present?
         filters << "category_id=eq.#{category_id}"
       end

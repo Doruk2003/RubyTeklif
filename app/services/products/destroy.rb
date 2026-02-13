@@ -6,11 +6,15 @@
     end
 
     def call(id:, actor_id:)
-      deleted = @client.delete("products?id=eq.#{id}", headers: { "Prefer" => "return=minimal" })
-      raise_from_response!(deleted, fallback: "Urun silinemedi.")
+      archived = @client.patch(
+        "products?id=eq.#{id}&deleted_at=is.null",
+        body: { deleted_at: Time.now.utc.iso8601 },
+        headers: { "Prefer" => "return=minimal" }
+      )
+      raise_from_response!(archived, fallback: "Urun arsivlenemedi.")
 
       @audit_log.log(
-        action: "products.delete",
+        action: "products.archive",
         actor_id: actor_id,
         target_id: id,
         target_type: "product",

@@ -56,9 +56,9 @@
 
                     <%= link_to currency_path(currency["id"]),
                           method: :delete,
-                          data: { confirm: "Bu kuru silmek istediğinize emin misiniz?" },
-                          title: "Sil",
-                          aria: { label: "Sil" },
+                          data: { confirm: "Bu kuru arşivlemek istediğinize emin misiniz?" },
+                          title: "Arşivle",
+                          aria: { label: "Arşivle" },
                           class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
                       <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 7h14"/>
@@ -118,5 +118,6 @@
     </div>
   </div>
 </div>
+
 
 

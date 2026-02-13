@@ -61,9 +61,9 @@ class CompaniesController < ApplicationController
 
   def destroy
     Companies::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to companies_path, notice: "Musteri silindi."
+    redirect_to companies_path, notice: "Müşteri arşivlendi."
   rescue ServiceErrors::Base => e
-    redirect_to companies_path, alert: "Musteri silinemedi: #{e.user_message}"
+    redirect_to companies_path, alert: "Müşteri arşivlenemedi: #{e.user_message}"
   end
 
   private

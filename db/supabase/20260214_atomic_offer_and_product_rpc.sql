@@ -163,6 +163,7 @@ begin
     category_id = p_category_id,
     active = p_active
   where id = p_product_id
+    and deleted_at is null
   returning id into v_product_id;
 
   if v_product_id is null then

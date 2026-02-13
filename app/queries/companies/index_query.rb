@@ -63,6 +63,8 @@
         query_parts << "active=eq.#{active}"
       end
 
+      query_parts << "deleted_at=is.null"
+
       "companies?#{query_parts.join('&')}"
     end
 
@@ -124,7 +126,7 @@
     end
 
     def load_offer_counts_fallback
-      data = @client.get("offers?select=company_id")
+      data = @client.get("offers?select=company_id&deleted_at=is.null")
       rows = data.is_a?(Array) ? data : []
 
       rows.each_with_object(Hash.new(0)) do |row, counts|

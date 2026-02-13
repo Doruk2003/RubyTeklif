@@ -25,7 +25,7 @@ module Products
     private
 
     def build_query(params, page:, per_page:)
-      filters = []
+      filters = ["deleted_at=is.null"]
       filters << "category_id=eq.#{params[:category]}" if params[:category].present?
 
       base = "products?select=id,name,category_id,price,vat_rate,item_type,active,categories(name)&order=created_at.desc"

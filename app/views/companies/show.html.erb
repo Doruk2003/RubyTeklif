@@ -9,7 +9,7 @@
 
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Düzenle", edit_company_path(@company), class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Sil", company_path(@company), method: :delete, data: { confirm: "Bu müşteriyi silmek istediğinize emin misiniz?" }, class: "btn-danger w-full sm:w-auto" %>
+          <%= link_to "Arşivle", company_path(@company), method: :delete, data: { confirm: "Bu müşteriyi arşivlemek istediğinize emin misiniz?" }, class: "btn-danger w-full sm:w-auto" %>
           <%= link_to "Listeye Dön", companies_path, class: "btn-secondary w-full sm:w-auto" %>
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
@@ -97,6 +97,7 @@
     </div>
   </div>
 </div>
+
 
 
 

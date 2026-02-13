@@ -1,18 +1,18 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-2">
     <div class="mt-0 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Ürün Detayı</h1>
-          <p class="text-sm text-slate-500"><%= @product&.dig("name") || "Ürün bulunamadı" %></p>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">ÃœrÃ¼n DetayÄ±</h1>
+          <p class="text-sm text-slate-500"><%= @product&.dig("name") || "ÃœrÃ¼n bulunamadÄ±" %></p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Ürün Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "ÃœrÃ¼n Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
           <% if @product.present? %>
-            <%= link_to "Düzenle", edit_product_path(@product["id"]), class: "btn-secondary w-full sm:w-auto" %>
-            <%= link_to "Sil", product_path(@product["id"]), method: :delete, data: { confirm: "Bu ürünü silmek istediğinize emin misiniz?" }, class: "btn-secondary w-full sm:w-auto" %>
+            <%= link_to "DÃ¼zenle", edit_product_path(@product["id"]), class: "btn-secondary w-full sm:w-auto" %>
+            <%= link_to "Arşivle", product_path(@product["id"]), method: :delete, data: { confirm: "Bu Ã¼rÃ¼nÃ¼ silmek istediÄŸinize emin misiniz?" }, class: "btn-secondary w-full sm:w-auto" %>
           <% end %>
-          <%= link_to "Yeni Ürün", new_product_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Yeni ÃœrÃ¼n", new_product_path, class: "btn-primary w-full sm:w-auto" %>
         </div>
       </div>
     </div>
@@ -22,7 +22,7 @@
         <% if @product.present? %>
           <dl class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Ürün</dt>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">ÃœrÃ¼n</dt>
               <dd class="mt-1 text-sm text-slate-900"><%= @product["name"].to_s %></dd>
             </div>
             <div>
@@ -35,21 +35,22 @@
             </div>
             <div>
               <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Aktif</dt>
-              <dd class="mt-1 text-sm text-slate-900"><%= @product["active"] ? "Evet" : "Hayır" %></dd>
+              <dd class="mt-1 text-sm text-slate-900"><%= @product["active"] ? "Evet" : "HayÄ±r" %></dd>
             </div>
             <div>
               <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Birim Fiyat</dt>
               <dd class="mt-1 text-sm text-slate-900"><%= number_to_currency(@product["price"], unit: "TL ", format: "%u%n") %></dd>
             </div>
             <div>
-              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">KDV Oranı</dt>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">KDV OranÄ±</dt>
               <dd class="mt-1 text-sm text-slate-900"><%= @product["vat_rate"].to_s %> %</dd>
             </div>
           </dl>
         <% else %>
-          <div class="text-sm text-slate-600">Ürün bulunamadı.</div>
+          <div class="text-sm text-slate-600">ÃœrÃ¼n bulunamadÄ±.</div>
         <% end %>
       </div>
     </div>
   </div>
 </div>
+

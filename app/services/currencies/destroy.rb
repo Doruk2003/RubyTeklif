@@ -6,11 +6,15 @@
     end
 
     def call(id:, actor_id:)
-      deleted = @client.delete("currencies?id=eq.#{id}", headers: { "Prefer" => "return=minimal" })
-      raise_from_response!(deleted, fallback: "Kur silinemedi.")
+      archived = @client.patch(
+        "currencies?id=eq.#{id}&deleted_at=is.null",
+        body: { deleted_at: Time.now.utc.iso8601 },
+        headers: { "Prefer" => "return=minimal" }
+      )
+      raise_from_response!(archived, fallback: "Kur arsivlenemedi.")
 
       @audit_log.log(
-        action: "currencies.delete",
+        action: "currencies.archive",
         actor_id: actor_id,
         target_id: id,
         target_type: "currency",

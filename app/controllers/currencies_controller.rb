@@ -48,9 +48,9 @@
 
   def destroy
     Currencies::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to currencies_path, notice: "Kur silindi."
+    redirect_to currencies_path, notice: "Kur arşivlendi."
   rescue ServiceErrors::Base => e
-    redirect_to currencies_path, alert: "Kur silinemedi: #{e.user_message}"
+    redirect_to currencies_path, alert: "Kur arşivlenemedi: #{e.user_message}"
   end
 
   private

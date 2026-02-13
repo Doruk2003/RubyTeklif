@@ -70,7 +70,7 @@
     def company_exists?(company_id)
       return false if company_id.blank?
 
-      data = @client.get("companies?id=eq.#{company_id}&select=id&limit=1")
+      data = @client.get("companies?id=eq.#{company_id}&deleted_at=is.null&select=id&limit=1")
       data.is_a?(Array) && data.first.is_a?(Hash) && data.first["id"].present?
     rescue StandardError
       false
@@ -79,7 +79,7 @@
     def find_company_id_by_tax_number_for_user(tax_number, user_id)
       return nil if tax_number.blank? || user_id.blank?
 
-      data = @client.get("companies?user_id=eq.#{user_id}&tax_number=eq.#{tax_number}&order=created_at.desc&select=id&limit=1")
+      data = @client.get("companies?user_id=eq.#{user_id}&tax_number=eq.#{tax_number}&deleted_at=is.null&order=created_at.desc&select=id&limit=1")
       return nil unless data.is_a?(Array) && data.first.is_a?(Hash)
 
       data.first["id"].to_s.presence

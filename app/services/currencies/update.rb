@@ -10,7 +10,7 @@
       validate_form!(form)
 
       payload = form.normalized_attributes
-      updated = @client.patch("currencies?id=eq.#{id}", body: payload, headers: { "Prefer" => "return=representation" })
+      updated = @client.patch("currencies?id=eq.#{id}&deleted_at=is.null", body: payload, headers: { "Prefer" => "return=representation" })
       raise_from_response!(updated, fallback: "Kur guncellenemedi.")
 
       @audit_log.log(

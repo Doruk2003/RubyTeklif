@@ -18,11 +18,7 @@ module Currencies
 
       def patch(_path, body:, headers:)
         @last_patch_body = body
-        @patch_response
-      end
-
-      def delete(_path, headers:)
-        @delete_response
+        @patch_response || @delete_response
       end
     end
 
@@ -83,4 +79,3 @@ module Currencies
     end
   end
 end
-

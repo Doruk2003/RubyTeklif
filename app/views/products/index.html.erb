@@ -1,14 +1,14 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-2">
     <div class="mt-1 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Ürünler</h1>
-          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @products.size %></span> ürün</p>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">ÃœrÃ¼nler</h1>
+          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @products.size %></span> Ã¼rÃ¼n</p>
         </div>
 
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni Ürün", new_product_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Yeni ÃœrÃ¼n", new_product_path, class: "btn-primary w-full sm:w-auto" %>
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
       </div>
@@ -19,7 +19,7 @@
         <div class="md:col-span-2">
           <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
           <%= f.select :category,
-                options_for_select([["Tüm Kategoriler", ""]] + @category_options, @category),
+                options_for_select([["TÃ¼m Kategoriler", ""]] + @category_options, @category),
                 {},
                 class: "form-input" %>
         </div>
@@ -38,7 +38,7 @@
         <table class="min-w-full divide-y divide-slate-200 text-sm">
           <thead>
             <tr>
-              <th>Ürün</th>
+              <th>ÃœrÃ¼n</th>
               <th>Kategori</th>
               <th>Tip</th>
               <th class="text-right">Fiyat</th>
@@ -66,8 +66,8 @@
                 <td class="text-right">
                   <div class="inline-flex items-center gap-2">
                     <%= link_to product_path(product["id"]),
-                          title: "Gör",
-                          aria: { label: "Gör" },
+                          title: "GÃ¶r",
+                          aria: { label: "GÃ¶r" },
                           class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-sky-700" do %>
                       <svg viewBox="0 0 24 24" class="h-5 w-5 text-sky-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M2.5 12c2.7-4.5 6.3-6.7 9.5-6.7s6.8 2.2 9.5 6.7c-2.7 4.5-6.3 6.7-9.5 6.7s-6.8-2.2-9.5-6.7z"/>
@@ -76,8 +76,8 @@
                     <% end %>
 
                     <%= link_to edit_product_path(product["id"]),
-                          title: "Düzenle",
-                          aria: { label: "Düzenle" },
+                          title: "DÃ¼zenle",
+                          aria: { label: "DÃ¼zenle" },
                           class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-amber-600" do %>
                       <svg viewBox="0 0 24 24" class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 20h5l9-9-5-5-9 9v5z"/>
@@ -87,9 +87,9 @@
 
                     <%= link_to product_path(product["id"]),
                           method: :delete,
-                          data: { confirm: "Bu ürünü silmek istediğinize emin misiniz?" },
-                          title: "Sil",
-                          aria: { label: "Sil" },
+                          data: { confirm: "Bu Ã¼rÃ¼nÃ¼ silmek istediÄŸinize emin misiniz?" },
+                          title: "Arşivle",
+                          aria: { label: "Arşivle" },
                           class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
                       <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 7h14"/>
@@ -106,8 +106,8 @@
               <tr>
                 <td colspan="7" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı ürün yok</div>
-                    <div class="text-sm text-slate-500">İlk ürününüzü eklemek için sağ üstteki butonu kullanın.</div>
+                    <div class="mb-2 text-sm font-semibold text-slate-700">HenÃ¼z kayÄ±tlÄ± Ã¼rÃ¼n yok</div>
+                    <div class="text-sm text-slate-500">Ä°lk Ã¼rÃ¼nÃ¼nÃ¼zÃ¼ eklemek iÃ§in saÄŸ Ã¼stteki butonu kullanÄ±n.</div>
                   </div>
                 </td>
               </tr>
@@ -122,7 +122,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
+          <span><%= @per_page %> kayÄ±t</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -134,9 +134,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Önceki", products_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Ã–nceki", products_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Ã–nceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -149,3 +149,4 @@
     </div>
   </div>
 </div>
+

@@ -7,7 +7,7 @@ module Companies
         @response = response
       end
 
-      def delete(_path, headers:)
+      def patch(_path, body:, headers:)
         @response
       end
     end
@@ -20,13 +20,13 @@ module Companies
       end
     end
 
-    test "deletes and logs action" do
+    test "archives and logs action" do
       audit_log = FakeAuditLog.new
       service = Companies::Destroy.new(client: FakeClient.new(response: []), audit_log: audit_log)
 
       service.call(id: "cmp-1", actor_id: "user-1")
 
-      assert_equal "companies.delete", audit_log.payload[:action]
+      assert_equal "companies.archive", audit_log.payload[:action]
       assert_equal "cmp-1", audit_log.payload[:target_id]
     end
 

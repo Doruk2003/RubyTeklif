@@ -7,7 +7,7 @@ module Categories
     def call(active_only: true)
       filters = []
       filters << "active=eq.true" if active_only
-      path = "categories?select=id,code,name,active&order=name.asc"
+      path = "categories?deleted_at=is.null&select=id,code,name,active&order=name.asc"
       path = "#{path}&#{filters.join('&')}" if filters.any?
 
       data = @client.get(path)

@@ -10,7 +10,7 @@ module Categories
     def call(params:)
       page = page(params)
       per_page = per_page(params)
-      data = @client.get("categories?select=id,code,name,active&order=name.asc&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}")
+      data = @client.get("categories?deleted_at=is.null&select=id,code,name,active&order=name.asc&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}")
       rows = data.is_a?(Array) ? data : []
 
       {

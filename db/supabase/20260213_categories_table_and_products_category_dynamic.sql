@@ -22,7 +22,7 @@ from public.products p
 where p.user_id is not null
   and p.category is not null
   and btrim(p.category) <> ''
-on conflict (user_id, code) do nothing;
+on conflict do nothing;
 
 alter table public.products
   drop constraint if exists products_category_check;
