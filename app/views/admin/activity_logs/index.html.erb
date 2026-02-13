@@ -14,7 +14,7 @@
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="p-4">
-        <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-6" do |f| %>
+        <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-7" do |f| %>
           <div>
             <%= f.label :action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :action,
@@ -33,6 +33,13 @@
             <%= f.label :target, "Hedef Kullanici", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :target,
                   options_for_select([["Tumu", ""]] + @users_index.map { |id, email| [email, id] }, params[:target].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :target_type, "Hedef Tipi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :target_type,
+                  options_for_select([["Tumu", ""]] + @target_type_options.map { |type| [type, type] }, params[:target_type].to_s),
                   {},
                   class: "form-input" %>
           </div>

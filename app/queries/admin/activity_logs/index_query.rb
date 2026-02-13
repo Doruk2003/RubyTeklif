@@ -31,6 +31,14 @@ module Admin
         []
       end
 
+      def target_type_options
+        rows = @client.get("activity_logs?select=target_type&order=target_type.asc&limit=500")
+        rows = rows.is_a?(Array) ? rows : []
+        rows.map { |row| row["target_type"].to_s }.reject(&:blank?).uniq
+      rescue StandardError
+        []
+      end
+
       private
 
       def build_query(params, page:, per_page:)
@@ -40,6 +48,7 @@ module Admin
         filters << "action=eq.#{params[:action]}" if params[:action].present?
         filters << "actor_id=eq.#{params[:actor]}" if params[:actor].present?
         filters << "target_id=eq.#{params[:target]}" if params[:target].present?
+        filters << "target_type=eq.#{params[:target_type]}" if params[:target_type].present?
         filters << "created_at=gte.#{params[:from]}" if params[:from].present?
         filters << "created_at=lte.#{params[:to]}" if params[:to].present?
         filters.empty? ? base : "#{base}&#{filters.join('&')}"
@@ -55,4 +64,3 @@ module Admin
     end
   end
 end
-

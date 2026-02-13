@@ -12,10 +12,12 @@ module Admin
       @has_next = result[:has_next]
       @users_index = load_users_index
       @action_options = query.action_options
+      @target_type_options = query.target_type_options
     rescue Supabase::Client::ConfigurationError
       @logs = []
       @users_index = {}
       @action_options = []
+      @target_type_options = []
       @page = 1
       @per_page = 100
       @has_next = false
