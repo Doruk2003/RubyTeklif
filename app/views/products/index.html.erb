@@ -14,6 +14,25 @@
       </div>
     </div>
 
+    <div class="rounded-2xl bg-slate-50/90 p-4 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <%= form_with url: products_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+        <div class="md:col-span-2">
+          <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+          <%= f.select :category,
+                options_for_select([["Tum Kategoriler", ""]] + ProductCategories::OPTIONS, @category),
+                {},
+                class: "form-input" %>
+        </div>
+        <div>
+          <%= f.hidden_field :per_page, value: @per_page %>
+          <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
+        </div>
+        <div>
+          <%= link_to "Temizle", products_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
+        </div>
+      <% end %>
+    </div>
+
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
@@ -21,6 +40,7 @@
             <tr>
               <th>Ürün</th>
               <th>Müşteri</th>
+              <th>Kategori</th>
               <th>Tip</th>
               <th class="text-right">Fiyat</th>
               <th class="text-right">KDV %</th>
@@ -34,6 +54,7 @@
               <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
                 <td class="font-medium text-slate-900"><%= product["name"].to_s %></td>
                 <td><%= product.dig("companies", "name").to_s.presence || "-" %></td>
+                <td><%= product["category"].present? ? ProductCategories.label_for(product["category"]) : "-" %></td>
                 <td><%= product["item_type"].to_s %></td>
                 <td class="text-right"><%= number_to_currency(product["price"], unit: "TL ", format: "%u%n") %></td>
                 <td class="text-right"><%= product["vat_rate"].to_s %></td>
@@ -85,7 +106,7 @@
 
             <% if @products.empty? %>
               <tr>
-                <td colspan="7" class="py-12 text-center">
+                <td colspan="8" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
                     <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı ürün yok</div>
                     <div class="text-sm text-slate-500">İlk ürününüzü eklemek için sağ üstteki butonu kullanın.</div>

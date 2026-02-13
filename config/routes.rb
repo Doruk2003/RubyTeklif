@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   get "theme-preview", to: "pages#theme_preview"
 
   resources :companies
-  resources :offers, only: [:index, :new, :show]
+  resources :offers, only: [:index, :new, :create, :show]
   resources :products, only: [:index, :new, :create, :show, :edit, :update, :destroy]
   resources :currencies, only: [:index, :new, :create, :edit, :update, :destroy]
 end

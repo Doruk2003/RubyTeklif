@@ -4,12 +4,14 @@
   def index
     result = Products::IndexQuery.new(client: client).call(params: params)
     @products = result[:items]
+    @category = params[:category].to_s.presence
     @page = result[:page]
     @per_page = result[:per_page]
     @has_prev = result[:has_prev]
     @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @products = []
+    @category = nil
     @page = 1
     @per_page = 50
     @has_prev = false
@@ -72,7 +74,7 @@
   end
 
   def product_params
-    params.require(:product).permit(:company_id, :name, :price, :vat_rate, :item_type, :active)
+    params.require(:product).permit(:company_id, :name, :price, :vat_rate, :item_type, :category, :active)
   end
 
   def authorize_products!

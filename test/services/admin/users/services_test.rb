@@ -19,6 +19,8 @@ module Admin
         end
 
         def get(_path)
+          return @get_response.call(_path) if @get_response.respond_to?(:call)
+
           @get_response
         end
       end
@@ -63,7 +65,16 @@ module Admin
       end
 
       test "update role raises policy error for forbidden response" do
-        client = FakeClient.new(patch_response: { "code" => "42501", "message" => "forbidden" })
+        client = FakeClient.new(
+          patch_response: { "code" => "42501", "message" => "forbidden" },
+          get_response: lambda { |path|
+            if path.include?("id=eq.usr-2")
+              [{ "id" => "usr-2", "role" => Roles::SALES, "active" => true }]
+            else
+              [{ "id" => "usr-1" }, { "id" => "usr-9" }]
+            end
+          }
+        )
         service = Admin::Users::UpdateRole.new(client: client, audit_log: FakeAuditLog.new)
 
         assert_raises(ServiceErrors::Policy) do
@@ -72,10 +83,72 @@ module Admin
       end
 
       test "set active works for disable" do
-        service = Admin::Users::SetActive.new(client: FakeClient.new(patch_response: []), audit_log: FakeAuditLog.new)
+        client = FakeClient.new(
+          patch_response: [],
+          get_response: lambda { |path|
+            if path.include?("id=eq.usr-2")
+              [{ "id" => "usr-2", "role" => Roles::SALES, "active" => true }]
+            else
+              [{ "id" => "usr-1" }, { "id" => "usr-3" }]
+            end
+          }
+        )
+        service = Admin::Users::SetActive.new(client: client, audit_log: FakeAuditLog.new)
 
         result = service.call(id: "usr-2", active: false, actor_id: "usr-1")
-        assert_nil result
+        assert_equal "users.disable", result[:action]
+      end
+
+      test "set active blocks self disable" do
+        service = Admin::Users::SetActive.new(client: FakeClient.new, audit_log: FakeAuditLog.new)
+
+        assert_raises(ServiceErrors::Validation) do
+          service.call(id: "usr-1", active: false, actor_id: "usr-1")
+        end
+      end
+
+      test "set active blocks disabling last active admin" do
+        client = FakeClient.new(
+          patch_response: [],
+          get_response: lambda { |path|
+            if path.include?("id=eq.usr-1")
+              [{ "id" => "usr-1", "role" => Roles::ADMIN, "active" => true }]
+            else
+              [{ "id" => "usr-1" }]
+            end
+          }
+        )
+        service = Admin::Users::SetActive.new(client: client, audit_log: FakeAuditLog.new)
+
+        assert_raises(ServiceErrors::Validation) do
+          service.call(id: "usr-1", active: false, actor_id: "usr-2")
+        end
+      end
+
+      test "update role blocks demoting last active admin" do
+        client = FakeClient.new(
+          patch_response: [],
+          get_response: lambda { |path|
+            if path.include?("id=eq.usr-1")
+              [{ "id" => "usr-1", "role" => Roles::ADMIN, "active" => true }]
+            else
+              [{ "id" => "usr-1" }]
+            end
+          }
+        )
+        service = Admin::Users::UpdateRole.new(client: client, audit_log: FakeAuditLog.new)
+
+        assert_raises(ServiceErrors::Validation) do
+          service.call(id: "usr-1", role: Roles::SALES, actor_id: "usr-2")
+        end
+      end
+
+      test "update role validates role input" do
+        service = Admin::Users::UpdateRole.new(client: FakeClient.new, audit_log: FakeAuditLog.new)
+
+        assert_raises(ServiceErrors::Validation) do
+          service.call(id: "usr-1", role: "owner", actor_id: "usr-2")
+        end
       end
 
       test "reset password raises validation when email missing" do

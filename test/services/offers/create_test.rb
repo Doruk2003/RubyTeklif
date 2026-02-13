@@ -14,10 +14,10 @@ module Offers
         @client ||= Object.new
       end
 
-      def fetch_products(_ids)
-        {
-          "prd-1" => { name: "Kalem", vat_rate: BigDecimal("20") }
-        }
+      def fetch_products(ids)
+        Array(ids).each_with_object({}) do |id, acc|
+          acc[id.to_s] = { name: "Kalem #{id}", vat_rate: BigDecimal("20") }
+        end
       end
 
       def create_offer(payload)
@@ -50,7 +50,7 @@ module Offers
           offer_number: "TK-100",
           offer_date: "2026-02-13",
           status: "taslak",
-          items: [{ product_id: "prd-1", description: "", quantity: "2", unit_price: "10" }]
+          items: [{ product_id: "prd-1", description: "", quantity: "2", unit_price: "10", discount_rate: "0" }]
         },
         user_id: "usr-1"
       )
@@ -60,6 +60,7 @@ module Offers
       assert_equal "offers.create", audit_log.payload[:action]
       assert_equal "offer", audit_log.payload[:target_type]
       assert_equal "TK-100", audit_log.payload[:metadata][:offer_number]
+      assert_equal BigDecimal("0"), repository.items_payload[:items][0][:discount_rate]
     end
 
     test "raises validation error when items are empty" do
@@ -91,7 +92,50 @@ module Offers
             offer_number: "TK-100",
             offer_date: "2026-02-13",
             status: "taslak",
-            items: [{ product_id: "prd-1", description: "", quantity: "2", unit_price: "10" }]
+            items: [{ product_id: "prd-1", description: "", quantity: "2", unit_price: "10", discount_rate: "0" }]
+          },
+          user_id: "usr-1"
+        )
+      end
+    end
+
+    test "supports multiple items in one offer" do
+      repository = FakeRepository.new(create_offer_response: [{ "id" => "off-9" }])
+      service = Offers::Create.new(repository: repository, audit_log: FakeAuditLog.new)
+
+      offer_id = service.call(
+        payload: {
+          company_id: "cmp-1",
+          offer_number: "TK-900",
+          offer_date: "2026-02-13",
+          status: "taslak",
+            items: [
+            { product_id: "prd-1", description: "", quantity: "2", unit_price: "10", discount_rate: "10" },
+            { product_id: "prd-2", description: "Ek Kalem", quantity: "1", unit_price: "25", discount_rate: "0" }
+          ]
+        },
+        user_id: "usr-1"
+      )
+
+      assert_equal "off-9", offer_id
+      assert_equal 2, repository.items_payload[:items].size
+      assert_equal "prd-1", repository.items_payload[:items][0][:product_id]
+      assert_equal "prd-2", repository.items_payload[:items][1][:product_id]
+      assert_equal BigDecimal("18"), repository.items_payload[:items][0][:line_total]
+    end
+
+    test "raises validation error when discount rate is invalid" do
+      repository = FakeRepository.new(create_offer_response: [{ "id" => "off-1" }])
+      service = Offers::Create.new(repository: repository, audit_log: FakeAuditLog.new)
+
+      assert_raises(ServiceErrors::Validation) do
+        service.call(
+          payload: {
+            company_id: "cmp-1",
+            offer_number: "TK-101",
+            offer_date: "2026-02-13",
+            status: "taslak",
+            items: [{ product_id: "prd-1", description: "", quantity: "1", unit_price: "100", discount_rate: "120" }]
           },
           user_id: "usr-1"
         )
@@ -99,4 +143,3 @@ module Offers
     end
   end
 end
-

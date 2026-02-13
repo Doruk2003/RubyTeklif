@@ -34,6 +34,10 @@
               <dd class="mt-1 text-sm text-slate-900"><%= @product["item_type"].to_s %></dd>
             </div>
             <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</dt>
+              <dd class="mt-1 text-sm text-slate-900"><%= @product["category"].present? ? ProductCategories.label_for(@product["category"]) : "-" %></dd>
+            </div>
+            <div>
               <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Aktif</dt>
               <dd class="mt-1 text-sm text-slate-900"><%= @product["active"] ? "Evet" : "Hayır" %></dd>
             </div>

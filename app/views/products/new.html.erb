@@ -38,6 +38,14 @@
           </div>
 
           <div>
+            <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :category,
+                  options_for_select(ProductCategories::OPTIONS, @product[:category] || @product["category"]),
+                  { prompt: "Kategori secin" },
+                  class: "form-input" %>
+          </div>
+
+          <div>
             <%= f.label :price, "Birim Fiyat", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.number_field :price, value: @product[:price], step: "0.01", class: "form-input" %>
           </div>

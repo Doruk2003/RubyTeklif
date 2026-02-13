@@ -28,6 +28,7 @@
                 <th>Aciklama</th>
                 <th class="text-right">Miktar</th>
                 <th class="text-right">Birim Fiyat</th>
+                <th class="text-right">Iskonto %</th>
                 <th class="text-right">Tutar</th>
               </tr>
             </thead>
@@ -37,13 +38,14 @@
                   <td><%= item["description"].to_s %></td>
                   <td class="text-right"><%= item["quantity"].to_s %></td>
                   <td class="text-right"><%= item["unit_price"].to_s %></td>
+                  <td class="text-right"><%= item["discount_rate"].to_s.presence || "0" %></td>
                   <td class="text-right"><%= item["line_total"].to_s %></td>
                 </tr>
               <% end %>
 
               <% if Array(@offer["offer_items"]).empty? %>
                 <tr>
-                  <td colspan="4" class="py-10 text-center text-slate-500">Teklif kalemi yok.</td>
+                  <td colspan="5" class="py-10 text-center text-slate-500">Teklif kalemi yok.</td>
                 </tr>
               <% end %>
             </tbody>

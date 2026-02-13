@@ -1,4 +1,5 @@
 require "date"
+require "bigdecimal"
 
 module Offers
   class CreateForm
@@ -17,6 +18,7 @@ module Offers
     validates :status, inclusion: { in: Offers::Status::ALLOWED }, allow_blank: true
     validate :offer_date_must_be_parseable
     validate :items_must_be_present
+    validate :discount_rates_must_be_valid
 
     def normalized_attributes
       {
@@ -50,9 +52,24 @@ module Offers
           product_id: item[:product_id].to_s,
           description: item[:description].to_s,
           quantity: item[:quantity],
-          unit_price: item[:unit_price]
+          unit_price: item[:unit_price],
+          discount_rate: item[:discount_rate]
         }
       end.reject { |i| i[:product_id].blank? }
+    end
+
+    def discount_rates_must_be_valid
+      normalize_items(items).each_with_index do |item, index|
+        value = item[:discount_rate].to_s
+        value = "0" if value.blank?
+
+        rate = BigDecimal(value)
+        next if rate >= BigDecimal("0") && rate <= BigDecimal("100")
+
+        errors.add(:items, "#{index + 1}. kalem icin iskonto orani 0-100 arasinda olmali")
+      rescue ArgumentError
+        errors.add(:items, "#{index + 1}. kalem icin iskonto orani gecersiz")
+      end
     end
   end
 end

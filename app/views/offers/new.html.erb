@@ -4,7 +4,7 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Yeni Teklif</h1>
-          <p class="text-sm text-slate-500">Form yapisi bir sonraki adimda eklenecek.</p>
+          <p class="text-sm text-slate-500">Musteri ve kategoriye gore urun secerek teklif olusturun.</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Listeye Don", offers_path, class: "btn-secondary w-full sm:w-auto" %>
@@ -13,8 +13,151 @@
     </div>
 
     <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <%= form_with url: new_offer_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+        <div class="md:col-span-2">
+          <%= f.label :company_id, "Musteri", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+          <%= f.select :company_id,
+                options_for_select([["Tum Musteriler", ""]] + @companies.map { |c| [c["name"], c["id"]] }, @offer["company_id"]),
+                {},
+                class: "form-input" %>
+        </div>
+        <div>
+          <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+          <%= f.select :category,
+                options_for_select([["Tum Kategoriler", ""]] + ProductCategories::OPTIONS, @selected_category),
+                {},
+                class: "form-input" %>
+        </div>
+        <div>
+          <%= f.submit "Urunleri Filtrele", class: "btn-secondary w-full" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <p class="text-sm text-slate-700">Teklif formu icin alanlar ve validasyonlar bu modulun sonraki iterasyonunda tanimlanacak.</p>
+        <%= form_with url: offers_path, method: :post, scope: :offer, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
+          <div>
+            <%= f.label :company_id, "Musteri", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :company_id,
+                  options_for_select(@companies.map { |c| [c["name"], c["id"]] }, @offer["company_id"]),
+                  { prompt: "Musteri secin" },
+                  class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :offer_number, "Teklif No", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.text_field :offer_number, value: @offer["offer_number"], placeholder: "Orn: TK-2026-001", class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :offer_date, "Tarih", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.date_field :offer_date, value: @offer["offer_date"], class: "form-input" %>
+          </div>
+
+          <div>
+            <%= f.label :status, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :status,
+                  options_for_select(Offers::Status::ALLOWED.map { |s| [s.humanize, s] }, @offer["status"] || "taslak"),
+                  {},
+                  class: "form-input" %>
+          </div>
+
+          <div class="md:col-span-2 rounded-xl border border-slate-200 p-4"
+               data-controller="offer-items"
+               data-offer-items-prices-value="<%= json_escape(@products.each_with_object({}) { |p, acc| acc[p['id'].to_s] = p['price'].to_s }.to_json) %>">
+            <div class="mb-3 flex items-center justify-between gap-3">
+              <div class="text-xs font-semibold uppercase tracking-wide text-slate-700/80">Teklif Kalemleri</div>
+              <button type="button" class="btn-secondary" data-action="offer-items#add">Kalem Ekle</button>
+            </div>
+            <%= f.hidden_field :product_category, value: @selected_category %>
+
+            <% item_rows = Array(@items) %>
+            <% item_rows = [{}] if item_rows.empty? %>
+
+            <div class="space-y-4" data-offer-items-target="list">
+              <% item_rows.each do |item| %>
+                <div class="rounded-lg border border-slate-200 p-3" data-offer-items-row>
+                  <div class="mb-3 text-right">
+                    <button type="button" class="text-xs font-semibold text-rose-600" data-action="offer-items#remove">Sil</button>
+                  </div>
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Urun</label>
+                      <%= select_tag "offer[items][][product_id]",
+                            options_for_select(@products.map { |p| ["#{p["name"]} (#{ProductCategories.label_for(p["category"])})", p["id"]] }, item[:product_id] || item["product_id"]),
+                            prompt: "Urun secin",
+                            data: { action: "change->offer-items#productChanged" },
+                            class: "form-input" %>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Miktar</label>
+                      <%= number_field_tag "offer[items][][quantity]", item[:quantity] || item["quantity"] || "1", step: "0.01", class: "form-input" %>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Birim Fiyat</label>
+                      <%= number_field_tag "offer[items][][unit_price]", item[:unit_price] || item["unit_price"], step: "0.01", class: "form-input" %>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Iskonto %</label>
+                      <%= number_field_tag "offer[items][][discount_rate]", item[:discount_rate] || item["discount_rate"] || "0", step: "0.01", min: "0", max: "100", class: "form-input" %>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Aciklama</label>
+                    <%= text_field_tag "offer[items][][description]", item[:description] || item["description"], class: "form-input", placeholder: "Bos birakirsaniz urun adi kullanilir" %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <template data-offer-items-target="template">
+              <div class="rounded-lg border border-slate-200 p-3" data-offer-items-row>
+                <div class="mb-3 text-right">
+                  <button type="button" class="text-xs font-semibold text-rose-600" data-action="offer-items#remove">Sil</button>
+                </div>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
+                  <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Urun</label>
+                    <%= select_tag "offer[items][][product_id]",
+                          options_for_select(@products.map { |p| ["#{p["name"]} (#{ProductCategories.label_for(p["category"])})", p["id"]] }),
+                          prompt: "Urun secin",
+                          data: { action: "change->offer-items#productChanged" },
+                          class: "form-input" %>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Miktar</label>
+                    <%= number_field_tag "offer[items][][quantity]", "1", step: "0.01", class: "form-input" %>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Birim Fiyat</label>
+                    <%= number_field_tag "offer[items][][unit_price]", nil, step: "0.01", class: "form-input" %>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Iskonto %</label>
+                    <%= number_field_tag "offer[items][][discount_rate]", "0", step: "0.01", min: "0", max: "100", class: "form-input" %>
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <label class="block text-xs font-semibold uppercase tracking-wide text-slate-700/80">Aciklama</label>
+                  <%= text_field_tag "offer[items][][description]", nil, class: "form-input", placeholder: "Bos birakirsaniz urun adi kullanilir" %>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <div class="md:col-span-2">
+            <%= f.submit "Teklifi Kaydet", class: "btn-primary w-full" %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>

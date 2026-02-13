@@ -41,6 +41,7 @@ module Products
         price: "10.5",
         vat_rate: "20",
         item_type: "product",
+        category: "general",
         active: "1"
       }
     end
@@ -65,6 +66,14 @@ module Products
       end
     end
 
+    test "create raises validation when category is missing" do
+      service = Products::Create.new(client: FakeClient.new(post_response: [{ "id" => "prd-1" }]), audit_log: FakeAuditLog.new)
+
+      assert_raises(ServiceErrors::Validation) do
+        service.call(form_payload: valid_payload.merge(category: ""), actor_id: "usr-1")
+      end
+    end
+
     test "update raises policy error for forbidden response" do
       client = FakeClient.new(patch_response: { "code" => "42501", "message" => "forbidden" })
       service = Products::Update.new(client: client, audit_log: FakeAuditLog.new)
@@ -84,4 +93,3 @@ module Products
     end
   end
 end
-

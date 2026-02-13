@@ -13,12 +13,13 @@ module Offers
       return {} if ids.empty?
 
       encoded_ids = ids.join(",")
-      data = @client.get("products?select=id,name,vat_rate&id=in.(#{encoded_ids})")
+      data = @client.get("products?select=id,name,category,vat_rate&id=in.(#{encoded_ids})")
       return {} unless data.is_a?(Array)
 
       data.each_with_object({}) do |row, acc|
         acc[row["id"].to_s] = {
           name: row["name"].to_s,
+          category: row["category"].to_s,
           vat_rate: decimal(row["vat_rate"])
         }
       end
@@ -39,6 +40,7 @@ module Offers
           description: item[:description],
           quantity: item[:quantity],
           unit_price: item[:unit_price],
+          discount_rate: item[:discount_rate],
           line_total: item[:line_total]
         }
       end

@@ -5,7 +5,7 @@ module Products
     end
 
     def find_product(id)
-      data = @client.get("products?id=eq.#{id}&select=id,company_id,name,price,vat_rate,item_type,active")
+      data = @client.get("products?id=eq.#{id}&select=id,company_id,name,price,vat_rate,item_type,category,active")
       data.is_a?(Array) ? data.first : nil
     end
 
@@ -15,4 +15,3 @@ module Products
     end
   end
 end
-

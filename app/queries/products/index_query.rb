@@ -10,7 +10,7 @@ module Products
     def call(params:)
       page = page(params)
       per_page = per_page(params)
-      data = @client.get("products?select=id,name,price,vat_rate,item_type,active,companies(name)&order=created_at.desc&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}")
+      data = @client.get(build_query(params, page: page, per_page: per_page))
       rows = data.is_a?(Array) ? data : []
 
       {
@@ -23,6 +23,15 @@ module Products
     end
 
     private
+
+    def build_query(params, page:, per_page:)
+      filters = []
+      filters << "category=eq.#{params[:category]}" if params[:category].present?
+
+      base = "products?select=id,name,category,price,vat_rate,item_type,active,companies(name)&order=created_at.desc"
+      query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
+      "#{query}&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
+    end
 
     def per_page(params)
       raw = params[:per_page].to_i
