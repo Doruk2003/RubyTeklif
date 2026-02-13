@@ -9,8 +9,9 @@ module Supabase
   class Client
     class ConfigurationError < StandardError; end
 
-    def initialize(role: :anon)
+    def initialize(role: :anon, access_token: nil)
       @role = role
+      @access_token = access_token.to_s
       validate_env!
     end
 
@@ -50,7 +51,7 @@ module Supabase
 
     def request(req, with_response: false)
       req["apikey"] = api_key
-      req["Authorization"] = "Bearer #{api_key}"
+      req["Authorization"] = "Bearer #{authorization_token}"
       req["Accept-Encoding"] = "gzip"
 
       http = Net::HTTP.new(req.uri.host, req.uri.port)
@@ -83,8 +84,23 @@ module Supabase
       case @role
       when :anon
         ENV.fetch("SUPABASE_ANON_KEY")
+      when :user
+        ENV.fetch("SUPABASE_ANON_KEY")
       when :service
         ENV.fetch("SUPABASE_SERVICE_ROLE_KEY")
+      else
+        raise ArgumentError, "Unknown role: #{@role}"
+      end
+    end
+
+    def authorization_token
+      case @role
+      when :user
+        return @access_token if @access_token.present?
+
+        raise ConfigurationError, "Missing access token for user role"
+      when :anon, :service
+        api_key
       else
         raise ArgumentError, "Unknown role: #{@role}"
       end

@@ -15,8 +15,14 @@ class ApplicationController < ActionController::Base
     Current.user
   end
 
+  def supabase_user_client
+    @supabase_user_client ||= Supabase::Client.new(role: :user, access_token: session[:access_token].to_s)
+  end
+
   def authenticate_user!
     refresh_session_if_needed
+    return expire_session! if @session_refresh_failed
+
     access_token = session[:access_token].to_s
     if access_token.blank?
       Current.user = nil
@@ -33,12 +39,10 @@ class ApplicationController < ActionController::Base
         if auth_user.is_a?(Hash) && auth_user["id"].present?
           load_current_user(auth_user)
         else
-          Current.user = nil
-          redirect_to login_path
+          expire_session!
         end
       else
-        Current.user = nil
-        redirect_to login_path
+        expire_session!
       end
     end
   end
@@ -64,24 +68,20 @@ class ApplicationController < ActionController::Base
   end
 
   def refresh_session_if_needed
-    return if session[:refresh_token].blank?
-
-    expires_at = session[:expires_at].to_i
-    return if expires_at.zero?
-
-    refresh_session if Time.now.to_i >= (expires_at - 60)
+    @session_refresh_failed = !session_refresh.call(session: session)
   end
 
   def refresh_session
-    response = Supabase::Auth.new.refresh(session[:refresh_token].to_s)
-    access_token = response["access_token"].to_s
-    return false if access_token.blank?
+    session_refresh.call(session: session, force: true)
+  end
 
-    session[:access_token] = access_token
-    session[:refresh_token] = response["refresh_token"].to_s if response["refresh_token"].present?
-    session[:expires_at] = Time.now.to_i + response["expires_in"].to_i if response["expires_in"].present?
-    true
-  rescue Supabase::Auth::AuthError
-    false
+  def expire_session!
+    Current.user = nil
+    reset_session
+    redirect_to login_path, alert: "Oturumunuz sona erdi. Lutfen tekrar giris yapin."
+  end
+
+  def session_refresh
+    @session_refresh ||= Auth::SessionRefresh.new
   end
 end

@@ -6,6 +6,7 @@ class SessionsController < ApplicationController
 
   def create
     response = Supabase::Auth.new.sign_in(email: params[:email].to_s, password: params[:password].to_s)
+    reset_session
     session[:access_token] = response["access_token"]
     session[:refresh_token] = response["refresh_token"]
     session[:expires_at] = Time.now.to_i + response["expires_in"].to_i if response["expires_in"].present?
