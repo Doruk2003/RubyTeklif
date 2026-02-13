@@ -1,7 +1,7 @@
 module Products
   class Create
-    def initialize(client:)
-      @client = client
+    def initialize(client: nil, repository: nil)
+      @repository = repository || Products::Repository.new(client: client)
     end
 
     def call(form_payload:, actor_id:)
@@ -9,19 +9,7 @@ module Products
       validate_form!(form)
 
       payload = form.normalized_attributes
-      response = @client.post(
-        "rpc/create_product_with_audit_atomic",
-        body: {
-          p_actor_id: actor_id,
-          p_name: payload[:name],
-          p_price: payload[:price],
-          p_vat_rate: payload[:vat_rate],
-          p_item_type: payload[:item_type],
-          p_category_id: payload[:category_id],
-          p_active: payload[:active]
-        },
-        headers: { "Prefer" => "return=representation" }
-      )
+      response = @repository.create_with_audit_atomic(payload: payload, actor_id: actor_id)
       raise_from_response!(response, fallback: "Urun olusturulamadi.")
 
       product_id = extract_product_id(response)
