@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "open3"
+
+ROOT = File.expand_path("..", __dir__)
+
+STEPS = [
+  ["RuboCop", ["bundle", "exec", "rubocop"]],
+  ["Brakeman", ["bundle", "exec", "brakeman", "--no-pager"]],
+  ["Bundler Audit", ["bundle", "exec", "bundler-audit", "check", "--update"]],
+  ["Tests", ["bundle", "exec", "rails", "test"]]
+].freeze
+
+def run_step(name, cmd)
+  puts "\n==> #{name}"
+  puts "$ #{cmd.join(' ')}"
+
+  status = nil
+  Open3.popen2e(*cmd, chdir: ROOT) do |_stdin, stdout_err, wait_thr|
+    stdout_err.each { |line| puts line }
+    status = wait_thr.value
+  end
+
+  return true if status&.success?
+
+  warn "\n[FAIL] #{name} failed."
+  false
+end
+
+failed = STEPS.any? { |name, cmd| !run_step(name, cmd) }
+exit(failed ? 1 : 0)

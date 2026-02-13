@@ -1,9 +1,10 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
-    branches: [ master ]
+    branches: [ main, master ]
 
 jobs:
   scan_ruby:
@@ -22,7 +23,7 @@ jobs:
         run: bin/brakeman --no-pager
       
       - name: Scan for known security vulnerabilities in gems used
-        run: bin/bundler-audit
+        run: bin/bundler-audit check --update
       
   scan_js:
     runs-on: ubuntu-latest
