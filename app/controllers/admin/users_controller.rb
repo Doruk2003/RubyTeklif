@@ -41,7 +41,7 @@
     end
 
     def update
-      role = params[:user].to_h[:role].to_s
+      role = params.require(:user).permit(:role)[:role].to_s
       Admin::Users::UpdateRole.new(client: client).call(id: params[:id], role: role, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici rolu guncellendi."
     rescue ServiceErrors::Base => e
