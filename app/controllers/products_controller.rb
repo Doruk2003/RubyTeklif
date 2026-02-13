@@ -41,10 +41,10 @@
   def create
     payload = product_params
     product_id = Products::CreateProduct.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to product_path(product_id), notice: "ÃœrÃ¼n oluÅŸturuldu."
+    redirect_to product_path(product_id), notice: "Ürün oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#create")
-    flash.now[:alert] = "ÃœrÃ¼n oluÅŸturulamadÄ±: #{e.user_message}"
+    flash.now[:alert] = "Ürün oluşturulamadı: #{e.user_message}"
     @product = payload || {}
     render :new, status: :unprocessable_entity
   end
@@ -52,20 +52,20 @@
   def update
     payload = product_params
     result = Products::UpdateProduct.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
-    redirect_to product_path(result[:id]), notice: "ÃœrÃ¼n gÃ¼ncellendi."
+    redirect_to product_path(result[:id]), notice: "Ürün güncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#update")
-    flash.now[:alert] = "ÃœrÃ¼n gÃ¼ncellenemedi: #{e.user_message}"
+    flash.now[:alert] = "Ürün güncellenemedi: #{e.user_message}"
     @product = payload.merge("id" => params[:id])
     render :edit, status: :unprocessable_entity
   end
 
   def destroy
     Products::ArchiveProduct.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to products_path, notice: "ÃœrÃ¼n arÅŸivlendi."
+    redirect_to products_path, notice: "Ürün arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#destroy")
-    redirect_to products_path, alert: "ÃœrÃ¼n arÅŸivlenemedi: #{e.user_message}"
+    redirect_to products_path, alert: "Ürün arşivlenemedi: #{e.user_message}"
   end
 
   def restore

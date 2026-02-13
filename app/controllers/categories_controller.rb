@@ -23,10 +23,10 @@
   def create
     payload = category_params
     Categories::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to safe_return_to || categories_path, notice: "Kategori oluÅŸturuldu."
+    redirect_to safe_return_to || categories_path, notice: "Kategori oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#create")
-    flash.now[:alert] = "Kategori oluÅŸturulamadÄ±: #{e.user_message}"
+    flash.now[:alert] = "Kategori oluşturulamadı: #{e.user_message}"
     @category = payload || {}
     render :new, status: :unprocessable_entity
   end

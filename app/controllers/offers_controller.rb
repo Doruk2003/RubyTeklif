@@ -44,16 +44,16 @@
     payload[:items] = Array(payload[:items]).map { |item| item.to_h.deep_symbolize_keys }
 
     offer_id = Offers::CreateOffer.new(client: supabase_user_client).call(payload: payload, user_id: current_user.id)
-    redirect_to offer_path(offer_id), notice: "Teklif oluÅŸturuldu."
+    redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#create")
-    flash.now[:alert] = "Teklif oluÅŸturulamadÄ±: #{e.user_message}"
+    flash.now[:alert] = "Teklif oluşturulamadı: #{e.user_message}"
     @offer = payload.except(:items).stringify_keys
     @items = payload[:items]
     load_form_data(category_id: @selected_category_id)
     render :new, status: :unprocessable_entity
   rescue Supabase::Client::ConfigurationError
-    flash.now[:alert] = "Teklif formu yÃ¼klenemedi."
+    flash.now[:alert] = "Teklif formu yüklenemedi."
     @offer = payload&.except(:items)&.stringify_keys || {}
     @items = payload&.[](:items) || [default_item]
     @companies = []
