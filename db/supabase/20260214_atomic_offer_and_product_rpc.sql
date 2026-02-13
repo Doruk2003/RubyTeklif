@@ -136,6 +136,7 @@ begin
   return query select v_product_id;
 end;
 $$;
+$$;
 
 create or replace function public.update_product_with_audit_atomic(
   p_actor_id uuid,
