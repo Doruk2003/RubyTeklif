@@ -22,7 +22,7 @@
 
   def create
     payload = currency_params
-    Currencies::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    Currencies::CreateCurrency.new(client: client).call(form_payload: payload, actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur kaydi olusturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#create")
@@ -39,7 +39,7 @@
 
   def update
     payload = currency_params
-    Currencies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    Currencies::UpdateCurrency.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur guncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#update")
@@ -49,7 +49,7 @@
   end
 
   def destroy
-    Currencies::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Currencies::ArchiveCurrency.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#destroy")

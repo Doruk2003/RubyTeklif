@@ -33,7 +33,7 @@
 
   def create
     form_payload = company_params
-    result = Companies::Create.new(client: client).call(form_payload: form_payload, actor_id: current_user.id)
+    result = Companies::CreateCompany.new(client: client).call(form_payload: form_payload, actor_id: current_user.id)
     redirect_to companies_path, notice: result[:notice]
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#create")
@@ -52,7 +52,7 @@
 
   def update
     payload = company_params
-    Companies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    Companies::UpdateCompany.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to company_path(params[:id]), notice: "Musteri guncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#update")
@@ -62,7 +62,7 @@
   end
 
   def destroy
-    Companies::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Companies::ArchiveCompany.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to companies_path, notice: "Müşteri arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#destroy")
