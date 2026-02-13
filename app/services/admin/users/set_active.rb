@@ -3,23 +3,23 @@ module Admin
     class SetActive
       def initialize(client:, audit_log: AuditLog.new(client: client))
         @client = client
-        @audit_log = audit_log
       end
 
       def call(id:, active:, actor_id:)
         ensure_not_self_disable!(id: id, active: active, actor_id: actor_id)
         ensure_last_active_admin_not_disabled!(id: id, active: active)
 
-        response = @client.patch("users?id=eq.#{Supabase::FilterValue.eq(id)}", body: { active: active }, headers: { "Prefer" => "return=representation" })
-        raise_from_response!(response, fallback: "Kullanici guncellenemedi.")
-
-        @audit_log.log(
-          action: active ? "users.enable" : "users.disable",
-          actor_id: actor_id,
-          target_id: id,
-          target_type: "user",
-          metadata: { active: active }
+        response = @client.post(
+          "rpc/admin_set_user_active_with_audit_atomic",
+          body: {
+            p_actor_id: actor_id,
+            p_target_user_id: id,
+            p_active: active
+          },
+          headers: { "Prefer" => "return=representation" }
         )
+        raise_from_response!(response, fallback: "Kullanici guncellenemedi.")
+        { action: active ? "users.enable" : "users.disable", target_id: id }
       end
 
       private

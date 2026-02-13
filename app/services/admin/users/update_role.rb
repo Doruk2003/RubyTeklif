@@ -5,7 +5,6 @@ module Admin
 
       def initialize(client:, audit_log: AuditLog.new(client: client))
         @client = client
-        @audit_log = audit_log
       end
 
       def call(id:, role:, actor_id:)
@@ -13,16 +12,16 @@ module Admin
         validate_role!(role)
         ensure_last_active_admin_not_demoted!(id: id, role: role)
 
-        response = @client.patch("users?id=eq.#{Supabase::FilterValue.eq(id)}", body: { role: role }, headers: { "Prefer" => "return=representation" })
-        raise_from_response!(response, fallback: "Kullanici guncellenemedi.")
-
-        @audit_log.log(
-          action: "users.role_change",
-          actor_id: actor_id,
-          target_id: id,
-          target_type: "user",
-          metadata: { role: role }
+        response = @client.post(
+          "rpc/admin_update_user_role_with_audit_atomic",
+          body: {
+            p_actor_id: actor_id,
+            p_target_user_id: id,
+            p_role: role
+          },
+          headers: { "Prefer" => "return=representation" }
         )
+        raise_from_response!(response, fallback: "Kullanici guncellenemedi.")
       end
 
       private

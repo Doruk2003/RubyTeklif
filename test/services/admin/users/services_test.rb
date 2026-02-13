@@ -66,7 +66,7 @@ module Admin
 
       test "update role raises policy error for forbidden response" do
         client = FakeClient.new(
-          patch_response: { "code" => "42501", "message" => "forbidden" },
+          post_response: { "code" => "42501", "message" => "forbidden" },
           get_response: lambda { |path|
             if path.include?("id=eq.usr-2")
               [{ "id" => "usr-2", "role" => Roles::SALES, "active" => true }]
@@ -84,7 +84,7 @@ module Admin
 
       test "set active works for disable" do
         client = FakeClient.new(
-          patch_response: [],
+          post_response: [],
           get_response: lambda { |path|
             if path.include?("id=eq.usr-2")
               [{ "id" => "usr-2", "role" => Roles::SALES, "active" => true }]
@@ -109,7 +109,7 @@ module Admin
 
       test "set active blocks disabling last active admin" do
         client = FakeClient.new(
-          patch_response: [],
+          post_response: [],
           get_response: lambda { |path|
             if path.include?("id=eq.usr-1")
               [{ "id" => "usr-1", "role" => Roles::ADMIN, "active" => true }]
@@ -127,7 +127,7 @@ module Admin
 
       test "update role blocks demoting last active admin" do
         client = FakeClient.new(
-          patch_response: [],
+          post_response: [],
           get_response: lambda { |path|
             if path.include?("id=eq.usr-1")
               [{ "id" => "usr-1", "role" => Roles::ADMIN, "active" => true }]
