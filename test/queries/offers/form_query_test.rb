@@ -16,27 +16,26 @@ module Offers
       end
     end
 
-    test "builds filtered product query with company and category" do
+    test "builds filtered product query with category id" do
       client = FakeClient.new(response: [])
       query = Offers::FormQuery.new(client: client)
 
-      query.products(company_id: "cmp-1", category: "service")
+      query.products(category_id: "cat-1")
       path = client.paths.first
 
       assert_includes path, "active=eq.true"
-      assert_includes path, "company_id=eq.cmp-1"
-      assert_includes path, "category=eq.service"
+      assert_includes path, "category_id=eq.cat-1"
     end
 
-    test "ignores unsupported category" do
+    test "omits category filter when blank" do
       client = FakeClient.new(response: [])
       query = Offers::FormQuery.new(client: client)
 
-      query.products(company_id: "", category: "invalid")
+      query.products(category_id: "")
       path = client.paths.first
 
       assert_includes path, "active=eq.true"
-      refute_includes path, "category=eq.invalid"
+      refute_includes path, "category_id=eq."
     end
   end
 end

@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-5">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-2">
     <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -35,7 +35,7 @@
                 <td class="text-right"><%= offer["gross_total"].to_s %></td>
                 <td class="text-right"><%= offer["status"].to_s %></td>
                 <td class="text-right">
-                  <%= link_to "Gor", offer_path(offer["id"]), class: "btn-secondary" %>
+                  <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
                 </td>
               </tr>
             <% end %>
@@ -45,7 +45,7 @@
                 <td colspan="6" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
                     <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı teklif yok</div>
-                    <div class="text-sm text-slate-500">Ilk teklifi olusturmak icin yukaridaki butonu kullanin.</div>
+                    <div class="text-sm text-slate-500">İlk teklifi oluşturmak için yukarıdaki butonu kullanın.</div>
                   </div>
                 </td>
               </tr>
@@ -60,7 +60,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayit</span>
+          <span><%= @per_page %> kayıt</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -72,9 +72,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Onceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Önceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Onceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -87,3 +87,6 @@
     </div>
   </div>
 </div>
+
+
+

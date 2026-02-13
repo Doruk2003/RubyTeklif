@@ -1,5 +1,6 @@
-﻿class ProductsController < ApplicationController
+class ProductsController < ApplicationController
   before_action :authorize_products!
+  before_action :load_category_options, only: [:index, :show, :new, :edit, :create, :update]
 
   def index
     result = Products::IndexQuery.new(client: client).call(params: params)
@@ -26,45 +27,40 @@
 
   def new
     @product = {}
-    @companies = Products::FormQuery.new(client: client).companies
   end
 
   def edit
     query = Products::FormQuery.new(client: client)
     @product = query.find_product(params[:id])
-    @companies = query.companies
   rescue Supabase::Client::ConfigurationError
     @product = nil
-    @companies = []
   end
 
   def create
     payload = product_params
     product_id = Products::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to product_path(product_id), notice: "Urun olusturuldu."
+    redirect_to product_path(product_id), notice: "Ürün oluşturuldu."
   rescue ServiceErrors::Base => e
-    flash.now[:alert] = "Urun olusturulamadi: #{e.user_message}"
+    flash.now[:alert] = "Ürün oluşturulamadı: #{e.user_message}"
     @product = payload || {}
-    @companies = Products::FormQuery.new(client: client).companies
     render :new, status: :unprocessable_entity
   end
 
   def update
     payload = product_params
     result = Products::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
-    redirect_to product_path(result[:id]), notice: "Urun guncellendi."
+    redirect_to product_path(result[:id]), notice: "Ürün güncellendi."
   rescue ServiceErrors::Base => e
-    flash.now[:alert] = "Urun guncellenemedi: #{e.user_message}"
+    flash.now[:alert] = "Ürün güncellenemedi: #{e.user_message}"
     @product = payload.merge("id" => params[:id])
-    @companies = Products::FormQuery.new(client: client).companies
     render :edit, status: :unprocessable_entity
   end
 
   def destroy
     Products::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to products_path, notice: "Urun silindi."
+    redirect_to products_path, notice: "Ürün silindi."
   rescue ServiceErrors::Base => e
-    redirect_to products_path, alert: "Urun silinemedi: #{e.user_message}"
+    redirect_to products_path, alert: "Ürün silinemedi: #{e.user_message}"
   end
 
   private
@@ -74,10 +70,19 @@
   end
 
   def product_params
-    params.require(:product).permit(:company_id, :name, :price, :vat_rate, :item_type, :category, :active)
+    params.require(:product).permit(:name, :price, :vat_rate, :item_type, :category_id, :active)
   end
 
   def authorize_products!
     require_role!(Roles::ADMIN, Roles::SALES)
+  end
+
+  def load_category_options
+    rows = Categories::OptionsQuery.new(client: client).call(active_only: false)
+    @category_options = rows.map { |row| [row["name"].to_s, row["id"].to_s] }
+    @category_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
+  rescue StandardError
+    @category_options = []
+    @category_labels = {}
   end
 end

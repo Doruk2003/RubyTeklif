@@ -1,4 +1,4 @@
-module Products
+module Categories
   class IndexQuery
     DEFAULT_PER_PAGE = 50
     MAX_PER_PAGE = 200
@@ -10,7 +10,7 @@ module Products
     def call(params:)
       page = page(params)
       per_page = per_page(params)
-      data = @client.get(build_query(params, page: page, per_page: per_page))
+      data = @client.get("categories?select=id,code,name,active&order=name.asc&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}")
       rows = data.is_a?(Array) ? data : []
 
       {
@@ -23,15 +23,6 @@ module Products
     end
 
     private
-
-    def build_query(params, page:, per_page:)
-      filters = []
-      filters << "category_id=eq.#{params[:category]}" if params[:category].present?
-
-      base = "products?select=id,name,category_id,price,vat_rate,item_type,active,categories(name)&order=created_at.desc"
-      query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
-      "#{query}&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
-    end
 
     def per_page(params)
       raw = params[:per_page].to_i

@@ -9,14 +9,13 @@ module Offers
       data.is_a?(Array) ? data : []
     end
 
-    def products(company_id:, category:)
+    def products(category_id:)
       filters = ["active=eq.true"]
-      filters << "company_id=eq.#{company_id}" if company_id.to_s.present?
-      if category.to_s.present? && ProductCategories::VALUES.include?(category.to_s)
-        filters << "category=eq.#{category}"
+      if category_id.to_s.present?
+        filters << "category_id=eq.#{category_id}"
       end
 
-      path = "products?select=id,name,category,price&order=name.asc&#{filters.join('&')}"
+      path = "products?select=id,name,category_id,categories(name),price&order=name.asc&#{filters.join('&')}"
       data = @client.get(path)
       data.is_a?(Array) ? data : []
     end

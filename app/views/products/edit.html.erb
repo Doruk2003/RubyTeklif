@@ -1,6 +1,6 @@
-<div class="min-h-screen bg-gradient-to-b from-slate-50 to-white px-4 py-3">
-  <div class="w-full space-y-4">
-    <div class="mt-1.5 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-2">
+    <div class="mt-0 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Ürün Düzenle</h1>
@@ -18,14 +18,6 @@
         <% if @product.present? %>
           <%= form_with url: product_path(@product["id"]), method: :patch, scope: :product, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
             <div>
-              <%= f.label :company_id, "Müşteri", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-              <%= f.select :company_id,
-                    options_for_select(@companies.map { |c| [c["name"], c["id"]] }, @product["company_id"]),
-                    { prompt: "Müşteri seçin" },
-                    class: "form-input" %>
-            </div>
-
-            <div>
               <%= f.label :name, "Ürün Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
               <%= f.text_field :name, value: @product["name"], placeholder: "Örn: Çelik Kapı", class: "form-input" %>
             </div>
@@ -39,10 +31,13 @@
             </div>
 
             <div>
-              <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-              <%= f.select :category,
-                    options_for_select(ProductCategories::OPTIONS, @product["category"]),
-                    { prompt: "Kategori secin" },
+              <div class="flex items-center justify-between gap-2">
+                <%= f.label :category_id, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+                <%= link_to "Yeni Kategori", new_category_path(return_to: request.fullpath), class: "text-xs font-medium text-sky-700 hover:text-sky-800" %>
+              </div>
+              <%= f.select :category_id,
+                    options_for_select(@category_options, @product["category_id"]),
+                    { prompt: "Kategori seçin" },
                     class: "form-input" %>
             </div>
 

@@ -36,12 +36,11 @@ module Products
 
     def valid_payload
       {
-        company_id: "cmp-1",
         name: "Urun A",
         price: "10.5",
         vat_rate: "20",
         item_type: "product",
-        category: "general",
+        category_id: "11111111-1111-1111-1111-111111111111",
         active: "1"
       }
     end
@@ -62,7 +61,7 @@ module Products
       service = Products::Create.new(client: FakeClient.new(post_response: [{ "id" => "prd-1" }]), audit_log: FakeAuditLog.new)
 
       assert_raises(ServiceErrors::Validation) do
-        service.call(form_payload: valid_payload.merge(company_id: "", price: "-1"), actor_id: "usr-1")
+        service.call(form_payload: valid_payload.merge(name: "", price: "-1"), actor_id: "usr-1")
       end
     end
 
@@ -70,7 +69,7 @@ module Products
       service = Products::Create.new(client: FakeClient.new(post_response: [{ "id" => "prd-1" }]), audit_log: FakeAuditLog.new)
 
       assert_raises(ServiceErrors::Validation) do
-        service.call(form_payload: valid_payload.merge(category: ""), actor_id: "usr-1")
+        service.call(form_payload: valid_payload.merge(category_id: ""), actor_id: "usr-1")
       end
     end
 

@@ -1,0 +1,27 @@
+<div class="relative min-h-screen overflow-hidden bg-[#f6f3ee] px-4 py-8 sm:py-10">
+  <div class="pointer-events-none absolute -left-12 top-10 h-44 w-44 rounded-full bg-sky-200/70 blur-2xl"></div>
+  <div class="pointer-events-none absolute -right-12 bottom-10 h-52 w-52 rounded-full bg-amber-200/70 blur-2xl"></div>
+
+  <div class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
+    <div class="rounded-3xl border border-white/60 bg-white/90 p-6 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.55)] sm:p-8">
+      <div class="mb-6 text-center">
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Hesap Kurtarma</p>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Şifremi unuttum</h1>
+        <p class="mt-2 text-sm text-slate-600">E-posta adresinizi girin, şifre sıfırlama bağlantısını gönderelim.</p>
+      </div>
+
+      <%= form_with url: password_recovery_path, method: :post, local: true, class: "space-y-4" do |f| %>
+        <div>
+          <%= f.label :email, "E-posta", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+          <%= f.email_field :email, class: "form-input", required: true, autocomplete: "email", placeholder: "ornek@firma.com" %>
+        </div>
+
+        <%= f.submit "Sıfırlama Bağlantısı Gönder", class: "btn-primary w-full" %>
+      <% end %>
+
+      <div class="mt-4 text-center">
+        <%= link_to "Giriş ekranına dön", login_path, class: "text-sm font-medium text-sky-700 hover:text-sky-800" %>
+      </div>
+    </div>
+  </div>
+</div>

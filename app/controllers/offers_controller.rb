@@ -28,34 +28,38 @@ class OffersController < ApplicationController
       "offer_date" => Date.current.iso8601,
       "status" => "taslak"
     }
-    @selected_category = params[:category].to_s.presence
+    @selected_category_id = params[:category_id].to_s.presence
     @items = [default_item]
-    load_form_data(company_id: @offer["company_id"], category: @selected_category)
+    load_form_data(category_id: @selected_category_id)
   rescue Supabase::Client::ConfigurationError
     @companies = []
     @products = []
+    @category_options = []
+    @category_labels = {}
   end
 
   def create
     payload = offer_params.to_h.deep_symbolize_keys
-    @selected_category = payload.delete(:product_category).to_s.presence
+    @selected_category_id = payload.delete(:product_category_id).to_s.presence
     payload[:items] = Array(payload[:items]).map { |item| item.to_h.deep_symbolize_keys }
 
     repository = Offers::Repository.new(client: supabase_user_client)
     offer_id = Offers::Create.new(repository: repository).call(payload: payload, user_id: current_user.id)
-    redirect_to offer_path(offer_id), notice: "Teklif olusturuldu."
+    redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
   rescue ServiceErrors::Base => e
-    flash.now[:alert] = "Teklif olusturulamadi: #{e.user_message}"
+    flash.now[:alert] = "Teklif oluşturulamadı: #{e.user_message}"
     @offer = payload.except(:items).stringify_keys
     @items = payload[:items]
-    load_form_data(company_id: @offer["company_id"], category: @selected_category)
+    load_form_data(category_id: @selected_category_id)
     render :new, status: :unprocessable_entity
   rescue Supabase::Client::ConfigurationError
-    flash.now[:alert] = "Teklif formu yuklenemedi."
+    flash.now[:alert] = "Teklif formu yüklenemedi."
     @offer = payload&.except(:items)&.stringify_keys || {}
     @items = payload&.[](:items) || [default_item]
     @companies = []
     @products = []
+    @category_options = []
+    @category_labels = {}
     render :new, status: :unprocessable_entity
   end
 
@@ -67,15 +71,23 @@ class OffersController < ApplicationController
       :offer_number,
       :offer_date,
       :status,
-      :product_category,
+      :product_category_id,
       items: %i[product_id description quantity unit_price discount_rate]
     )
   end
 
-  def load_form_data(company_id:, category:)
+  def load_form_data(category_id:)
     query = Offers::FormQuery.new(client: supabase_user_client)
     @companies = query.companies
-    @products = query.products(company_id: company_id, category: category)
+    @products = query.products(category_id: category_id)
+    category_rows = Categories::OptionsQuery.new(client: supabase_user_client).call(active_only: true)
+    @category_options = category_rows.map { |row| [row["name"].to_s, row["id"].to_s] }
+    @category_labels = category_rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
+  rescue StandardError
+    @companies = []
+    @products = []
+    @category_options = []
+    @category_labels = {}
   end
 
   def default_item
