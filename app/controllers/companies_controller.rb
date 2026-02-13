@@ -1,4 +1,4 @@
-class CompaniesController < ApplicationController
+﻿class CompaniesController < ApplicationController
   before_action :authorize_companies!
 
   def index
@@ -36,6 +36,7 @@ class CompaniesController < ApplicationController
     result = Companies::Create.new(client: client).call(form_payload: form_payload, actor_id: current_user.id)
     redirect_to companies_path, notice: result[:notice]
   rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "companies#create")
     flash.now[:alert] = "Musteri olusturulamadi: #{e.user_message}"
     @company = Company.new(form_payload || {})
     render :new, status: :unprocessable_entity
@@ -54,6 +55,7 @@ class CompaniesController < ApplicationController
     Companies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to company_path(params[:id]), notice: "Musteri guncellendi."
   rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "companies#update")
     flash.now[:alert] = "Musteri guncellenemedi: #{e.user_message}"
     @company = Company.new(payload.merge(id: params[:id]))
     render :edit, status: :unprocessable_entity
@@ -63,6 +65,7 @@ class CompaniesController < ApplicationController
     Companies::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to companies_path, notice: "Müşteri arşivlendi."
   rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "companies#destroy")
     redirect_to companies_path, alert: "Müşteri arşivlenemedi: #{e.user_message}"
   end
 

@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :authenticate_user!
+  rescue_from StandardError, with: :handle_unexpected_error
 
   helper_method :current_user
 
@@ -114,5 +115,29 @@ class ApplicationController < ActionController::Base
 
   def remember_me_enabled?
     ActiveModel::Type::Boolean.new.cast(session[:remember_me])
+  end
+
+  def report_handled_error(error, source:)
+    Observability::ErrorReporter.report(
+      error,
+      severity: :warn,
+      context: error_context.merge(source: source)
+    )
+  end
+
+  def handle_unexpected_error(error)
+    report_handled_error(error, source: "unhandled_exception")
+    raise error if Rails.env.development? || Rails.env.test?
+
+    redirect_to root_path, alert: "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+  end
+
+  def error_context
+    {
+      request_id: request&.request_id,
+      path: request&.fullpath,
+      method: request&.request_method,
+      user_id: current_user&.id
+    }
   end
 end

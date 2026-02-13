@@ -1,4 +1,4 @@
-class CategoriesController < ApplicationController
+﻿class CategoriesController < ApplicationController
   before_action :authorize_categories!
 
   def index
@@ -23,9 +23,10 @@ class CategoriesController < ApplicationController
   def create
     payload = category_params
     Categories::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to safe_return_to || categories_path, notice: "Kategori oluşturuldu."
+    redirect_to safe_return_to || categories_path, notice: "Kategori oluÅŸturuldu."
   rescue ServiceErrors::Base => e
-    flash.now[:alert] = "Kategori oluşturulamadı: #{e.user_message}"
+    report_handled_error(e, source: "categories#create")
+    flash.now[:alert] = "Kategori oluÅŸturulamadÄ±: #{e.user_message}"
     @category = payload || {}
     render :new, status: :unprocessable_entity
   end

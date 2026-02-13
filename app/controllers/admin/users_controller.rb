@@ -26,6 +26,7 @@
       Admin::Users::Create.new(client: client).call(form_payload: user_params, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici olusturuldu."
     rescue ServiceErrors::Base => e
+      report_handled_error(e, source: "admin/users#create")
       flash.now[:alert] = "Kullanici olusturulamadi: #{e.user_message}"
       @user = { "email" => user_params&.[]("email").to_s, "role" => user_params&.[]("role").to_s.presence || Roles::ADMIN }
       render :new, status: :unprocessable_entity
@@ -44,6 +45,7 @@
       Admin::Users::UpdateRole.new(client: client).call(id: params[:id], role: role, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici rolu guncellendi."
     rescue ServiceErrors::Base => e
+      report_handled_error(e, source: "admin/users#update")
       redirect_to admin_users_path, alert: "Kullanici guncellenemedi: #{e.user_message}"
     end
 
@@ -51,6 +53,7 @@
       Admin::Users::SetActive.new(client: client).call(id: params[:id], active: false, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici devre disi birakildi."
     rescue ServiceErrors::Base => e
+      report_handled_error(e, source: "admin/users#disable")
       redirect_to admin_users_path, alert: "Kullanici guncellenemedi: #{e.user_message}"
     end
 
@@ -58,6 +61,7 @@
       Admin::Users::SetActive.new(client: client).call(id: params[:id], active: true, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici aktif edildi."
     rescue ServiceErrors::Base => e
+      report_handled_error(e, source: "admin/users#enable")
       redirect_to admin_users_path, alert: "Kullanici guncellenemedi: #{e.user_message}"
     end
 
@@ -65,6 +69,7 @@
       Admin::Users::ResetPassword.new(client: client).call(id: params[:id])
       redirect_to admin_users_path, notice: "Parola sifirlama maili gonderildi."
     rescue ServiceErrors::Base => e
+      report_handled_error(e, source: "admin/users#reset_password")
       redirect_to admin_users_path, alert: "Parola sifirlama gonderilemedi: #{e.user_message}"
     end
 

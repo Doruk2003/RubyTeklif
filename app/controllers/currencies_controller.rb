@@ -25,6 +25,7 @@
     Currencies::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur kaydi olusturuldu."
   rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "currencies#create")
     flash.now[:alert] = "Kur kaydi olusturulamadi: #{e.user_message}"
     @currency = payload || {}
     render :new, status: :unprocessable_entity
@@ -41,6 +42,7 @@
     Currencies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur guncellendi."
   rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "currencies#update")
     flash.now[:alert] = "Kur guncellenemedi: #{e.user_message}"
     @currency = payload.merge("id" => params[:id])
     render :edit, status: :unprocessable_entity
@@ -50,6 +52,7 @@
     Currencies::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur arşivlendi."
   rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "currencies#destroy")
     redirect_to currencies_path, alert: "Kur arşivlenemedi: #{e.user_message}"
   end
 

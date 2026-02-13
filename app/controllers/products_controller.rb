@@ -1,4 +1,4 @@
-class ProductsController < ApplicationController
+﻿class ProductsController < ApplicationController
   before_action :authorize_products!
   before_action :load_category_options, only: [:index, :show, :new, :edit, :create, :update]
 
@@ -39,9 +39,10 @@ class ProductsController < ApplicationController
   def create
     payload = product_params
     product_id = Products::CreateProduct.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to product_path(product_id), notice: "Ürün oluşturuldu."
+    redirect_to product_path(product_id), notice: "ÃœrÃ¼n oluÅŸturuldu."
   rescue ServiceErrors::Base => e
-    flash.now[:alert] = "Ürün oluşturulamadı: #{e.user_message}"
+    report_handled_error(e, source: "products#create")
+    flash.now[:alert] = "ÃœrÃ¼n oluÅŸturulamadÄ±: #{e.user_message}"
     @product = payload || {}
     render :new, status: :unprocessable_entity
   end
@@ -49,18 +50,20 @@ class ProductsController < ApplicationController
   def update
     payload = product_params
     result = Products::UpdateProduct.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
-    redirect_to product_path(result[:id]), notice: "Ürün güncellendi."
+    redirect_to product_path(result[:id]), notice: "ÃœrÃ¼n gÃ¼ncellendi."
   rescue ServiceErrors::Base => e
-    flash.now[:alert] = "Ürün güncellenemedi: #{e.user_message}"
+    report_handled_error(e, source: "products#update")
+    flash.now[:alert] = "ÃœrÃ¼n gÃ¼ncellenemedi: #{e.user_message}"
     @product = payload.merge("id" => params[:id])
     render :edit, status: :unprocessable_entity
   end
 
   def destroy
     Products::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to products_path, notice: "Ürün arşivlendi."
+    redirect_to products_path, notice: "ÃœrÃ¼n arÅŸivlendi."
   rescue ServiceErrors::Base => e
-    redirect_to products_path, alert: "Ürün arşivlenemedi: #{e.user_message}"
+    report_handled_error(e, source: "products#destroy")
+    redirect_to products_path, alert: "ÃœrÃ¼n arÅŸivlenemedi: #{e.user_message}"
   end
 
   private
