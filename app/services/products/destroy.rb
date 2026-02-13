@@ -7,7 +7,7 @@
 
     def call(id:, actor_id:)
       archived = @client.patch(
-        "products?id=eq.#{id}&deleted_at=is.null",
+        "products?id=eq.#{Supabase::FilterValue.eq(id)}&deleted_at=is.null",
         body: { deleted_at: Time.now.utc.iso8601 },
         headers: { "Prefer" => "return=minimal" }
       )

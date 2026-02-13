@@ -7,7 +7,7 @@ module Admin
       end
 
       def call(id:)
-        data = @client.get("users?id=eq.#{id}&select=email&limit=1")
+        data = @client.get("users?id=eq.#{Supabase::FilterValue.eq(id)}&select=email&limit=1")
         user = data.is_a?(Array) ? data.first : nil
         email = user.is_a?(Hash) ? user["email"].to_s : ""
         raise ServiceErrors::Validation.new(user_message: "E-posta bulunamadi.") if email.blank?
@@ -19,4 +19,3 @@ module Admin
     end
   end
 end
-

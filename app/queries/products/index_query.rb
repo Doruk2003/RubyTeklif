@@ -26,7 +26,9 @@ module Products
 
     def build_query(params, page:, per_page:)
       filters = ["deleted_at=is.null"]
-      filters << "category_id=eq.#{params[:category]}" if params[:category].present?
+      if params[:category].present?
+        filters << "category_id=eq.#{Supabase::FilterValue.eq(params[:category])}"
+      end
 
       base = "products?select=id,name,category_id,price,vat_rate,item_type,active,categories(name)&order=created_at.desc"
       query = filters.empty? ? base : "#{base}&#{filters.join('&')}"

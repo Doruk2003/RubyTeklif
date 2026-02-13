@@ -9,7 +9,7 @@ module Offers
     end
 
     def fetch_products(ids)
-      ids = Array(ids).compact.uniq
+      ids = Supabase::FilterValue.uuid_list(ids)
       return {} if ids.empty?
 
       encoded_ids = ids.join(",")

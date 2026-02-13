@@ -45,12 +45,12 @@ module Admin
         offset = (page - 1) * per_page
         base = "activity_logs?select=id,action,actor_id,target_id,target_type,metadata,created_at&order=created_at.desc&limit=#{per_page + 1}&offset=#{offset}"
         filters = []
-        filters << "action=eq.#{params[:action]}" if params[:action].present?
-        filters << "actor_id=eq.#{params[:actor]}" if params[:actor].present?
-        filters << "target_id=eq.#{params[:target]}" if params[:target].present?
-        filters << "target_type=eq.#{params[:target_type]}" if params[:target_type].present?
-        filters << "created_at=gte.#{params[:from]}" if params[:from].present?
-        filters << "created_at=lte.#{params[:to]}" if params[:to].present?
+        filters << "action=eq.#{Supabase::FilterValue.eq(params[:action])}" if params[:action].present?
+        filters << "actor_id=eq.#{Supabase::FilterValue.eq(params[:actor])}" if params[:actor].present?
+        filters << "target_id=eq.#{Supabase::FilterValue.eq(params[:target])}" if params[:target].present?
+        filters << "target_type=eq.#{Supabase::FilterValue.eq(params[:target_type])}" if params[:target_type].present?
+        filters << "created_at=gte.#{Supabase::FilterValue.eq(params[:from])}" if params[:from].present?
+        filters << "created_at=lte.#{Supabase::FilterValue.eq(params[:to])}" if params[:to].present?
         filters.empty? ? base : "#{base}&#{filters.join('&')}"
       end
 

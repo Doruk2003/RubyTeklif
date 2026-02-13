@@ -13,7 +13,7 @@ module Admin
         validate_role!(role)
         ensure_last_active_admin_not_demoted!(id: id, role: role)
 
-        response = @client.patch("users?id=eq.#{id}", body: { role: role }, headers: { "Prefer" => "return=representation" })
+        response = @client.patch("users?id=eq.#{Supabase::FilterValue.eq(id)}", body: { role: role }, headers: { "Prefer" => "return=representation" })
         raise_from_response!(response, fallback: "Kullanici guncellenemedi.")
 
         @audit_log.log(
@@ -45,7 +45,7 @@ module Admin
       end
 
       def find_user!(id:)
-        response = @client.get("users?id=eq.#{id}&select=id,role,active&limit=1")
+        response = @client.get("users?id=eq.#{Supabase::FilterValue.eq(id)}&select=id,role,active&limit=1")
         raise_from_response!(response, fallback: "Kullanici bilgisi okunamadi.")
 
         user = response.is_a?(Array) ? response.first : nil

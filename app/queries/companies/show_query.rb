@@ -5,7 +5,7 @@ module Companies
     end
 
     def call(id)
-      data = @client.get("companies?id=eq.#{id}&deleted_at=is.null&select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active")
+      data = @client.get("companies?id=eq.#{Supabase::FilterValue.eq(id)}&deleted_at=is.null&select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active")
       row = data.is_a?(Array) ? data.first : nil
       return nil unless row.is_a?(Hash)
 

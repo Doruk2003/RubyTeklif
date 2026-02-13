@@ -32,10 +32,10 @@ module Admin
 
         if params[:q].present?
           q = params[:q].to_s.strip
-          filters << "email=ilike.*#{q}*"
+          filters << "email=ilike.*#{Supabase::FilterValue.ilike(q)}*"
         end
-        filters << "role=eq.#{params[:role]}" if params[:role].present?
-        filters << "active=eq.#{params[:active]}" if params[:active].present?
+        filters << "role=eq.#{Supabase::FilterValue.eq(params[:role])}" if params[:role].present?
+        filters << "active=eq.#{Supabase::FilterValue.eq(params[:active])}" if params[:active].present?
 
         query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
         "#{query}&limit=#{per_page + 1}&offset=#{offset}"
@@ -51,4 +51,3 @@ module Admin
     end
   end
 end
-
