@@ -10,7 +10,7 @@ module Admin
 
       validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
       validates :password, presence: true, length: { minimum: 8, maximum: 128 }
-      validates :role, inclusion: { in: [Roles::ADMIN, Roles::SALES, Roles::FINANCE, Roles::HR] }
+      validates :role, inclusion: { in: Roles::ACCEPTED_ROLES }
 
       def role
         super.to_s.presence || Roles::ADMIN
@@ -22,4 +22,3 @@ module Admin
     end
   end
 end
-

@@ -1,5 +1,5 @@
 class OffersPolicy < ApplicationPolicy
   def access?
-    role_in?(Roles::ADMIN, Roles::SALES)
+    Roles.catalog_manage?(user&.role)
   end
 end

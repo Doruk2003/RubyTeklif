@@ -1,5 +1,5 @@
 class CurrenciesPolicy < ApplicationPolicy
   def access?
-    role_in?(Roles::ADMIN, Roles::FINANCE)
+    Roles.finance_manage?(user&.role)
   end
 end

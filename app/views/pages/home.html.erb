@@ -37,7 +37,7 @@
             <span class="sidebar-text">Dashboard</span>
           <% end %>
 
-          <% if current_user && [Roles::ADMIN, Roles::SALES].include?(current_user.role) %>
+          <% if current_user && Roles.catalog_manage?(current_user.role) %>
           <div class="space-y-1">
             <input id="menu-companies" type="checkbox" class="peer/menu-companies hidden" />
             <label for="menu-companies" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
@@ -75,7 +75,7 @@
           </div>
           <% end %>
 
-          <% if current_user && [Roles::ADMIN, Roles::SALES].include?(current_user.role) %>
+          <% if current_user && Roles.catalog_manage?(current_user.role) %>
           <div class="space-y-1">
             <input id="menu-offers" type="checkbox" class="peer/menu-offers hidden" />
             <label for="menu-offers" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
@@ -113,7 +113,7 @@
           </div>
           <% end %>
 
-          <% if current_user && [Roles::ADMIN, Roles::SALES].include?(current_user.role) %>
+          <% if current_user && Roles.catalog_manage?(current_user.role) %>
           <div class="space-y-1">
             <input id="menu-products" type="checkbox" class="peer/menu-products hidden" />
             <label for="menu-products" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
@@ -151,7 +151,7 @@
           </div>
           <% end %>
 
-          <% if current_user && [Roles::ADMIN, Roles::FINANCE].include?(current_user.role) %>
+          <% if current_user && Roles.finance_manage?(current_user.role) %>
           <%= link_to currencies_path, class: "group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70", style: "font-size: 14px; line-height: 1.25rem;", data: { sidebar_item: true } do %>
             <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
             <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
@@ -165,7 +165,7 @@
           <% end %>
 
           <div class="sidebar-text mt-4 text-xs font-semibold uppercase tracking-wider text-white/50">Ayarlar</div>
-          <% if current_user && current_user.role == Roles::ADMIN %>
+          <% if current_user && Roles.admin?(current_user.role) %>
           <div class="space-y-1">
             <input id="menu-settings" type="checkbox" class="peer/menu-settings hidden" />
             <label for="menu-settings" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
@@ -544,12 +544,12 @@
           <div class="mt-5 rounded-3xl bg-white p-5 shadow-sm">
             <div class="text-sm font-semibold text-slate-900">Hızlı İşlemler</div>
             <div class="mt-3 space-y-2 text-sm">
-              <% if current_user && [Roles::ADMIN, Roles::SALES].include?(current_user.role) %>
+              <% if current_user && Roles.catalog_manage?(current_user.role) %>
                 <%= link_to "Müşteri listesi", companies_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
                 <%= link_to "Teklif oluştur", new_offer_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
                 <%= link_to "Ürün kataloğu", products_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
               <% end %>
-              <% if current_user && [Roles::ADMIN, Roles::FINANCE].include?(current_user.role) %>
+              <% if current_user && Roles.finance_manage?(current_user.role) %>
                 <%= link_to "Kurlar", currencies_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
               <% end %>
             </div>
@@ -1179,6 +1179,7 @@
     document.addEventListener("turbo:load", initTableLinks);
   </script>
 </div>
+
 
 
 

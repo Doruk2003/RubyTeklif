@@ -26,12 +26,7 @@
           <div>
             <%= f.label :role, "Rol", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :role,
-                  options_for_select([
-                    ["Admin", Roles::ADMIN],
-                    ["Satis", Roles::SALES],
-                    ["Finans", Roles::FINANCE],
-                    ["IK", Roles::HR]
-                  ], @user&.[]("role").to_s),
+                  options_for_select(Roles::ASSIGNABLE_ROLE_OPTIONS, @user&.[]("role").to_s),
                   {},
                   class: "form-input" %>
           </div>

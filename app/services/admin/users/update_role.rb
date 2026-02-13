@@ -1,7 +1,7 @@
 module Admin
   module Users
     class UpdateRole
-      ALLOWED_ROLES = [Roles::ADMIN, Roles::SALES, Roles::FINANCE, Roles::HR].freeze
+      ALLOWED_ROLES = Roles::ACCEPTED_ROLES
 
       def initialize(client:, audit_log: AuditLog.new(client: client))
         @client = client

@@ -1,5 +1,5 @@
 class AdminUsersPolicy < ApplicationPolicy
   def access?
-    role_in?(Roles::ADMIN)
+    Roles.admin?(user&.role)
   end
 end

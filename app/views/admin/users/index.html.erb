@@ -25,10 +25,7 @@
             <%= f.select :role,
                   options_for_select([
                     ["Tum Roller", ""],
-                    ["Admin", Roles::ADMIN],
-                    ["Satis", Roles::SALES],
-                    ["Finans", Roles::FINANCE],
-                    ["IK", Roles::HR]
+                    *Roles::ASSIGNABLE_ROLE_OPTIONS
                   ], params[:role].to_s),
                   {},
                   class: "form-input" %>
@@ -67,13 +64,7 @@
                 <td><%= user["email"].to_s %></td>
                 <td class="text-center">
                   <% role = user["role"].to_s %>
-                  <% role_class = case role
-                                 when Roles::ADMIN then "bg-slate-800 text-white"
-                                 when Roles::SALES then "bg-sky-100 text-sky-800"
-                                 when Roles::FINANCE then "bg-emerald-100 text-emerald-800"
-                                 when Roles::HR then "bg-amber-100 text-amber-800"
-                                 else "bg-slate-100 text-slate-700"
-                                 end %>
+                  <% role_class = Roles.role_badge_class(role) %>
                   <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold <%= role_class %>"><%= role %></span>
                 </td>
                 <td class="text-center">
