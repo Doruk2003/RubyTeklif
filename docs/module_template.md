@@ -42,7 +42,7 @@ app/
 ```
 module Offers
   class IndexQuery
-    def initialize(client: Supabase::Client.new(role: :service))
+    def initialize(client:)
       @client = client
     end
 
@@ -59,7 +59,7 @@ end
 ```
 module Offers
   class Create
-    def initialize(client: Supabase::Client.new(role: :service))
+    def initialize(client:)
       @client = client
     end
 

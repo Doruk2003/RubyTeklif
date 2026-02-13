@@ -1,6 +1,6 @@
 class PagesController < ApplicationController
   def home
-    service = DashboardService.new
+    service = DashboardService.new(client: supabase_user_client)
     @kpis = service.kpis
     @recent_offers = service.recent_offers
     @flow_stats = service.flow_stats

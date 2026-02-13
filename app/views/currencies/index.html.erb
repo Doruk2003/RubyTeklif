@@ -85,5 +85,36 @@
         </table>
       </div>
     </div>
+
+    <div class="rounded-2xl bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+      <div class="flex items-center justify-between gap-3 text-sm">
+        <div class="text-slate-600">
+          Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
+          <span class="text-slate-400">/</span>
+          <span><%= @per_page %> kayit</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-1 text-xs">
+            <span class="text-slate-500">Sayfa boyutu:</span>
+            <% [25, 50, 100].each do |size| %>
+              <% active = @per_page == size %>
+              <%= link_to size.to_s, currencies_path(request.query_parameters.merge(page: 1, per_page: size)),
+                    class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
+            <% end %>
+          </div>
+          <% if @has_prev %>
+            <%= link_to "Onceki", currencies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+          <% else %>
+            <span class="btn-secondary opacity-50 pointer-events-none">Onceki</span>
+          <% end %>
+
+          <% if @has_next %>
+            <%= link_to "Sonraki", currencies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+          <% else %>
+            <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

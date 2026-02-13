@@ -1,6 +1,6 @@
 module Offers
   class ShowQuery
-    def initialize(client: Supabase::Client.new(role: :service))
+    def initialize(client:)
       @client = client
     end
 

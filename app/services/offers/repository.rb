@@ -2,7 +2,9 @@ require "bigdecimal"
 
 module Offers
   class Repository
-    def initialize(client: Supabase::Client.new(role: :service))
+    attr_reader :client
+
+    def initialize(client:)
       @client = client
     end
 
@@ -27,7 +29,7 @@ module Offers
     end
 
     def create_items(offer_id, items, user_id:)
-      return if items.empty?
+      return [] if items.empty?
 
       payload = items.map do |item|
         {

@@ -2,7 +2,7 @@
 require "uri"
 
 class DashboardService
-  def initialize(client: Supabase::Client.new(role: :service))
+  def initialize(client:)
     @client = client
   end
 

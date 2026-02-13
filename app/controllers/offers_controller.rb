@@ -2,13 +2,22 @@ class OffersController < ApplicationController
   before_action :authorize_offers!
 
   def index
-    @offers = Offers::IndexQuery.new.call
+    result = Offers::IndexQuery.new(client: supabase_user_client).call(params: params)
+    @offers = result[:items]
+    @page = result[:page]
+    @per_page = result[:per_page]
+    @has_prev = result[:has_prev]
+    @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @offers = []
+    @page = 1
+    @per_page = 50
+    @has_prev = false
+    @has_next = false
   end
 
   def show
-    @offer = Offers::ShowQuery.new.call(params[:id])
+    @offer = Offers::ShowQuery.new(client: supabase_user_client).call(params[:id])
   rescue Supabase::Client::ConfigurationError
     @offer = nil
   end
@@ -22,10 +31,11 @@ class OffersController < ApplicationController
     payload = offer_params.to_h
     payload[:items] = Array(payload[:items])
 
-    offer_id = Offers::Create.new.call(payload: payload, user_id: service_user_id)
+    repository = Offers::Repository.new(client: supabase_user_client)
+    offer_id = Offers::Create.new(repository: repository).call(payload: payload, user_id: current_user.id)
     redirect_to offer_path(offer_id), notice: "Teklif olusturuldu."
-  rescue StandardError => e
-    flash.now[:alert] = "Teklif olusturulamadi: #{e.message}"
+  rescue ServiceErrors::Base => e
+    flash.now[:alert] = "Teklif olusturulamadi: #{e.user_message}"
     @offer = payload || {}
     @items = payload[:items] || []
     render :new, status: :unprocessable_entity
@@ -42,11 +52,6 @@ class OffersController < ApplicationController
       items: %i[product_id description quantity unit_price]
     )
   end
-
-  def service_user_id
-    ENV.fetch("SUPABASE_SERVICE_USER_ID")
-  end
-
   def authorize_offers!
     require_role!(Roles::ADMIN, Roles::SALES)
   end
