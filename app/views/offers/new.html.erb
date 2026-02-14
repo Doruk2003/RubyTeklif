@@ -1,6 +1,6 @@
 ﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+  <div class="w-full space-y-5">
+    <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Yeni Teklif</h1>
@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <%= form_with url: new_offer_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-3 md:items-end" do |f| %>
         <div>
           <%= f.label :category_id, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
@@ -27,7 +27,7 @@
       <% end %>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="rounded-2xl bg-white p-6 shadow-sm">
         <%= form_with url: offers_path, method: :post, scope: :offer, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
           <div>
