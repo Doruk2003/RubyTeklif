@@ -26,6 +26,8 @@ module Admin
       end
 
       class FakeAuth
+        attr_reader :deleted_user_id
+
         def initialize(create_user_response: nil, recovery_ok: true)
           @create_user_response = create_user_response
           @recovery_ok = recovery_ok
@@ -38,6 +40,11 @@ module Admin
         def send_recovery(email:)
           raise Supabase::Auth::AuthError, "mail error" unless @recovery_ok
 
+          {}
+        end
+
+        def delete_user(user_id:)
+          @deleted_user_id = user_id
           {}
         end
       end
@@ -62,6 +69,20 @@ module Admin
 
         assert_equal "usr-2", user_id
         assert_equal "users.create", audit.payload[:action]
+      end
+
+      test "create user cleans up auth user when profile insert fails" do
+        client = FakeClient.new(post_response: { "message" => "insert failed" })
+        auth = FakeAuth.new(create_user_response: { "id" => "usr-9" })
+
+        assert_raises(ServiceErrors::System) do
+          Admin::Users::Create.new(client: client, auth: auth, audit_log: FakeAuditLog.new).call(
+            form_payload: { email: "rollback@example.com", password: "Password12", role: Roles::MANAGER },
+            actor_id: "usr-1"
+          )
+        end
+
+        assert_equal "usr-9", auth.deleted_user_id
       end
 
       test "update role raises policy error for forbidden response" do

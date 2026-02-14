@@ -15,8 +15,16 @@ module Admin
         user_id = created.is_a?(Hash) ? (created["id"].presence || created.dig("user", "id").to_s) : nil
         raise ServiceErrors::System.new(user_message: "Kullanici olusturulamadi.") if user_id.blank?
 
-        inserted = @client.post("users", body: { id: user_id, email: form.email, role: form.role, active: true }, headers: { "Prefer" => "return=minimal" })
-        raise_from_response!(inserted, fallback: "Kullanici olusturulamadi.")
+        begin
+          inserted = @client.post("users", body: { id: user_id, email: form.email, role: form.role, active: true }, headers: { "Prefer" => "return=minimal" })
+          raise_from_response!(inserted, fallback: "Kullanici olusturulamadi.")
+        rescue ServiceErrors::Base => e
+          cleanup_auth_user(user_id)
+          raise e
+        rescue StandardError
+          cleanup_auth_user(user_id)
+          raise
+        end
 
         @audit_log.log(
           action: "users.create",
@@ -54,7 +62,14 @@ module Admin
         parts = [response["message"], response["details"], response["hint"], response["code"]].compact.reject(&:blank?)
         raise ServiceErrors::System.new(user_message: parts.presence&.join(" | ") || fallback)
       end
+
+      def cleanup_auth_user(user_id)
+        return if user_id.blank?
+
+        @auth.delete_user(user_id: user_id)
+      rescue StandardError
+        nil
+      end
     end
   end
 end
-

@@ -86,6 +86,22 @@ module Supabase
       response
     end
 
+    def delete_user(user_id:)
+      uri = URI("#{@base}/auth/v1/admin/users/#{user_id}")
+      req = Net::HTTP::Delete.new(uri)
+      req["apikey"] = @service_key
+      req["Authorization"] = "Bearer #{@service_key}"
+      req["Content-Type"] = "application/json"
+
+      response = request(req)
+      if response.is_a?(Hash) && (response["error"].present? || response["message"].present?)
+        message = response["error_description"].presence || response["message"].presence || response["error"].to_s || response["msg"].to_s
+        raise AuthError, message.presence || response.inspect
+      end
+
+      response
+    end
+
     def refresh(refresh_token)
       uri = URI("#{@base}/auth/v1/token?grant_type=refresh_token")
       req = Net::HTTP::Post.new(uri)
