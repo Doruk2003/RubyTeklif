@@ -1,9 +1,9 @@
 module Admin
   module Users
     class UpdateRole
-      ALLOWED_ROLES = Roles::ACCEPTED_ROLES
+      ALLOWED_ROLES = Roles::ASSIGNABLE_ROLES
 
-      def initialize(client:, audit_log: AuditLog.new(client: client))
+      def initialize(client:)
         @client = client
       end
 

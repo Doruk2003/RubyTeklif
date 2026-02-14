@@ -1,7 +1,7 @@
 module Admin
   module Users
     class SetActive
-      def initialize(client:, audit_log: AuditLog.new(client: client))
+      def initialize(client:)
         @client = client
       end
 

@@ -100,16 +100,16 @@ module Admin
             end
           }
         )
-        service = Admin::Users::UpdateRole.new(client: client, audit_log: FakeAuditLog.new)
+        service = Admin::Users::UpdateRole.new(client: client)
 
         assert_raises(ServiceErrors::Policy) do
-          service.call(id: "usr-2", role: Roles::FINANCE, actor_id: "usr-1")
+          service.call(id: "usr-2", role: Roles::MANAGER, actor_id: "usr-1")
         end
 
         assert_equal "rpc/admin_update_user_role_with_audit_atomic", client.last_post_path
         assert_equal "usr-1", client.last_post_body[:p_actor_id]
         assert_equal "usr-2", client.last_post_body[:p_target_user_id]
-        assert_equal Roles::FINANCE, client.last_post_body[:p_role]
+        assert_equal Roles::MANAGER, client.last_post_body[:p_role]
       end
 
       test "set active works for disable" do
@@ -123,7 +123,7 @@ module Admin
             end
           }
         )
-        service = Admin::Users::SetActive.new(client: client, audit_log: FakeAuditLog.new)
+        service = Admin::Users::SetActive.new(client: client)
 
         result = service.call(id: "usr-2", active: false, actor_id: "usr-1")
         assert_equal "users.disable", result[:action]
@@ -132,7 +132,7 @@ module Admin
       end
 
       test "set active blocks self disable" do
-        service = Admin::Users::SetActive.new(client: FakeClient.new, audit_log: FakeAuditLog.new)
+        service = Admin::Users::SetActive.new(client: FakeClient.new)
 
         assert_raises(ServiceErrors::Validation) do
           service.call(id: "usr-1", active: false, actor_id: "usr-1")
@@ -150,7 +150,7 @@ module Admin
             end
           }
         )
-        service = Admin::Users::SetActive.new(client: client, audit_log: FakeAuditLog.new)
+        service = Admin::Users::SetActive.new(client: client)
 
         assert_raises(ServiceErrors::Validation) do
           service.call(id: "usr-1", active: false, actor_id: "usr-2")
@@ -168,7 +168,7 @@ module Admin
             end
           }
         )
-        service = Admin::Users::UpdateRole.new(client: client, audit_log: FakeAuditLog.new)
+        service = Admin::Users::UpdateRole.new(client: client)
 
         assert_raises(ServiceErrors::Validation) do
           service.call(id: "usr-1", role: Roles::SALES, actor_id: "usr-2")
@@ -176,7 +176,7 @@ module Admin
       end
 
       test "update role validates role input" do
-        service = Admin::Users::UpdateRole.new(client: FakeClient.new, audit_log: FakeAuditLog.new)
+        service = Admin::Users::UpdateRole.new(client: FakeClient.new)
 
         assert_raises(ServiceErrors::Validation) do
           service.call(id: "usr-1", role: "owner", actor_id: "usr-2")
