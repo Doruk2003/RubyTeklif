@@ -4,6 +4,8 @@ module Admin
   module Users
     class ServicesTest < ActiveSupport::TestCase
       class FakeClient
+        attr_reader :last_post_path, :last_post_body
+
         def initialize(post_response: nil, patch_response: nil, get_response: nil)
           @post_response = post_response
           @patch_response = patch_response
@@ -11,6 +13,8 @@ module Admin
         end
 
         def post(_path, body:, headers:)
+          @last_post_path = _path
+          @last_post_body = body
           @post_response
         end
 
@@ -101,6 +105,11 @@ module Admin
         assert_raises(ServiceErrors::Policy) do
           service.call(id: "usr-2", role: Roles::FINANCE, actor_id: "usr-1")
         end
+
+        assert_equal "rpc/admin_update_user_role_with_audit_atomic", client.last_post_path
+        assert_equal "usr-1", client.last_post_body[:p_actor_id]
+        assert_equal "usr-2", client.last_post_body[:p_target_user_id]
+        assert_equal Roles::FINANCE, client.last_post_body[:p_role]
       end
 
       test "set active works for disable" do
@@ -118,6 +127,8 @@ module Admin
 
         result = service.call(id: "usr-2", active: false, actor_id: "usr-1")
         assert_equal "users.disable", result[:action]
+        assert_equal "rpc/admin_set_user_active_with_audit_atomic", client.last_post_path
+        assert_equal false, client.last_post_body[:p_active]
       end
 
       test "set active blocks self disable" do
