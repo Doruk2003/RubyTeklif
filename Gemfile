@@ -69,3 +69,4 @@ end
 gem "tailwindcss-rails", "~> 4.4"
 
 gem "dotenv-rails", "~> 3.2"
+gem "pundit", "~> 2.4"

@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Pundit::Authorization
+
   STANDARD_IDLE_TIMEOUT_SECONDS = 8.hours.to_i
   REMEMBER_ME_IDLE_TIMEOUT_SECONDS = 30.days.to_i
 
@@ -7,6 +9,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   rescue_from StandardError, with: :handle_unexpected_error
+  rescue_from Pundit::NotAuthorizedError, with: :handle_not_authorized
 
   helper_method :current_user
 
@@ -59,10 +62,7 @@ class ApplicationController < ActionController::Base
 
   def authorize_with_policy!(policy_class, query: :access?)
     authenticate_user! unless current_user
-    policy = policy_class.new(current_user)
-    return if policy.public_send(query)
-
-    redirect_to root_path, alert: Auth::Messages::UNAUTHORIZED
+    authorize(policy_class, query, policy_class: policy_class)
   end
 
   def load_current_user(auth_user)
@@ -132,6 +132,15 @@ class ApplicationController < ActionController::Base
     raise error if Rails.env.development? || Rails.env.test?
 
     redirect_to root_path, alert: Auth::Messages::UNEXPECTED_ERROR
+  end
+
+  def pundit_user
+    current_user
+  end
+
+  def handle_not_authorized(error)
+    report_handled_error(error, source: "authorization")
+    redirect_to root_path, alert: Auth::Messages::UNAUTHORIZED
   end
 
   def error_context
