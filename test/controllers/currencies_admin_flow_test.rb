@@ -39,7 +39,7 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
   end
 
   class FakeCurrenciesIndexQuery
-    def call(params:)
+    def call(params:, **_kwargs)
       {
         items: [],
         page: 1,
@@ -75,7 +75,7 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
   end
 
   class FakeAdminUsersIndexQuery
-    def call(params:)
+    def call(params:, **_kwargs)
       {
         items: [],
         page: 1,
@@ -222,4 +222,5 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     end
   end
 end
+
 

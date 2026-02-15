@@ -2,7 +2,7 @@
   before_action :authorize_currencies!
 
   def index
-    result = Currencies::IndexQuery.new(client: client).call(params: params)
+    result = Currencies::IndexQuery.new(client: client).call(params: params, user_id: current_user.id)
     @currencies = result[:items]
     @scope = result[:scope]
     @page = result[:page]
@@ -25,6 +25,7 @@
   def create
     payload = currency_params
     Catalog::UseCases::Currencies::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    clear_currencies_cache!
     redirect_to currencies_path, notice: "Kur kaydi olusturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#create")
@@ -42,6 +43,7 @@
   def update
     payload = currency_params
     Catalog::UseCases::Currencies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    clear_currencies_cache!
     redirect_to currencies_path, notice: "Kur guncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#update")
@@ -52,6 +54,7 @@
 
   def destroy
     Catalog::UseCases::Currencies::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_currencies_cache!
     redirect_to currencies_path, notice: "Kur arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#destroy")
@@ -60,6 +63,7 @@
 
   def restore
     Catalog::UseCases::Currencies::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_currencies_cache!
     redirect_to currencies_path(scope: "archived"), notice: "Kur geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#restore")
@@ -78,6 +82,10 @@
 
   def authorize_currencies!
     authorize_with_policy!(CurrenciesPolicy)
+  end
+
+  def clear_currencies_cache!
+    Rails.cache.delete_matched("queries/currencies/v1/user:#{current_user.id}/*")
   end
 end
 

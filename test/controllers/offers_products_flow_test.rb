@@ -39,7 +39,7 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
   end
 
   class FakeProductsIndexQuery
-    def call(params:)
+    def call(params:, **_kwargs)
       {
         items: [],
         page: 1,
@@ -51,7 +51,7 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
   end
 
   class FakeOffersIndexQuery
-    def call(params:)
+    def call(params:, **_kwargs)
       {
         items: [],
         page: 1,
@@ -292,4 +292,5 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
     end
   end
 end
+
 

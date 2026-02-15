@@ -1,4 +1,6 @@
-﻿module Companies
+﻿require "digest"
+
+module Companies
   class IndexQuery
     DEFAULT_PER_PAGE = 50
     MAX_PER_PAGE = 200
@@ -7,7 +9,17 @@
       @client = client
     end
 
-    def call(params:)
+    def call(params:, user_id: nil)
+      return build_result(params) unless user_id.present?
+
+      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 90.seconds) do
+        build_result(params)
+      end
+    end
+
+    private
+
+    def build_result(params)
       page = page(params)
       per_page = per_page(params)
       rows = fetch_companies(params)
@@ -33,7 +45,21 @@
       }
     end
 
-    private
+    def cache_key(params, user_id:)
+      filtered = {
+        page: page(params),
+        per_page: per_page(params),
+        scope: normalized_scope(params),
+        q: params[:q].to_s.strip,
+        tax_number: params[:tax_number].to_s.strip,
+        active: params[:active].to_s,
+        has_offers: params[:has_offers].to_s,
+        sort: params[:sort].to_s,
+        dir: params[:dir].to_s
+      }
+
+      "queries/companies/v1/user:#{user_id}/#{Digest::SHA256.hexdigest(filtered.to_json)}"
+    end
 
     def fetch_companies(params)
       @client.get(build_companies_query(params)).tap do |data|
@@ -196,3 +222,4 @@
     end
   end
 end
+

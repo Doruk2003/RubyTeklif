@@ -2,7 +2,7 @@
   before_action :authorize_companies!
 
   def index
-    result = Companies::IndexQuery.new(client: client).call(params: params)
+    result = Companies::IndexQuery.new(client: client).call(params: params, user_id: current_user.id)
     @companies = result[:items]
     @scope = result[:scope]
     @page = result[:page]
@@ -36,6 +36,7 @@
   def create
     form_payload = company_params
     result = Catalog::UseCases::Companies::Create.new(client: client).call(form_payload: form_payload, actor_id: current_user.id)
+    clear_companies_cache!
     redirect_to companies_path, notice: result[:notice]
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#create")
@@ -55,6 +56,7 @@
   def update
     payload = company_params
     Catalog::UseCases::Companies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    clear_companies_cache!
     redirect_to company_path(params[:id]), notice: "Musteri guncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#update")
@@ -65,6 +67,7 @@
 
   def destroy
     Catalog::UseCases::Companies::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_companies_cache!
     redirect_to companies_path, notice: "Müşteri arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#destroy")
@@ -73,6 +76,7 @@
 
   def restore
     Catalog::UseCases::Companies::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_companies_cache!
     redirect_to companies_path(scope: "archived"), notice: "Müşteri geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#restore")
@@ -91,6 +95,10 @@
 
   def authorize_companies!
     authorize_with_policy!(CompaniesPolicy)
+  end
+
+  def clear_companies_cache!
+    Rails.cache.delete_matched("queries/companies/v1/user:#{current_user.id}/*")
   end
 end
 

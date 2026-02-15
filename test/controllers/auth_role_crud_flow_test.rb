@@ -39,7 +39,7 @@ class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
   end
 
   class FakeCompaniesIndexQuery
-    def call(params:)
+    def call(params:, **_kwargs)
       {
         items: [],
         page: 1,
@@ -140,4 +140,5 @@ class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
     end
   end
 end
+
 

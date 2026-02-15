@@ -1,4 +1,4 @@
-require "test_helper"
+﻿require "test_helper"
 
 class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
   class FakeAuth
@@ -47,7 +47,7 @@ class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
   end
 
   class FakeCompaniesIndexQuery
-    def call(params:)
+    def call(params:, **_kwargs)
       {
         items: [],
         page: 1,
@@ -107,3 +107,4 @@ class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
     end
   end
 end
+

@@ -3,7 +3,7 @@
   before_action :load_category_options, only: [:index, :show, :new, :edit, :create, :update]
 
   def index
-    result = Products::IndexQuery.new(client: client).call(params: params)
+    result = Products::IndexQuery.new(client: client).call(params: params, user_id: current_user.id)
     @products = result[:items]
     @scope = result[:scope]
     @category = params[:category].to_s.presence
@@ -41,6 +41,7 @@
   def create
     payload = product_params
     product_id = Catalog::UseCases::Products::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    clear_products_cache!
     redirect_to product_path(product_id), notice: "Ürün oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#create")
@@ -52,6 +53,7 @@
   def update
     payload = product_params
     result = Catalog::UseCases::Products::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    clear_products_cache!
     redirect_to product_path(result[:id]), notice: "Ürün güncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#update")
@@ -62,6 +64,7 @@
 
   def destroy
     Catalog::UseCases::Products::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_products_cache!
     redirect_to products_path, notice: "Ürün arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#destroy")
@@ -70,6 +73,7 @@
 
   def restore
     Catalog::UseCases::Products::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_products_cache!
     redirect_to products_path(scope: "archived"), notice: "Urun geri yuklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#restore")
@@ -97,6 +101,11 @@
   rescue StandardError
     @category_options = []
     @category_labels = {}
+  end
+
+  def clear_products_cache!
+    Rails.cache.delete_matched("queries/products/v1/user:#{current_user.id}/*")
+    Rails.cache.delete_matched("offers/form/products/v1/user:#{current_user.id}/*")
   end
 end
 

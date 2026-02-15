@@ -1,3 +1,5 @@
+require "digest"
+
 module Products
   class IndexQuery
     DEFAULT_PER_PAGE = 50
@@ -7,7 +9,17 @@ module Products
       @client = client
     end
 
-    def call(params:)
+    def call(params:, user_id: nil)
+      return build_result(params) unless user_id.present?
+
+      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 90.seconds) do
+        build_result(params)
+      end
+    end
+
+    private
+
+    def build_result(params)
       page = page(params)
       per_page = per_page(params)
       data = @client.get(build_query(params, page: page, per_page: per_page))
@@ -23,7 +35,16 @@ module Products
       }
     end
 
-    private
+    def cache_key(params, user_id:)
+      filtered = {
+        page: page(params),
+        per_page: per_page(params),
+        scope: normalized_scope(params),
+        category: params[:category].to_s
+      }
+
+      "queries/products/v1/user:#{user_id}/#{Digest::SHA256.hexdigest(filtered.to_json)}"
+    end
 
     def build_query(params, page:, per_page:)
       filters = [deleted_scope_filter(params)].compact

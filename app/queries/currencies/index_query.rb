@@ -1,3 +1,5 @@
+require "digest"
+
 module Currencies
   class IndexQuery
     DEFAULT_PER_PAGE = 50
@@ -7,7 +9,17 @@ module Currencies
       @client = client
     end
 
-    def call(params:)
+    def call(params:, user_id: nil)
+      return build_result(params) unless user_id.present?
+
+      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 90.seconds) do
+        build_result(params)
+      end
+    end
+
+    private
+
+    def build_result(params)
       page = page(params)
       per_page = per_page(params)
       data = @client.get(build_query(params, page: page, per_page: per_page))
@@ -23,7 +35,15 @@ module Currencies
       }
     end
 
-    private
+    def cache_key(params, user_id:)
+      filtered = {
+        page: page(params),
+        per_page: per_page(params),
+        scope: normalized_scope(params)
+      }
+
+      "queries/currencies/v1/user:#{user_id}/#{Digest::SHA256.hexdigest(filtered.to_json)}"
+    end
 
     def per_page(params)
       raw = params[:per_page].to_i
