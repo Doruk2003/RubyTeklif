@@ -98,6 +98,18 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeResetPasswordJob
+    attr_reader :calls
+
+    def initialize
+      @calls = []
+    end
+
+    def perform_later(target_user_id, actor_id)
+      @calls << { target_user_id: target_user_id, actor_id: actor_id }
+    end
+  end
+
   private def with_stubbed_constructor(klass, instance)
     original_new = klass.method(:new)
     klass.singleton_class.send(:define_method, :new) do |*args, **kwargs, &blk|
@@ -188,6 +200,24 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
       with_stubbed_constructor(Admin::Users::UpdateRole, fake_update) do
         patch admin_user_path("usr-2"), params: { user: { role: "invalid" } }
         assert_redirected_to admin_users_path
+      end
+    end
+  end
+
+  test "admin reset password enqueues background job" do
+    fake_job = FakeResetPasswordJob.new
+    with_authenticated_context(role: Roles::ADMIN) do
+      original_perform_later = Admin::Users::ResetPasswordJob.method(:perform_later)
+      Admin::Users::ResetPasswordJob.singleton_class.send(:define_method, :perform_later) do |target_user_id, actor_id|
+        fake_job.perform_later(target_user_id, actor_id)
+      end
+
+      post reset_password_admin_user_path("usr-2")
+      assert_equal [{ target_user_id: "usr-2", actor_id: "usr-1" }], fake_job.calls
+      assert_redirected_to admin_users_path
+    ensure
+      Admin::Users::ResetPasswordJob.singleton_class.send(:define_method, :perform_later) do |target_user_id, actor_id|
+        original_perform_later.call(target_user_id, actor_id)
       end
     end
   end

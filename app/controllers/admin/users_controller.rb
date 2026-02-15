@@ -66,11 +66,11 @@
     end
 
     def reset_password
-      Admin::Users::ResetPassword.new(client: client).call(id: params[:id], actor_id: current_user.id)
-      redirect_to admin_users_path, notice: "Parola sifirlama maili gonderildi."
-    rescue ServiceErrors::Base => e
+      Admin::Users::ResetPasswordJob.perform_later(params[:id], current_user.id)
+      redirect_to admin_users_path, notice: "Parola sifirlama talebi kuyruga alindi."
+    rescue StandardError => e
       report_handled_error(e, source: "admin/users#reset_password")
-      redirect_to admin_users_path, alert: "Parola sifirlama gonderilemedi: #{e.user_message}"
+      redirect_to admin_users_path, alert: "Parola sifirlama baslatilamadi."
     end
 
     private
