@@ -31,19 +31,39 @@ module Admin
         load_filter_options[:target_types]
       end
 
+      def export_rows(params:, max_rows: 5_000)
+        limit = [ max_rows.to_i, 10_000 ].min
+        base = "activity_logs?select=id,action,actor_id,target_id,target_type,metadata,created_at&order=created_at.desc&limit=#{limit}&offset=0"
+        query = append_filters(base, params)
+        rows = @client.get(query)
+        rows.is_a?(Array) ? rows : []
+      rescue StandardError
+        []
+      end
+
       private
 
       def build_query(params, page:, per_page:)
         offset = (page - 1) * per_page
         base = "activity_logs?select=id,action,actor_id,target_id,target_type,metadata,created_at&order=created_at.desc&limit=#{per_page + 1}&offset=#{offset}"
+        append_filters(base, params)
+      end
+
+      def append_filters(base_query, params)
+        filters = build_filters(params)
+        filters.empty? ? base_query : "#{base_query}&#{filters.join('&')}"
+      end
+
+      def build_filters(params)
         filters = []
-        filters << "action=eq.#{Supabase::FilterValue.eq(params[:action])}" if params[:action].present?
+        action_filter = params[:event_action].presence || params[:action].presence
+        filters << "action=eq.#{Supabase::FilterValue.eq(action_filter)}" if action_filter.present?
         filters << "actor_id=eq.#{Supabase::FilterValue.eq(params[:actor])}" if params[:actor].present?
         filters << "target_id=eq.#{Supabase::FilterValue.eq(params[:target])}" if params[:target].present?
         filters << "target_type=eq.#{Supabase::FilterValue.eq(params[:target_type])}" if params[:target_type].present?
         filters << "created_at=gte.#{Supabase::FilterValue.eq(params[:from])}" if params[:from].present?
         filters << "created_at=lte.#{Supabase::FilterValue.eq(params[:to])}" if params[:to].present?
-        filters.empty? ? base : "#{base}&#{filters.join('&')}"
+        filters
       end
 
       def positive_int(value, default:, max: nil)
@@ -51,7 +71,7 @@ module Admin
         parsed = default if parsed <= 0
         return parsed unless max
 
-        [parsed, max].min
+        [ parsed, max ].min
       end
 
       def load_filter_options

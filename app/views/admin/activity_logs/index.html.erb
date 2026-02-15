@@ -8,17 +8,41 @@
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Admin Panel", admin_users_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= button_to "CSV Export", export_admin_activity_logs_path(request.query_parameters), method: :post, class: "btn-primary w-full sm:w-auto" %>
         </div>
       </div>
     </div>
+
+    <% if @export.present? %>
+      <div class="rounded-2xl bg-slate-50/90 p-4 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div class="text-sm text-slate-700">
+            <% if @export[:status].to_s == "ready" %>
+              Son export hazır.
+            <% elsif @export[:status].to_s == "failed" %>
+              Export başarısız oldu. Tekrar deneyin.
+            <% else %>
+              Export hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
+            <% end %>
+          </div>
+          <div>
+            <% if @export[:status].to_s == "ready" %>
+              <%= link_to "CSV İndir", download_export_admin_activity_logs_path(token: @export[:token]), class: "btn-secondary" %>
+            <% elsif @export[:status].to_s == "pending" %>
+              <%= link_to "Yenile", admin_activity_logs_path(request.query_parameters), class: "btn-secondary" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
       <div class="p-4">
         <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-7" do |f| %>
           <div>
-            <%= f.label :action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.select :action,
-                  options_for_select([["Tümü", ""]] + @action_options.map { |action| [action, action] }, params[:action].to_s),
+            <%= f.label :event_action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.select :event_action,
+                  options_for_select([["Tümü", ""]] + @action_options.map { |action| [action, action] }, params[:event_action].to_s),
                   {},
                   class: "form-input" %>
           </div>

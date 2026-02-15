@@ -13,7 +13,12 @@ Rails.application.routes.draw do
         post :reset_password
       end
     end
-    resources :activity_logs, only: [:index]
+    resources :activity_logs, only: [:index] do
+      collection do
+        post :export
+        get "exports/:token", action: :download_export, as: :download_export
+      end
+    end
   end
 
   root "pages#home"

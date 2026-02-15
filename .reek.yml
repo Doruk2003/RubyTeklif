@@ -72,6 +72,9 @@ detectors:
     - CompaniesHelper#format_tax_number
     - Admin::ActivityLogs::IndexQuery#build_query
     - Admin::ActivityLogs::IndexQuery#load_filter_options
+    - Admin::ActivityLogs::IndexQuery#build_filters
+    - Admin::ActivityLogsController#export
+    - Admin::ActivityLogs::ExportCsvJob#perform
     - Admin::Users::IndexQuery#build_query
     - Companies::IndexQuery#apply_has_offers_filter
     - Companies::IndexQuery#build_companies_query
@@ -127,6 +130,8 @@ detectors:
   FeatureEnvy:
     exclude:
     - Admin::ActivityLogsController#load_users_index
+    - Admin::ActivityLogs::IndexQuery#append_filters
+    - Admin::ActivityLogs::ExportCsvJob#perform
     - CategoriesController#safe_return_to
     - Offers::CreateForm#normalize_items
     - CompaniesHelper#format_phone
@@ -210,6 +215,7 @@ detectors:
   IrresponsibleModule:
     exclude:
     - Admin::ActivityLogsController
+    - Admin::ActivityLogs::ExportCsvJob
     - Admin::UsersController
     - ApplicationController
     - CategoriesController
@@ -363,6 +369,7 @@ detectors:
   NestedIterators:
     exclude:
     - Observability::ErrorReporter#report
+    - Admin::ActivityLogs::ExportCsvJob#perform
   NilCheck:
     exclude:
     - Admin::UsersController#edit
@@ -377,6 +384,7 @@ detectors:
   RepeatedConditional:
     exclude:
     - Companies::IndexQuery
+    - Admin::ActivityLogs::IndexQuery
     - Admin::Users::SetActive
     - DashboardService
     - Supabase::Auth
@@ -403,6 +411,8 @@ detectors:
     exclude:
     - initialize
     - Admin::ActivityLogsController#index
+    - Admin::ActivityLogsController#download_export
+    - Admin::ActivityLogsController#current_export_state
     - Admin::UsersController#create
     - Admin::UsersController#index
     - Admin::UsersController#update
@@ -439,8 +449,11 @@ detectors:
     - CompaniesHelper#format_phone
     - Roles#self.role_badge_class
     - Admin::ActivityLogs::IndexQuery#build_query
+    - Admin::ActivityLogs::IndexQuery#build_filters
     - Admin::ActivityLogs::IndexQuery#call
+    - Admin::ActivityLogs::IndexQuery#export_rows
     - Admin::ActivityLogs::IndexQuery#load_filter_options
+    - Admin::ActivityLogs::ExportCsvJob#perform
     - Admin::Users::IndexQuery#build_query
     - Admin::Users::IndexQuery#call
     - Categories::IndexQuery#call
@@ -503,6 +516,7 @@ detectors:
     - Admin::UsersController#enable
     - Admin::UsersController#reset_password
     - Admin::UsersController#update
+    - Admin::ActivityLogs::ExportCsvJob#perform
     - CategoriesController
     - CategoriesController#create
     - CategoriesController#destroy
@@ -546,6 +560,7 @@ detectors:
   UtilityFunction:
     exclude:
     - ApplicationController#current_user
+    - Admin::ActivityLogsController#normalized_export_state
     - Categories::UpsertForm#normalize_active
     - Companies::UpsertForm#normalize_active
     - Currencies::UpsertForm#normalize_active
@@ -553,6 +568,7 @@ detectors:
     - CompaniesHelper#format_tax_number
     - CompaniesHelper#phone_digits
     - Admin::ActivityLogs::IndexQuery#build_query
+    - Admin::ActivityLogs::IndexQuery#build_filters
     - Admin::ActivityLogs::IndexQuery#positive_int
     - Admin::Users::IndexQuery#build_query
     - Admin::Users::IndexQuery#positive_int
