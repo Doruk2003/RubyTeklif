@@ -69,12 +69,7 @@ module Admin
     end
 
     def load_users_index
-      data = client.get("users?select=id,email&order=email.asc")
-      return {} unless data.is_a?(Array)
-
-      data.each_with_object({}) do |row, acc|
-        acc[row["id"].to_s] = row["email"].to_s
-      end
+      Admin::Users::EmailIndexQuery.new(client: client).call
     end
 
     def export_params

@@ -36,8 +36,7 @@
     end
 
     def edit
-      data = client.get("users?id=eq.#{Supabase::FilterValue.eq(params[:id])}&select=id,email,role&limit=1")
-      @user = data.is_a?(Array) ? data.first : nil
+      @user = Admin::Users::ShowQuery.new(client: client).call(id: params[:id])
       redirect_to admin_users_path, alert: "Kullanici bulunamadi." if @user.nil?
     rescue Supabase::Client::ConfigurationError
       redirect_to admin_users_path, alert: "Kullanici yuklenemedi."

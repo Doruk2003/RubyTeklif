@@ -5,7 +5,7 @@ module Categories
     end
 
     def call(id)
-      rows = @client.get("categories?id=eq.#{id}&select=id,code,name,active,deleted_at&limit=1")
+      rows = @client.get("categories?id=eq.#{Supabase::FilterValue.eq(id)}&select=id,code,name,active,deleted_at&limit=1")
       rows.is_a?(Array) ? rows.first : nil
     end
   end
