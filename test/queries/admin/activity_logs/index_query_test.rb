@@ -6,17 +6,15 @@ module Admin
       class FakeClient
         attr_reader :paths
 
-        def initialize(logs_response:, actions_response: nil, target_types_response: nil)
+        def initialize(logs_response:, filter_options_response: nil)
           @logs_response = logs_response
-          @actions_response = actions_response || logs_response
-          @target_types_response = target_types_response || logs_response
+          @filter_options_response = filter_options_response || logs_response
           @paths = []
         end
 
         def get(path)
           @paths << path
-          return @actions_response if path.start_with?("activity_logs?select=action")
-          return @target_types_response if path.start_with?("activity_logs?select=target_type")
+          return @filter_options_response if path.start_with?("activity_logs?select=action,target_type")
 
           @logs_response
         end
@@ -33,7 +31,8 @@ module Admin
           { "target_type" => "offer" },
           { "target_type" => "offer" }
         ]
-        client = FakeClient.new(logs_response: logs, target_types_response: target_types)
+        filter_options = logs + target_types
+        client = FakeClient.new(logs_response: logs, filter_options_response: filter_options)
         query = Admin::ActivityLogs::IndexQuery.new(client: client)
 
         result = query.call(params: { action: "offers.create", target_type: "offer", page: "1", per_page: "2" })

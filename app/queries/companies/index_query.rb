@@ -13,7 +13,8 @@
       rows = fetch_companies(params)
       has_next = rows.size > per_page
       rows = rows.first(per_page)
-      offer_counts = needs_offer_counts?(params) ? load_offer_counts : Hash.new(0)
+      company_ids = rows.map { |row| row["id"].to_s }.reject(&:blank?)
+      offer_counts = needs_offer_counts?(params) ? load_offer_counts(company_ids) : Hash.new(0)
 
       companies = rows.map do |row|
         build_company(row, offers_count: offer_counts[row["id"]].to_i)
@@ -130,8 +131,11 @@
       params[:has_offers].present? || params[:sort].to_s == "offers_count"
     end
 
-    def load_offer_counts
-      data = @client.get("company_offer_stats?select=company_id,offers_count")
+    def load_offer_counts(company_ids)
+      return Hash.new(0) if company_ids.empty?
+
+      encoded_ids = company_ids.map { |id| Supabase::FilterValue.eq(id) }.join(",")
+      data = @client.get("company_offer_stats?select=company_id,offers_count&company_id=in.(#{encoded_ids})")
       rows = data.is_a?(Array) ? data : []
 
       rows.each_with_object(Hash.new(0)) do |row, counts|
@@ -142,11 +146,14 @@
         counts[company_id] = count
       end
     rescue StandardError
-      load_offer_counts_fallback
+      load_offer_counts_fallback(company_ids)
     end
 
-    def load_offer_counts_fallback
-      data = @client.get("offers?select=company_id&deleted_at=is.null")
+    def load_offer_counts_fallback(company_ids)
+      return Hash.new(0) if company_ids.empty?
+
+      encoded_ids = company_ids.map { |id| Supabase::FilterValue.eq(id) }.join(",")
+      data = @client.get("offers?select=company_id&deleted_at=is.null&company_id=in.(#{encoded_ids})")
       rows = data.is_a?(Array) ? data : []
 
       rows.each_with_object(Hash.new(0)) do |row, counts|

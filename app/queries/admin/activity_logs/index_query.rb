@@ -24,19 +24,11 @@ module Admin
       end
 
       def action_options
-        rows = @client.get("activity_logs?select=action&order=action.asc&limit=500")
-        rows = rows.is_a?(Array) ? rows : []
-        rows.map { |row| row["action"].to_s }.reject(&:blank?).uniq
-      rescue StandardError
-        []
+        load_filter_options[:actions]
       end
 
       def target_type_options
-        rows = @client.get("activity_logs?select=target_type&order=target_type.asc&limit=500")
-        rows = rows.is_a?(Array) ? rows : []
-        rows.map { |row| row["target_type"].to_s }.reject(&:blank?).uniq
-      rescue StandardError
-        []
+        load_filter_options[:target_types]
       end
 
       private
@@ -60,6 +52,19 @@ module Admin
         return parsed unless max
 
         [parsed, max].min
+      end
+
+      def load_filter_options
+        return @filter_options if defined?(@filter_options)
+
+        rows = @client.get("activity_logs?select=action,target_type&order=created_at.desc&limit=500")
+        rows = rows.is_a?(Array) ? rows : []
+        @filter_options = {
+          actions: rows.map { |row| row["action"].to_s }.reject(&:blank?).uniq,
+          target_types: rows.map { |row| row["target_type"].to_s }.reject(&:blank?).uniq
+        }
+      rescue StandardError
+        @filter_options = { actions: [], target_types: [] }
       end
     end
   end
