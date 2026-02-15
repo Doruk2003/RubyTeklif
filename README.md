@@ -1,24 +1,53 @@
-# README
+# RubyTeklif
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Rails + Supabase tabanli teklif/CRM uygulamasi.
 
-Things you may want to cover:
+## Temel Ozellikler
 
-* Ruby version
+- Rol bazli erisim: `admin`, `manager`, `operator`, `viewer`
+- Supabase RLS policy yapisi
+- Atomic RPC tabanli CRUD + audit log
+- Soft delete (`deleted_at`) + restore akislari
+- Admin panel: kullanici yonetimi, activity logs, CSV export
 
-* System dependencies
+## Kurulum
 
-* Configuration
+1. Ruby surumunu `.ruby-version` ile uyumlu kur.
+2. Bagimliliklari yukle:
+   - `bundle install`
+3. Ortam degiskenlerini tanimla (`.env`):
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_SERVICE_USER_ID`
+4. Uygulamayi baslat:
+   - `bin/dev`
 
-* Database creation
+## Test ve Kalite Kapisi
 
-* Database initialization
+- Tum testler: `bin/rails test`
+- Mimari sinir testleri: `bin/rails test test/architecture`
+- Koku analizi: `bin/reek app`
+- Stil: `bin/rubocop`
+- Guvenlik: `bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error`
 
-* How to run the test suite
+CI pipeline su ana joblari icerir:
 
-* Services (job queues, cache servers, search engines, etc.)
+- `scan_ruby` (brakeman + bundler-audit)
+- `scan_js` (importmap audit)
+- `lint` (rubocop + reek)
+- `architecture` (boundary testleri)
+- `test`
+- `system-test`
 
-* Deployment instructions
+## Supabase SQL
 
-* ...
+SQL migration dosyalari `db/supabase` altindadir.
+Bu projede SQL dosyalari Supabase SQL Editor uzerinden manuel calistirilabilir.
+
+## Release
+
+Canliya cikis oncesi zorunlu checklist:
+
+- `docs/release_smoke_checklist.md`
+- `docs/release_gate_checklist.md`
