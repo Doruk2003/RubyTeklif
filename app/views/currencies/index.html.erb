@@ -20,8 +20,8 @@
             <%= f.select :scope,
                   options_for_select([
                     ["Aktif", "active"],
-                    ["Arsiv", "archived"],
-                    ["Tum Kayitlar", "all"]
+                    ["Arşiv", "archived"],
+                    ["Tüm Kayıtlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
@@ -80,9 +80,9 @@
                     <% if currency["deleted_at"].present? %>
                       <%= link_to restore_currency_path(currency["id"]),
                             method: :patch,
-                            data: { confirm: "Bu kuru geri yuklemek istediginize emin misiniz?" },
-                            title: "Geri Yukle",
-                            aria: { label: "Geri Yukle" },
+                            data: { confirm: "Bu kuru geri yüklemek istediğinize emin misiniz?" },
+                            title: "Geri Yükle",
+                            aria: { label: "Geri Yükle" },
                             class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-emerald-700" do %>
                         <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 12a9 9 0 1 0 3-6.7"/>
@@ -155,6 +155,5 @@
     </div>
   </div>
 </div>
-
 
 

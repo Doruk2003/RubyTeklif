@@ -3,8 +3,8 @@
     <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Aktivite Kayitlari</h1>
-          <p class="text-sm text-slate-500">Rol degisiklikleri ve admin aksiyonlari</p>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Aktivite Kayıtları</h1>
+          <p class="text-sm text-slate-500">Rol değişiklikleri ve admin aksiyonları</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Admin Panel", admin_users_path, class: "btn-secondary w-full sm:w-auto" %>
@@ -18,37 +18,37 @@
           <div>
             <%= f.label :action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :action,
-                  options_for_select([["Tumu", ""]] + @action_options.map { |action| [action, action] }, params[:action].to_s),
+                  options_for_select([["Tümü", ""]] + @action_options.map { |action| [action, action] }, params[:action].to_s),
                   {},
                   class: "form-input" %>
           </div>
           <div>
-            <%= f.label :actor, "Islem Yapan", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.label :actor, "İşlem Yapan", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :actor,
-                  options_for_select([["Tumu", ""]] + @users_index.map { |id, email| [email, id] }, params[:actor].to_s),
+                  options_for_select([["Tümü", ""]] + @users_index.map { |id, email| [email, id] }, params[:actor].to_s),
                   {},
                   class: "form-input" %>
           </div>
           <div>
-            <%= f.label :target, "Hedef Kullanici", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.label :target, "Hedef Kullanıcı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :target,
-                  options_for_select([["Tumu", ""]] + @users_index.map { |id, email| [email, id] }, params[:target].to_s),
+                  options_for_select([["Tümü", ""]] + @users_index.map { |id, email| [email, id] }, params[:target].to_s),
                   {},
                   class: "form-input" %>
           </div>
           <div>
             <%= f.label :target_type, "Hedef Tipi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :target_type,
-                  options_for_select([["Tumu", ""]] + @target_type_options.map { |type| [type, type] }, params[:target_type].to_s),
+                  options_for_select([["Tümü", ""]] + @target_type_options.map { |type| [type, type] }, params[:target_type].to_s),
                   {},
                   class: "form-input" %>
           </div>
           <div>
-            <%= f.label :from, "Baslangic", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.label :from, "Başlangıç", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.date_field :from, value: params[:from], class: "form-input" %>
           </div>
           <div>
-            <%= f.label :to, "Bitis", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+            <%= f.label :to, "Bitiş", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.date_field :to, value: params[:to], class: "form-input" %>
           </div>
           <div class="flex items-end gap-2">
@@ -64,8 +64,8 @@
             <tr>
               <th>Tarih</th>
               <th>Aksiyon</th>
-              <th>Islem Yapan</th>
-              <th>Hedef Kullanici</th>
+              <th>İşlem Yapan</th>
+              <th>Hedef Kullanıcı</th>
               <th>Hedef Tipi</th>
               <th>Detay</th>
             </tr>
@@ -84,7 +84,7 @@
 
             <% if @logs.empty? %>
               <tr>
-                <td colspan="6" class="py-12 text-center text-slate-500">Kayit yok.</td>
+                <td colspan="6" class="py-12 text-center text-slate-500">Kayıt yok.</td>
               </tr>
             <% end %>
           </tbody>
@@ -97,7 +97,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayit</span>
+          <span><%= @per_page %> kayıt</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -109,9 +109,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Onceki", admin_activity_logs_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Önceki", admin_activity_logs_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Onceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
           <% end %>
 
           <% if @has_next %>

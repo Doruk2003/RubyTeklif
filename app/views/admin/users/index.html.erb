@@ -4,10 +4,10 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Admin Panel</h1>
-          <p class="text-sm text-slate-500">Kullanici rolleri</p>
+          <p class="text-sm text-slate-500">Kullanıcı rolleri</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni Kullanici", new_admin_user_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Yeni Kullanıcı", new_admin_user_path, class: "btn-primary w-full sm:w-auto" %>
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
       </div>
@@ -24,7 +24,7 @@
             <%= f.label :role, "Rol", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :role,
                   options_for_select([
-                    ["Tum Roller", ""],
+                    ["Tüm Roller", ""],
                     *Roles::ASSIGNABLE_ROLE_OPTIONS
                   ], params[:role].to_s),
                   {},
@@ -34,7 +34,7 @@
             <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :active,
                   options_for_select([
-                    ["Tum", ""],
+                    ["Tüm", ""],
                     ["Aktif", "true"],
                     ["Pasif", "false"]
                   ], params[:active].to_s),
@@ -75,11 +75,11 @@
                   <% end %>
                 </td>
                 <td class="text-right">
-                  <%= link_to "Duzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
-                  <%= link_to "Sifre Sifirla",
+                  <%= link_to "Düzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
+                  <%= link_to "Şifre Sıfırla",
                         reset_password_admin_user_path(user["id"]),
                         method: :post,
-                        data: { confirm: "Parola sifirlama maili gonderilsin mi?" },
+                        data: { confirm: "Parola sıfırlama maili gönderilsin mi?" },
                         class: "btn-secondary" %>
                   <% if user["active"] == false %>
                     <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), method: :patch, class: "btn-secondary" %>
@@ -92,7 +92,7 @@
 
             <% if @users.empty? %>
               <tr>
-                <td colspan="4" class="py-12 text-center text-slate-500">Kullanici yok.</td>
+                <td colspan="4" class="py-12 text-center text-slate-500">Kullanıcı yok.</td>
               </tr>
             <% end %>
           </tbody>
@@ -105,7 +105,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayit</span>
+          <span><%= @per_page %> kayıt</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -117,9 +117,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Onceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Önceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Onceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
           <% end %>
 
           <% if @has_next %>

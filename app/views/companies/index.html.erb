@@ -29,7 +29,7 @@
             <% display = case key
                         when "has_offers" then value.to_s == "1" ? "Var" : "Yok"
                         when "active" then value.to_s == "1" ? "Aktif" : "Pasif"
-                        when "scope" then value.to_s == "archived" ? "Arsiv" : (value.to_s == "all" ? "Tum Kayitlar" : "Aktif")
+                        when "scope" then value.to_s == "archived" ? "Arşiv" : (value.to_s == "all" ? "Tüm Kayıtlar" : "Aktif")
                         else value
                         end %>
             <%= link_to companies_path(request.query_parameters.except(key)),
@@ -77,7 +77,7 @@
             <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :active,
                   options_for_select([
-                    ["Tumu", ""],
+                    ["Tümü", ""],
                     ["Aktif", "1"],
                     ["Pasif", "0"]
                   ], params[:active]),
@@ -90,8 +90,8 @@
             <%= f.select :scope,
                   options_for_select([
                     ["Aktif", "active"],
-                    ["Arsiv", "archived"],
-                    ["Tum Kayitlar", "all"]
+                    ["Arşiv", "archived"],
+                    ["Tüm Kayıtlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
@@ -152,10 +152,10 @@
               <%= link_to "Gör", company_path(company), class: "btn-secondary w-full text-center" %>
               <%= link_to "Düzenle", edit_company_path(company), class: "btn-secondary w-full text-center" %>
               <% if company.deleted_at.present? %>
-                <%= link_to "Geri Yukle",
+                <%= link_to "Geri Yükle",
                       restore_company_path(company),
                       method: :patch,
-                      data: { confirm: "Bu kaydi geri yuklemek istiyor musunuz?" },
+                      data: { confirm: "Bu kaydı geri yüklemek istiyor musunuz?" },
                       class: "btn-secondary w-full text-center" %>
               <% else %>
                 <%= link_to "Arşivle",
@@ -327,10 +327,10 @@
                       <%= link_to "Gör", company_path(company), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
                       <%= link_to "Düzenle", edit_company_path(company), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
                       <% if company.deleted_at.present? %>
-                        <%= link_to "Geri Yukle",
+                        <%= link_to "Geri Yükle",
                               restore_company_path(company),
                               method: :patch,
-                              data: { confirm: "Bu kaydi geri yuklemek istiyor musunuz?" },
+                              data: { confirm: "Bu kaydı geri yüklemek istiyor musunuz?" },
                               class: "block rounded-lg px-3 py-2 text-emerald-700 hover:bg-emerald-50" %>
                       <% else %>
                         <%= link_to "Arşivle",

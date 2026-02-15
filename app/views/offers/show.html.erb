@@ -3,23 +3,23 @@
     <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Teklif Detayi</h1>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Teklif Detayı</h1>
           <p class="text-sm text-slate-500">Teklif #<%= @offer&.dig("offer_number").to_s.presence || "-" %></p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Listeye Don", offers_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "Listeye Dön", offers_path, class: "btn-secondary w-full sm:w-auto" %>
           <% if @offer.present? %>
             <% if @offer["deleted_at"].present? %>
-              <%= link_to "Geri Yukle",
+              <%= link_to "Geri Yükle",
                     restore_offer_path(@offer["id"]),
                     method: :patch,
-                    data: { confirm: "Bu teklifi geri yuklemek istediginize emin misiniz?" },
+                    data: { confirm: "Bu teklifi geri yüklemek istediğinize emin misiniz?" },
                     class: "btn-secondary w-full sm:w-auto" %>
             <% else %>
-              <%= link_to "Arsivle",
+              <%= link_to "Arşivle",
                     offer_path(@offer["id"]),
                     method: :delete,
-                    data: { confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
+                    data: { confirm: "Bu teklifi arşivlemek istediğinize emin misiniz?" },
                     class: "btn-secondary w-full sm:w-auto" %>
             <% end %>
           <% end %>
@@ -30,7 +30,7 @@
     <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <% if @offer.present? %>
         <div class="grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2">
-          <div><span class="font-semibold text-slate-900">Musteri:</span> <%= @offer.dig("companies", "name").to_s.presence || "-" %></div>
+          <div><span class="font-semibold text-slate-900">Müşteri:</span> <%= @offer.dig("companies", "name").to_s.presence || "-" %></div>
           <div><span class="font-semibold text-slate-900">Tarih:</span> <%= @offer["offer_date"].to_s %></div>
           <div><span class="font-semibold text-slate-900">Durum:</span> <%= @offer["status"].to_s %></div>
           <div><span class="font-semibold text-slate-900">Toplam:</span> <%= @offer["gross_total"].to_s %></div>
@@ -40,10 +40,10 @@
           <table class="min-w-full text-sm">
             <thead class="sticky top-0 z-10">
               <tr>
-                <th>Aciklama</th>
+                <th>Açıklama</th>
                 <th class="text-right">Miktar</th>
                 <th class="text-right">Birim Fiyat</th>
-                <th class="text-right">Iskonto %</th>
+                <th class="text-right">İskonto %</th>
                 <th class="text-right">Tutar</th>
               </tr>
             </thead>
@@ -67,7 +67,7 @@
           </table>
         </div>
       <% else %>
-        <div class="py-12 text-center text-sm text-slate-500">Teklif bulunamadi.</div>
+        <div class="py-12 text-center text-sm text-slate-500">Teklif bulunamadı.</div>
       <% end %>
     </div>
   </div>

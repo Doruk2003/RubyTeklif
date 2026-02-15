@@ -19,8 +19,8 @@
             <%= f.select :scope,
                   options_for_select([
                     ["Aktif", "active"],
-                    ["Arsiv", "archived"],
-                    ["Tum Kayitlar", "all"]
+                    ["Arşiv", "archived"],
+                    ["Tüm Kayıtlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
@@ -61,16 +61,16 @@
                   <div class="inline-flex items-center gap-2">
                     <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
                     <% if offer["deleted_at"].present? %>
-                      <%= link_to "Geri Yukle",
+                      <%= link_to "Geri Yükle",
                             restore_offer_path(offer["id"]),
                             method: :patch,
-                            data: { confirm: "Bu teklifi geri yuklemek istediginize emin misiniz?" },
+                            data: { confirm: "Bu teklifi geri yüklemek istediğinize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% else %>
-                      <%= link_to "Arsivle",
+                      <%= link_to "Arşivle",
                             offer_path(offer["id"]),
                             method: :delete,
-                            data: { confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
+                            data: { confirm: "Bu teklifi arşivlemek istediğinize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% end %>
                   </div>
@@ -125,6 +125,5 @@
     </div>
   </div>
 </div>
-
 
 
