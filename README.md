@@ -50,6 +50,7 @@ CI pipeline su ana joblari icerir:
 - `architecture` (boundary testleri)
 - `test`
 - `system-test`
+- `release-gate` (tum kapilarin ozet yesil durumu)
 
 ## Environment Ayrimi
 

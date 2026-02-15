@@ -35,6 +35,7 @@ Bu liste merge/deploy oncesi "go/no-go" kararini standartlastirir.
 ## 5) Operasyonel Kontrol
 
 - [ ] CI'da tum joblar yesil (scan/lint/architecture/test/system-test).
+- [ ] CI `release-gate` job'u yesil.
 - [ ] Son commitler `main` ile senkron.
 - [ ] Uretim ortam degiskenleri guncel ve eksiksiz.
 - [ ] Smoke testler (`docs/release_smoke_checklist.md`) tamamlandi.
