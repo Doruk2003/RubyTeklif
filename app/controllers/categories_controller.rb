@@ -5,6 +5,10 @@ class CategoriesController < ApplicationController
     result = Categories::IndexQuery.new(client: client).call(params: params)
     @categories = result[:items]
     @scope = result[:scope]
+    @active = result[:active]
+    @q = result[:q]
+    @sort = result[:sort]
+    @dir = result[:dir]
     @page = result[:page]
     @per_page = result[:per_page]
     @has_prev = result[:has_prev]
@@ -12,6 +16,10 @@ class CategoriesController < ApplicationController
   rescue Supabase::Client::ConfigurationError
     @categories = []
     @scope = "active"
+    @active = ""
+    @q = ""
+    @sort = "name"
+    @dir = "asc"
     @page = 1
     @per_page = 50
     @has_prev = false

@@ -13,7 +13,22 @@
       </div>
 
       <div class="mt-4">
-        <%= form_with url: categories_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+        <%= form_with url: categories_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-6 md:items-end" do |f| %>
+          <div class="md:col-span-2">
+            <%= f.label :q, "Kategori Ara", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+            <%= f.search_field :q, value: @q, placeholder: "Ad veya kod", class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+            <%= f.select :active,
+                  options_for_select([
+                    ["Tümü", ""],
+                    ["Aktif", "1"],
+                    ["Pasif", "0"]
+                  ], @active),
+                  {},
+                  class: "form-input" %>
+          </div>
           <div>
             <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
             <%= f.select :scope,
@@ -21,7 +36,7 @@
                     ["Aktif", "active"],
                     ["Arşiv", "archived"],
                     ["Tüm Kayıtlar", "all"]
-                  ], @scope || params[:scope] || "active"),
+                  ], @scope || "active"),
                   {},
                   class: "form-input" %>
           </div>
@@ -37,13 +52,39 @@
     </div>
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+      <% current_sort = @sort.to_s %>
+      <% current_dir = @dir.to_s == "desc" ? "desc" : "asc" %>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
           <thead>
             <tr>
-              <th>Ad</th>
-              <th>Kod</th>
-              <th>Durum</th>
+              <th>
+                <% next_dir = current_sort == "name" && current_dir == "asc" ? "desc" : "asc" %>
+                <%= link_to categories_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                  <span>Ad</span>
+                  <% if current_sort == "name" %>
+                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                  <% end %>
+                <% end %>
+              </th>
+              <th>
+                <% next_dir = current_sort == "code" && current_dir == "asc" ? "desc" : "asc" %>
+                <%= link_to categories_path(request.query_parameters.merge(sort: "code", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                  <span>Kod</span>
+                  <% if current_sort == "code" %>
+                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                  <% end %>
+                <% end %>
+              </th>
+              <th class="text-center">
+                <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
+                <%= link_to categories_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                  <span>Durum</span>
+                  <% if current_sort == "active" %>
+                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                  <% end %>
+                <% end %>
+              </th>
               <th class="text-right">Aksiyon</th>
             </tr>
           </thead>
@@ -52,7 +93,7 @@
               <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
                 <td class="font-medium text-slate-900"><%= category["name"].to_s %></td>
                 <td><%= category["code"].to_s %></td>
-                <td>
+                <td class="text-center">
                   <% if category["active"] %>
                     <span class="badge-success">Aktif</span>
                   <% else %>
