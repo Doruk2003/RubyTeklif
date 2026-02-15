@@ -2,8 +2,8 @@
   <%= hidden_field_tag :return_to, params[:return_to].to_s %>
 
   <div>
-    <%= f.label :name, "Kategori Adi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-    <%= f.text_field :name, value: category[:name] || category["name"], placeholder: "Orn: Mobilya Aksesuar", class: "form-input" %>
+    <%= f.label :name, "Kategori Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+    <%= f.text_field :name, value: category[:name] || category["name"], placeholder: "Örn: Mobilya Aksesuar", class: "form-input" %>
   </div>
 
   <div>

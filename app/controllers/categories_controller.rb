@@ -31,10 +31,10 @@ class CategoriesController < ApplicationController
   def create
     payload = category_params
     Categories::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to safe_return_to || categories_path, notice: "Kategori olusturuldu."
+    redirect_to safe_return_to || categories_path, notice: "Kategori oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#create")
-    flash.now[:alert] = "Kategori olusturulamadi: #{e.user_message}"
+    flash.now[:alert] = "Kategori oluşturulamadı: #{e.user_message}"
     @category = payload || {}
     render :new, status: :unprocessable_entity
   end
@@ -42,28 +42,28 @@ class CategoriesController < ApplicationController
   def update
     payload = category_params
     Categories::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
-    redirect_to categories_path, notice: "Kategori guncellendi."
+    redirect_to categories_path, notice: "Kategori güncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#update")
-    flash.now[:alert] = "Kategori guncellenemedi: #{e.user_message}"
+    flash.now[:alert] = "Kategori güncellenemedi: #{e.user_message}"
     @category = payload.merge("id" => params[:id])
     render :edit, status: :unprocessable_entity
   end
 
   def destroy
     Categories::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to categories_path, notice: "Kategori arsivlendi."
+    redirect_to categories_path, notice: "Kategori arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#destroy")
-    redirect_to categories_path, alert: "Kategori arsivlenemedi: #{e.user_message}"
+    redirect_to categories_path, alert: "Kategori arşivlenemedi: #{e.user_message}"
   end
 
   def restore
     Categories::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
-    redirect_to categories_path(scope: "archived"), notice: "Kategori geri yuklendi."
+    redirect_to categories_path(scope: "archived"), notice: "Kategori geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#restore")
-    redirect_to categories_path(scope: "archived"), alert: "Kategori geri yuklenemedi: #{e.user_message}"
+    redirect_to categories_path(scope: "archived"), alert: "Kategori geri yüklenemedi: #{e.user_message}"
   end
 
   private

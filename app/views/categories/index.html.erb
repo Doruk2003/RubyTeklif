@@ -8,7 +8,7 @@
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Yeni Kategori", new_category_path, class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Urunler", products_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "Ürünler", products_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
       </div>
 
@@ -19,8 +19,8 @@
             <%= f.select :scope,
                   options_for_select([
                     ["Aktif", "active"],
-                    ["Arsiv", "archived"],
-                    ["Tum Kayitlar", "all"]
+                    ["Arşiv", "archived"],
+                    ["Tüm Kayıtlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
@@ -61,18 +61,18 @@
                 </td>
                 <td class="text-right">
                   <div class="inline-flex items-center gap-2">
-                    <%= link_to "Duzenle", edit_category_path(category["id"]), class: "btn-secondary" %>
+                    <%= link_to "Düzenle", edit_category_path(category["id"]), class: "btn-secondary" %>
                     <% if category["deleted_at"].present? %>
-                      <%= link_to "Geri Yukle",
+                      <%= link_to "Geri Yükle",
                             restore_category_path(category["id"]),
                             method: :patch,
-                            data: { confirm: "Bu kategoriyi geri yuklemek istediginize emin misiniz?" },
+                            data: { confirm: "Bu kategoriyi geri yüklemek istediğinize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% else %>
-                      <%= link_to "Arsivle",
+                      <%= link_to "Arşivle",
                             category_path(category["id"]),
                             method: :delete,
-                            data: { confirm: "Bu kategoriyi arsivlemek istediginize emin misiniz?" },
+                            data: { confirm: "Bu kategoriyi arşivlemek istediğinize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% end %>
                   </div>
@@ -82,7 +82,7 @@
 
             <% if @categories.empty? %>
               <tr>
-                <td colspan="4" class="py-10 text-center text-sm text-slate-500">Henuz kategori yok.</td>
+                <td colspan="4" class="py-10 text-center text-sm text-slate-500">Henüz kategori yok.</td>
               </tr>
             <% end %>
           </tbody>
@@ -95,13 +95,21 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayit</span>
+          <span><%= @per_page %> kayıt</span>
         </div>
         <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-1 text-xs">
+            <span class="text-slate-500">Sayfa boyutu:</span>
+            <% [25, 50, 100].each do |size| %>
+              <% active = @per_page == size %>
+              <%= link_to size.to_s, categories_path(request.query_parameters.merge(page: 1, per_page: size)),
+                    class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
+            <% end %>
+          </div>
           <% if @has_prev %>
-            <%= link_to "Onceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Önceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Onceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
           <% end %>
 
           <% if @has_next %>
