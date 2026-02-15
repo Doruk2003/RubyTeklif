@@ -1,15 +1,17 @@
-﻿class CategoriesController < ApplicationController
+class CategoriesController < ApplicationController
   before_action :authorize_categories!
 
   def index
     result = Categories::IndexQuery.new(client: client).call(params: params)
     @categories = result[:items]
+    @scope = result[:scope]
     @page = result[:page]
     @per_page = result[:per_page]
     @has_prev = result[:has_prev]
     @has_next = result[:has_next]
   rescue Supabase::Client::ConfigurationError
     @categories = []
+    @scope = "active"
     @page = 1
     @per_page = 50
     @has_prev = false
@@ -20,15 +22,48 @@
     @category = {}
   end
 
+  def edit
+    @category = Categories::ShowQuery.new(client: client).call(params[:id])
+  rescue Supabase::Client::ConfigurationError
+    @category = nil
+  end
+
   def create
     payload = category_params
     Categories::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
-    redirect_to safe_return_to || categories_path, notice: "Kategori oluşturuldu."
+    redirect_to safe_return_to || categories_path, notice: "Kategori olusturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#create")
-    flash.now[:alert] = "Kategori oluşturulamadı: #{e.user_message}"
+    flash.now[:alert] = "Kategori olusturulamadi: #{e.user_message}"
     @category = payload || {}
     render :new, status: :unprocessable_entity
+  end
+
+  def update
+    payload = category_params
+    Categories::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    redirect_to categories_path, notice: "Kategori guncellendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "categories#update")
+    flash.now[:alert] = "Kategori guncellenemedi: #{e.user_message}"
+    @category = payload.merge("id" => params[:id])
+    render :edit, status: :unprocessable_entity
+  end
+
+  def destroy
+    Categories::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to categories_path, notice: "Kategori arsivlendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "categories#destroy")
+    redirect_to categories_path, alert: "Kategori arsivlenemedi: #{e.user_message}"
+  end
+
+  def restore
+    Categories::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    redirect_to categories_path(scope: "archived"), notice: "Kategori geri yuklendi."
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "categories#restore")
+    redirect_to categories_path(scope: "archived"), alert: "Kategori geri yuklenemedi: #{e.user_message}"
   end
 
   private

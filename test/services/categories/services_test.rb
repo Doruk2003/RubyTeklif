@@ -48,5 +48,41 @@ module Categories
         service.call(form_payload: { code: "raw_material", name: "Raw Material", active: "1" }, actor_id: "usr-1")
       end
     end
+
+    test "update calls atomic rpc" do
+      client = FakeClient.new(post_response: [{ "category_id" => "cat-1" }])
+      service = Categories::Update.new(client: client)
+
+      result = service.call(
+        id: "cat-1",
+        form_payload: { code: "service", name: "Service", active: "1" },
+        actor_id: "usr-1"
+      )
+
+      assert_equal "cat-1", result[:id]
+      assert_equal "rpc/update_category_with_audit_atomic", client.last_post_path
+      assert_equal "usr-1", client.last_post_body[:p_actor_id]
+      assert_equal "cat-1", client.last_post_body[:p_category_id]
+    end
+
+    test "destroy calls archive rpc" do
+      client = FakeClient.new(post_response: [{ "category_id" => "cat-1" }])
+      service = Categories::Destroy.new(client: client)
+
+      service.call(id: "cat-1", actor_id: "usr-1")
+
+      assert_equal "rpc/archive_category_with_audit_atomic", client.last_post_path
+      assert_equal "cat-1", client.last_post_body[:p_category_id]
+    end
+
+    test "restore calls restore rpc" do
+      client = FakeClient.new(post_response: [{ "category_id" => "cat-1" }])
+      service = Categories::Restore.new(client: client)
+
+      service.call(id: "cat-1", actor_id: "usr-1")
+
+      assert_equal "rpc/restore_category_with_audit_atomic", client.last_post_path
+      assert_equal "cat-1", client.last_post_body[:p_category_id]
+    end
   end
 end

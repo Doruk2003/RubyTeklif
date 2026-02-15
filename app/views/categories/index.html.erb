@@ -4,12 +4,35 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Kategoriler</h1>
-          <p class="text-sm text-slate-500">Ürün kategorilerini yönetin.</p>
+          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @categories.size %></span> kategori</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Yeni Kategori", new_category_path, class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Ürünler", products_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "Urunler", products_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
+      </div>
+
+      <div class="mt-4">
+        <%= form_with url: categories_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+          <div>
+            <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+            <%= f.select :scope,
+                  options_for_select([
+                    ["Aktif", "active"],
+                    ["Arsiv", "archived"],
+                    ["Tum Kayitlar", "all"]
+                  ], @scope || params[:scope] || "active"),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.hidden_field :per_page, value: @per_page %>
+            <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
+          </div>
+          <div>
+            <%= link_to "Temizle", categories_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
+          </div>
+        <% end %>
       </div>
     </div>
 
@@ -21,11 +44,12 @@
               <th>Ad</th>
               <th>Kod</th>
               <th>Durum</th>
+              <th class="text-right">Aksiyon</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200 bg-white">
             <% @categories.each do |category| %>
-              <tr class="odd:bg-slate-50 even:bg-white">
+              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
                 <td class="font-medium text-slate-900"><%= category["name"].to_s %></td>
                 <td><%= category["code"].to_s %></td>
                 <td>
@@ -35,12 +59,30 @@
                     <span class="badge-info">Pasif</span>
                   <% end %>
                 </td>
+                <td class="text-right">
+                  <div class="inline-flex items-center gap-2">
+                    <%= link_to "Duzenle", edit_category_path(category["id"]), class: "btn-secondary" %>
+                    <% if category["deleted_at"].present? %>
+                      <%= link_to "Geri Yukle",
+                            restore_category_path(category["id"]),
+                            method: :patch,
+                            data: { confirm: "Bu kategoriyi geri yuklemek istediginize emin misiniz?" },
+                            class: "btn-secondary" %>
+                    <% else %>
+                      <%= link_to "Arsivle",
+                            category_path(category["id"]),
+                            method: :delete,
+                            data: { confirm: "Bu kategoriyi arsivlemek istediginize emin misiniz?" },
+                            class: "btn-secondary" %>
+                    <% end %>
+                  </div>
+                </td>
               </tr>
             <% end %>
 
             <% if @categories.empty? %>
               <tr>
-                <td colspan="3" class="py-10 text-center text-sm text-slate-500">Henüz kategori yok.</td>
+                <td colspan="4" class="py-10 text-center text-sm text-slate-500">Henuz kategori yok.</td>
               </tr>
             <% end %>
           </tbody>
@@ -53,13 +95,13 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
+          <span><%= @per_page %> kayit</span>
         </div>
         <div class="flex items-center gap-2">
           <% if @has_prev %>
-            <%= link_to "Önceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Onceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Onceki</span>
           <% end %>
 
           <% if @has_next %>

@@ -40,5 +40,9 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
-  resources :categories, only: [:index, :new, :create]
+  resources :categories, only: [:index, :new, :create, :edit, :update, :destroy] do
+    member do
+      patch :restore
+    end
+  end
 end
