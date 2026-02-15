@@ -22,7 +22,7 @@ class DashboardService
 
   def recent_offers
     cached("recent_offers") do
-      data = @client.get("offers?select=offer_number,offer_date,gross_total,status,companies(name)&order=offer_date.desc&limit=5")
+      data = @client.get("offers?select=offer_number,offer_date,gross_total,status,companies(name)&deleted_at=is.null&order=offer_date.desc&limit=5")
       return [] unless data.is_a?(Array)
 
       data.map { |row| serialize_recent_offer_row(row) }
@@ -98,12 +98,12 @@ class DashboardService
   end
 
   def count_companies
-    body, response = @client.get_with_response("companies?select=id&limit=1", headers: { "Prefer" => "count=exact" })
+    body, response = @client.get_with_response("companies?select=id&deleted_at=is.null&limit=1", headers: { "Prefer" => "count=exact" })
     count_from_response(body, response)
   end
 
   def count_offers(status: nil)
-    path = "offers?select=id&limit=1"
+    path = "offers?select=id&deleted_at=is.null&limit=1"
     path += "&status=eq.#{URI.encode_www_form_component(status)}" if status
     body, response = @client.get_with_response(path, headers: { "Prefer" => "count=exact" })
     count_from_response(body, response)
@@ -111,7 +111,7 @@ class DashboardService
 
   def sum_gross_total_this_month
     start = Date.today.beginning_of_month.iso8601
-    data = @client.get("offers?select=sum(gross_total)&offer_date=gte.#{start}")
+    data = @client.get("offers?select=sum(gross_total)&deleted_at=is.null&offer_date=gte.#{start}")
     return 0 unless data.is_a?(Array)
 
     data.first&.fetch("sum", 0) || 0
@@ -119,19 +119,19 @@ class DashboardService
 
   def companies_created_since(days:)
     since = (Date.today - days).iso8601
-    data = @client.get("companies?select=id&created_at=gte.#{since}")
+    data = @client.get("companies?select=id&deleted_at=is.null&created_at=gte.#{since}")
     data.is_a?(Array) ? data.size : 0
   end
 
   def offers_created_since(days:)
     since = (Date.today - days).iso8601
-    data = @client.get("offers?select=id&created_at=gte.#{since}")
+    data = @client.get("offers?select=id&deleted_at=is.null&created_at=gte.#{since}")
     data.is_a?(Array) ? data.size : 0
   end
 
   def offers_closed_since(days:)
     since = (Date.today - days).iso8601
-    data = @client.get("offers?select=id&created_at=gte.#{since}&status=eq.onaylandi")
+    data = @client.get("offers?select=id&deleted_at=is.null&created_at=gte.#{since}&status=eq.onaylandi")
     data.is_a?(Array) ? data.size : 0
   end
 
