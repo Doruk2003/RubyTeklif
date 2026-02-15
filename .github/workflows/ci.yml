@@ -66,6 +66,9 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+      - name: Analyze code smells
+        run: bin/reek app
+
   test:
     runs-on: ubuntu-latest
 
