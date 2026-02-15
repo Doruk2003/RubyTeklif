@@ -35,7 +35,7 @@
 
   def create
     form_payload = company_params
-    result = Companies::CreateCompany.new(client: client).call(form_payload: form_payload, actor_id: current_user.id)
+    result = Catalog::UseCases::Companies::Create.new(client: client).call(form_payload: form_payload, actor_id: current_user.id)
     redirect_to companies_path, notice: result[:notice]
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#create")
@@ -54,7 +54,7 @@
 
   def update
     payload = company_params
-    Companies::UpdateCompany.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    Catalog::UseCases::Companies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to company_path(params[:id]), notice: "Musteri guncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#update")
@@ -64,7 +64,7 @@
   end
 
   def destroy
-    Companies::ArchiveCompany.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Catalog::UseCases::Companies::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to companies_path, notice: "Müşteri arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#destroy")
@@ -72,7 +72,7 @@
   end
 
   def restore
-    Companies::RestoreCompany.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Catalog::UseCases::Companies::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to companies_path(scope: "archived"), notice: "Müşteri geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#restore")
@@ -93,3 +93,4 @@
     authorize_with_policy!(CompaniesPolicy)
   end
 end
+

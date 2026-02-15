@@ -25,5 +25,7 @@ module RubyTeklifApp
     # config.eager_load_paths << Rails.root.join("extras")
     config.autoload_paths << Rails.root.join("app/queries")
     config.autoload_paths << Rails.root.join("app/forms")
+    config.autoload_paths << Rails.root.join("app/domains")
+    config.eager_load_paths << Rails.root.join("app/domains")
   end
 end

@@ -40,7 +40,7 @@
 
   def create
     payload = product_params
-    product_id = Products::CreateProduct.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    product_id = Catalog::UseCases::Products::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
     redirect_to product_path(product_id), notice: "Ürün oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#create")
@@ -51,7 +51,7 @@
 
   def update
     payload = product_params
-    result = Products::UpdateProduct.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    result = Catalog::UseCases::Products::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to product_path(result[:id]), notice: "Ürün güncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#update")
@@ -61,7 +61,7 @@
   end
 
   def destroy
-    Products::ArchiveProduct.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Catalog::UseCases::Products::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to products_path, notice: "Ürün arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#destroy")
@@ -69,7 +69,7 @@
   end
 
   def restore
-    Products::RestoreProduct.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Catalog::UseCases::Products::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to products_path(scope: "archived"), notice: "Urun geri yuklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "products#restore")
@@ -99,3 +99,4 @@
     @category_labels = {}
   end
 end
+

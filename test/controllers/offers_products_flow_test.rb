@@ -1,4 +1,4 @@
-require "test_helper"
+﻿require "test_helper"
 
 class OffersProductsFlowTest < ActionDispatch::IntegrationTest
   class FakeAuth
@@ -204,7 +204,7 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
     fake_use_case = FakeProductsCreateUseCase.new(error: error)
 
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Products::CreateProduct, fake_use_case) do
+      with_stubbed_constructor(Catalog::UseCases::Products::Create, fake_use_case) do
         with_stubbed_constructor(Categories::OptionsQuery, FakeCategoriesOptionsQuery.new) do
           post products_path, params: { product: { name: "", price: "10", vat_rate: "20", item_type: "product", category_id: "cat-1", active: "1" } }
           assert_response :unprocessable_entity
@@ -218,7 +218,7 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
     fake_use_case = FakeProductsUpdateUseCase.new(error: error)
 
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Products::UpdateProduct, fake_use_case) do
+      with_stubbed_constructor(Catalog::UseCases::Products::Update, fake_use_case) do
         with_stubbed_constructor(Categories::OptionsQuery, FakeCategoriesOptionsQuery.new) do
           patch product_path("prd-1"), params: { product: { name: "Test", price: "-1", vat_rate: "20", item_type: "product", category_id: "cat-1", active: "1" } }
           assert_response :unprocessable_entity
@@ -248,7 +248,7 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
     fake_use_case = FakeOffersCreateUseCase.new(error: error)
 
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Offers::CreateOffer, fake_use_case) do
+      with_stubbed_constructor(Sales::UseCases::Offers::Create, fake_use_case) do
         post offers_path,
              params: {
                offer: {
@@ -266,12 +266,12 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
 
   test "operator can archive and restore product" do
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Products::ArchiveProduct, FakeProductsArchiveUseCase.new) do
+      with_stubbed_constructor(Catalog::UseCases::Products::Archive, FakeProductsArchiveUseCase.new) do
         delete product_path("prd-1")
         assert_redirected_to products_path
       end
 
-      with_stubbed_constructor(Products::RestoreProduct, FakeProductsRestoreUseCase.new) do
+      with_stubbed_constructor(Catalog::UseCases::Products::Restore, FakeProductsRestoreUseCase.new) do
         patch restore_product_path("prd-1")
         assert_redirected_to products_path(scope: "archived")
       end
@@ -280,15 +280,16 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
 
   test "operator can archive and restore offer" do
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Offers::ArchiveOffer, FakeOffersArchiveUseCase.new) do
+      with_stubbed_constructor(Sales::UseCases::Offers::Archive, FakeOffersArchiveUseCase.new) do
         delete offer_path("off-1")
         assert_redirected_to offers_path
       end
 
-      with_stubbed_constructor(Offers::RestoreOffer, FakeOffersRestoreUseCase.new) do
+      with_stubbed_constructor(Sales::UseCases::Offers::Restore, FakeOffersRestoreUseCase.new) do
         patch restore_offer_path("off-1")
         assert_redirected_to offers_path(scope: "archived")
       end
     end
   end
 end
+

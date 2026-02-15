@@ -24,7 +24,7 @@
 
   def create
     payload = currency_params
-    Currencies::CreateCurrency.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    Catalog::UseCases::Currencies::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur kaydi olusturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#create")
@@ -41,7 +41,7 @@
 
   def update
     payload = currency_params
-    Currencies::UpdateCurrency.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    Catalog::UseCases::Currencies::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur guncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#update")
@@ -51,7 +51,7 @@
   end
 
   def destroy
-    Currencies::ArchiveCurrency.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Catalog::UseCases::Currencies::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to currencies_path, notice: "Kur arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#destroy")
@@ -59,7 +59,7 @@
   end
 
   def restore
-    Currencies::RestoreCurrency.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Catalog::UseCases::Currencies::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to currencies_path(scope: "archived"), notice: "Kur geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "currencies#restore")
@@ -80,3 +80,4 @@
     authorize_with_policy!(CurrenciesPolicy)
   end
 end
+

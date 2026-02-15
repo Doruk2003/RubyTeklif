@@ -1,4 +1,4 @@
-require "test_helper"
+﻿require "test_helper"
 
 class CategoriesFlowTest < ActionDispatch::IntegrationTest
   class FakeAuth
@@ -141,7 +141,7 @@ class CategoriesFlowTest < ActionDispatch::IntegrationTest
     fake_use_case = FakeCategoriesCreateUseCase.new(error: error)
 
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Categories::CreateCategory, fake_use_case) do
+      with_stubbed_constructor(Catalog::UseCases::Categories::Create, fake_use_case) do
         post categories_path, params: { category: { code: "", name: "", active: "1" } }
         assert_response :unprocessable_entity
       end
@@ -150,15 +150,16 @@ class CategoriesFlowTest < ActionDispatch::IntegrationTest
 
   test "operator can archive and restore category" do
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Categories::ArchiveCategory, FakeCategoriesArchiveUseCase.new) do
+      with_stubbed_constructor(Catalog::UseCases::Categories::Archive, FakeCategoriesArchiveUseCase.new) do
         delete category_path("cat-1")
         assert_redirected_to categories_path
       end
 
-      with_stubbed_constructor(Categories::RestoreCategory, FakeCategoriesRestoreUseCase.new) do
+      with_stubbed_constructor(Catalog::UseCases::Categories::Restore, FakeCategoriesRestoreUseCase.new) do
         patch restore_category_path("cat-1")
         assert_redirected_to categories_path(scope: "archived")
       end
     end
   end
 end
+

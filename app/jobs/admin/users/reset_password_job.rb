@@ -1,4 +1,4 @@
-module Admin
+﻿module Admin
   module Users
     class ResetPasswordJob < ApplicationJob
       queue_as :default
@@ -14,7 +14,7 @@ module Admin
       end
 
       def perform(target_user_id, actor_id)
-        Admin::Users::ResetUserPassword.new(client: Supabase::Client.new(role: :service)).call(
+        Admin::Users::UseCases::ResetUserPassword.new(client: Supabase::Client.new(role: :service)).call(
           id: target_user_id,
           actor_id: actor_id
         )
@@ -22,3 +22,4 @@ module Admin
     end
   end
 end
+

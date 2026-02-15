@@ -1,4 +1,4 @@
-require "test_helper"
+﻿require "test_helper"
 
 class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
   class FakeAuth
@@ -124,7 +124,7 @@ class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
     fake_use_case = FakeCompaniesCreateUseCase.new(error: error)
 
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Companies::CreateCompany, fake_use_case) do
+      with_stubbed_constructor(Catalog::UseCases::Companies::Create, fake_use_case) do
         post companies_path, params: { company: { name: "", tax_number: "12345678", active: "1" } }
         assert_response :unprocessable_entity
       end
@@ -133,10 +133,11 @@ class AuthRoleCrudFlowTest < ActionDispatch::IntegrationTest
 
   test "operator can restore archived company" do
     with_authenticated_context(role: Roles::OPERATOR) do
-      with_stubbed_constructor(Companies::RestoreCompany, FakeCompaniesRestoreUseCase.new) do
+      with_stubbed_constructor(Catalog::UseCases::Companies::Restore, FakeCompaniesRestoreUseCase.new) do
         patch restore_company_path("cmp-1")
         assert_redirected_to companies_path(scope: "archived")
       end
     end
   end
 end
+

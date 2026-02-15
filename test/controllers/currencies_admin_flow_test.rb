@@ -1,4 +1,4 @@
-require "test_helper"
+﻿require "test_helper"
 
 class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
   class FakeAuth
@@ -160,7 +160,7 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     fake_use_case = FakeCurrenciesCreateUseCase.new(error: error)
 
     with_authenticated_context(role: Roles::MANAGER) do
-      with_stubbed_constructor(Currencies::CreateCurrency, fake_use_case) do
+      with_stubbed_constructor(Catalog::UseCases::Currencies::Create, fake_use_case) do
         post currencies_path, params: { currency: { code: "", name: "USD", symbol: "$", rate_to_try: "35", active: "1" } }
         assert_response :unprocessable_entity
       end
@@ -169,7 +169,7 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
 
   test "manager can restore archived currency" do
     with_authenticated_context(role: Roles::MANAGER) do
-      with_stubbed_constructor(Currencies::RestoreCurrency, FakeCurrenciesRestoreUseCase.new) do
+      with_stubbed_constructor(Catalog::UseCases::Currencies::Restore, FakeCurrenciesRestoreUseCase.new) do
         patch restore_currency_path("cur-1")
         assert_redirected_to currencies_path(scope: "archived")
       end
@@ -197,7 +197,7 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     fake_update = FakeAdminUsersUpdateRole.new(error: error)
 
     with_authenticated_context(role: Roles::ADMIN) do
-      with_stubbed_constructor(Admin::Users::UpdateUserRole, fake_update) do
+      with_stubbed_constructor(Admin::Users::UseCases::UpdateUserRole, fake_update) do
         patch admin_user_path("usr-2"), params: { user: { role: "invalid" } }
         assert_redirected_to admin_users_path
       end
@@ -222,3 +222,4 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     end
   end
 end
+

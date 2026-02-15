@@ -1,4 +1,4 @@
-require "test_helper"
+﻿require "test_helper"
 
 module Admin
   module Users
@@ -34,7 +34,7 @@ module Admin
       test "delegates to reset password service" do
         fake_use_case = FakeResetPasswordUseCase.new
 
-        with_stubbed_constructor(Admin::Users::ResetUserPassword, fake_use_case) do
+        with_stubbed_constructor(Admin::Users::UseCases::ResetUserPassword, fake_use_case) do
           with_stubbed_constructor(Supabase::Client, Object.new) do
             ResetPasswordJob.perform_now("usr-2", "usr-1")
           end
@@ -46,7 +46,7 @@ module Admin
       test "discards validation errors" do
         fake_use_case = FakeResetPasswordUseCase.new(error: ServiceErrors::Validation.new(user_message: "email yok"))
 
-        with_stubbed_constructor(Admin::Users::ResetUserPassword, fake_use_case) do
+        with_stubbed_constructor(Admin::Users::UseCases::ResetUserPassword, fake_use_case) do
           with_stubbed_constructor(Supabase::Client, Object.new) do
             assert_nothing_raised do
               ResetPasswordJob.perform_now("usr-2", "usr-1")
@@ -57,3 +57,4 @@ module Admin
     end
   end
 end
+

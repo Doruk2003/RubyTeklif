@@ -25,7 +25,7 @@
   end
 
   def destroy
-    Offers::ArchiveOffer.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
+    Sales::UseCases::Offers::Archive.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
     redirect_to offers_path, notice: "Teklif arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#destroy")
@@ -33,7 +33,7 @@
   end
 
   def restore
-    Offers::RestoreOffer.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
+    Sales::UseCases::Offers::Restore.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
     redirect_to offers_path(scope: "archived"), notice: "Teklif geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#restore")
@@ -61,7 +61,7 @@
     @selected_category_id = payload.delete(:product_category_id).to_s.presence
     payload[:items] = Array(payload[:items]).map { |item| item.to_h.deep_symbolize_keys }
 
-    offer_id = Offers::CreateOffer.new(client: supabase_user_client).call(payload: payload, user_id: current_user.id)
+    offer_id = Sales::UseCases::Offers::Create.new(client: supabase_user_client).call(payload: payload, user_id: current_user.id)
     redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#create")
@@ -116,3 +116,4 @@
     authorize_with_policy!(OffersPolicy)
   end
 end
+
