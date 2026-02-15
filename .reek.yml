@@ -230,6 +230,7 @@ detectors:
     - PagesController
     - ProductsController
     - SessionsController
+    - Maintenance::CleanupExportFilesJob
     - Admin::Users::CreateForm
     - Categories::UpsertForm
     - Companies::UpsertForm
@@ -376,6 +377,7 @@ detectors:
     - Observability::ErrorReporter#report
     - Admin::ActivityLogs::ExportCsvJob#perform
     - Admin::Users::ExportCsvJob#perform
+    - Maintenance::CleanupExportFilesJob#perform
   NilCheck:
     exclude:
     - Admin::UsersController#edit
@@ -518,6 +520,7 @@ detectors:
     - Supabase::Client#patch
     - Supabase::Client#post
     - Supabase::Client#request
+    - Maintenance::CleanupExportFilesJob#perform
   UncommunicativeMethodName:
     exclude:
     - Categories::IndexQuery#q
@@ -634,4 +637,5 @@ detectors:
     - Supabase::Auth#request
     - Supabase::Client#parse_response_body
     - Auth::SendRecoveryEmailJob#perform
+    - Maintenance::CleanupExportFilesJob#perform
 
