@@ -2,52 +2,53 @@
 require "uri"
 
 class DashboardService
-  def initialize(client:)
+  CACHE_TTL = 2.minutes
+
+  def initialize(client:, actor_id: nil, cache_store: Rails.cache)
     @client = client
+    @actor_id = actor_id.to_s.presence || "anonymous"
+    @cache_store = cache_store
   end
 
   def kpis
-    [
-      active_customers_kpi,
-      open_offers_kpi,
-      monthly_revenue_kpi
-    ]
+    cached("kpis") do
+      [
+        active_customers_kpi,
+        open_offers_kpi,
+        monthly_revenue_kpi
+      ]
+    end
   end
 
   def recent_offers
-    data = @client.get("offers?select=offer_number,offer_date,gross_total,status,companies(name)&order=offer_date.desc&limit=5")
-    return [] unless data.is_a?(Array)
+    cached("recent_offers") do
+      data = @client.get("offers?select=offer_number,offer_date,gross_total,status,companies(name)&order=offer_date.desc&limit=5")
+      return [] unless data.is_a?(Array)
 
-    data.map do |row|
-      status = (row["status"] || "Taslak").to_s
-      {
-        number: row["offer_number"].to_s,
-        company: row.dig("companies", "name").to_s,
-        amount: format_currency(row["gross_total"]),
-        status: status,
-        status_class: status_badge_class(status)
-      }
+      data.map { |row| serialize_recent_offer_row(row) }
     end
   end
 
   def flow_stats
-    [
-      {
-        label: "Yeni Müşteri",
-        value: companies_created_since(days: 7).to_s,
-        note: "Son 7 gün"
-      },
-      {
-        label: "Oluşturulan Teklif",
-        value: offers_created_since(days: 7).to_s,
-        note: "Son 7 gün"
-      },
-      {
-        label: "Kapanan Teklif",
-        value: offers_closed_since(days: 7).to_s,
-        note: "Son 7 gün"
-      }
-    ]
+    cached("flow_stats") do
+      [
+        {
+          label: "Yeni Müşteri",
+          value: companies_created_since(days: 7).to_s,
+          note: "Son 7 gün"
+        },
+        {
+          label: "Oluşturulan Teklif",
+          value: offers_created_since(days: 7).to_s,
+          note: "Son 7 gün"
+        },
+        {
+          label: "Kapanan Teklif",
+          value: offers_closed_since(days: 7).to_s,
+          note: "Son 7 gün"
+        }
+      ]
+    end
   end
 
   def reminders
@@ -170,5 +171,21 @@ class DashboardService
     when 6..15 then "w-1/2"
     else "w-3/4"
     end
+  end
+
+  def cached(section, &block)
+    @cache_store.fetch("dashboard/#{@actor_id}/#{section}", expires_in: CACHE_TTL, &block)
+  end
+
+  # :reek:FeatureEnvy
+  def serialize_recent_offer_row(row)
+    status = (row["status"] || "Taslak").to_s
+    {
+      number: row["offer_number"].to_s,
+      company: row.dig("companies", "name").to_s,
+      amount: format_currency(row["gross_total"]),
+      status: status,
+      status_class: status_badge_class(status)
+    }
   end
 end
