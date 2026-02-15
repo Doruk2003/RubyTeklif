@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "open3"
+
+ROOT = File.expand_path("..", __dir__)
+WITH_SYSTEM = ARGV.include?("--with-system")
+
+steps = [
+  ["RuboCop", ["bundle", "exec", "rubocop"]],
+  ["Reek", ["bundle", "exec", "reek", "app"]],
+  ["Brakeman", ["bundle", "exec", "brakeman", "--quiet", "--no-pager", "--exit-on-warn", "--exit-on-error"]],
+  ["Architecture tests", ["bundle", "exec", "rails", "test", "test/architecture"]],
+  ["Rails test suite", ["bundle", "exec", "rails", "test"]]
+]
+
+if WITH_SYSTEM
+  steps << ["System tests", ["bundle", "exec", "rails", "test:system"]]
+end
+
+def run_step(name, cmd)
+  puts "\n==> #{name}"
+  puts "$ #{cmd.join(' ')}"
+
+  status = nil
+  Open3.popen2e(*cmd, chdir: ROOT) do |_stdin, out, wait_thr|
+    out.each { |line| puts line }
+    status = wait_thr.value
+  end
+
+  return true if status&.success?
+
+  warn "\n[FAIL] #{name} failed."
+  false
+end
+
+failed = steps.any? { |name, cmd| !run_step(name, cmd) }
+if failed
+  exit 1
+end
+
+puts "\n[OK] Release smoke checks passed."
+puts "Manual checklist: docs/release_smoke_checklist.md"

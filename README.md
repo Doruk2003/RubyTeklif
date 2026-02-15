@@ -70,3 +70,4 @@ Canliya cikis oncesi zorunlu checklist:
 
 - `docs/release_smoke_checklist.md`
 - `docs/release_gate_checklist.md`
+- Otomatik smoke komutu: `bin/release_smoke` (opsiyonel system test ile: `bin/release_smoke --with-system`)

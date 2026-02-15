@@ -41,6 +41,7 @@ Bu liste, son degisikliklerden sonra minimum zorunlu kontrolleri kapsar.
 
 ## 6) Komutlar
 
+- `bin/release_smoke`
+- (opsiyonel) `bin/release_smoke --with-system`
 - `bin/rubocop`
 - `bin/rails test`
-
