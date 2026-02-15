@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :authenticate_user!
+  before_action :set_request_context
   rescue_from StandardError, with: :handle_unexpected_error
   rescue_from Pundit::NotAuthorizedError, with: :handle_not_authorized
 
@@ -17,6 +18,10 @@ class ApplicationController < ActionController::Base
 
   def current_user
     Current.user
+  end
+
+  def set_request_context
+    Current.request_id = request&.request_id
   end
 
   def supabase_user_client

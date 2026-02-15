@@ -70,3 +70,5 @@ gem "tailwindcss-rails", "~> 4.4"
 
 gem "dotenv-rails", "~> 3.2"
 gem "pundit", "~> 2.4"
+gem "sentry-ruby", "~> 5.17"
+gem "sentry-rails", "~> 5.17"
