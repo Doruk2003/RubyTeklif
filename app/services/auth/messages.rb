@@ -1,4 +1,4 @@
-module Auth
+﻿module Auth
   module Messages
     SESSION_TIMEOUT = "Oturum süreniz doldu. Lütfen tekrar giriş yapın.".freeze
     SESSION_ENDED = "Oturumunuz sona erdi. Lütfen tekrar giriş yapın.".freeze
