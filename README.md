@@ -15,7 +15,8 @@ Rails + Supabase tabanli teklif/CRM uygulamasi.
 1. Ruby surumunu `.ruby-version` ile uyumlu kur.
 2. Bagimliliklari yukle:
    - `bundle install`
-3. Ortam degiskenlerini tanimla (`.env`):
+3. Ortam degiskenlerini tanimla:
+   - `.env.example` dosyasini `.env` olarak kopyala ve degerleri doldur.
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
