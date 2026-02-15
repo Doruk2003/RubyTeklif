@@ -19,6 +19,14 @@ module Admin
       def email
         super.to_s.strip
       end
+
+      def to_h
+        {
+          email: email,
+          password: password.to_s,
+          role: role
+        }
+      end
     end
   end
 end

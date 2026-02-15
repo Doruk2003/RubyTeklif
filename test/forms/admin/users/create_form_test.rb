@@ -23,6 +23,19 @@ module Admin
         assert_equal false, form.valid?
         assert_includes form.errors[:role], "is not included in the list"
       end
+
+      test "normalizes payload for service layer" do
+        form = Admin::Users::CreateForm.new(
+          email: "  user@example.com  ",
+          password: "Password12",
+          role: Roles::MANAGER
+        )
+
+        assert_equal(
+          { email: "user@example.com", password: "Password12", role: Roles::MANAGER },
+          form.to_h
+        )
+      end
     end
   end
 end

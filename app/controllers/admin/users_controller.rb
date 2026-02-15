@@ -25,14 +25,14 @@
     end
 
     def create
-      user_params = params.require(:user).permit(:email, :password, :role).to_h
-      Admin::Users::UseCases::CreateUser.new(client: client).call(form_payload: user_params, actor_id: current_user.id)
+      form = Admin::Users::CreateForm.new(params.require(:user).permit(:email, :password, :role).to_h)
+      return render_create_error(form: form, message: form.errors.full_messages.join(", ")) if form.invalid?
+
+      Admin::Users::UseCases::CreateUser.new(client: client).call(form_payload: form.to_h, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici olusturuldu."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#create")
-      flash.now[:alert] = "Kullanici olusturulamadi: #{e.user_message}"
-      @user = { "email" => user_params&.[]("email").to_s, "role" => user_params&.[]("role").to_s.presence || Roles::ADMIN }
-      render :new, status: :unprocessable_entity
+      render_create_error(form: form, message: e.user_message)
     end
 
     def edit
@@ -44,7 +44,7 @@
 
     def update
       form = Admin::Users::UpdateRoleForm.new(params.require(:user).permit(:role).to_h)
-      unless form.valid?
+      if form.invalid?
         return redirect_to admin_users_path, alert: "Kullanici guncellenemedi: #{form.errors.full_messages.join(', ')}"
       end
 
@@ -150,6 +150,12 @@
       return nil unless state.is_a?(Hash)
 
       state.to_h.symbolize_keys
+    end
+
+    def render_create_error(form:, message:)
+      flash.now[:alert] = "Kullanici olusturulamadi: #{message}"
+      @user = { "email" => form&.email.to_s, "role" => form&.role.to_s.presence || Roles::ADMIN }
+      render :new, status: :unprocessable_entity
     end
   end
 end
