@@ -43,8 +43,12 @@
     end
 
     def update
-      role = params.require(:user).permit(:role)[:role].to_s
-      Admin::Users::UseCases::UpdateUserRole.new(client: client).call(id: params[:id], role: role, actor_id: current_user.id)
+      form = Admin::Users::UpdateRoleForm.new(params.require(:user).permit(:role).to_h)
+      unless form.valid?
+        return redirect_to admin_users_path, alert: "Kullanici guncellenemedi: #{form.errors.full_messages.join(', ')}"
+      end
+
+      Admin::Users::UseCases::UpdateUserRole.new(client: client).call(id: params[:id], role: form.role, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici rolu guncellendi."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#update")
