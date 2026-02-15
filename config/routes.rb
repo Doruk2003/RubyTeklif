@@ -7,6 +7,10 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :users, only: [:index, :new, :create, :edit, :update] do
+      collection do
+        post :export
+        get "exports/:token", action: :download_export, as: :download_export
+      end
       member do
         patch :disable
         patch :enable

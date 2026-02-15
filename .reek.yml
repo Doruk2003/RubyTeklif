@@ -76,6 +76,9 @@ detectors:
     - Admin::ActivityLogsController#export
     - Admin::ActivityLogs::ExportCsvJob#perform
     - Admin::Users::IndexQuery#build_query
+    - Admin::Users::IndexQuery#build_filters
+    - Admin::UsersController#export
+    - Admin::Users::ExportCsvJob#perform
     - Companies::IndexQuery#apply_has_offers_filter
     - Companies::IndexQuery#build_companies_query
     - Companies::IndexQuery#call
@@ -132,6 +135,7 @@ detectors:
     - Admin::ActivityLogsController#load_users_index
     - Admin::ActivityLogs::IndexQuery#append_filters
     - Admin::ActivityLogs::ExportCsvJob#perform
+    - Admin::Users::IndexQuery#append_filters
     - CategoriesController#safe_return_to
     - Offers::CreateForm#normalize_items
     - CompaniesHelper#format_phone
@@ -216,6 +220,7 @@ detectors:
     exclude:
     - Admin::ActivityLogsController
     - Admin::ActivityLogs::ExportCsvJob
+    - Admin::Users::ExportCsvJob
     - Admin::UsersController
     - ApplicationController
     - CategoriesController
@@ -370,6 +375,7 @@ detectors:
     exclude:
     - Observability::ErrorReporter#report
     - Admin::ActivityLogs::ExportCsvJob#perform
+    - Admin::Users::ExportCsvJob#perform
   NilCheck:
     exclude:
     - Admin::UsersController#edit
@@ -405,6 +411,7 @@ detectors:
   TooManyMethods:
     exclude:
     - ApplicationController
+    - Admin::UsersController
     - Companies::IndexQuery
     - DashboardService
   TooManyStatements:
@@ -414,6 +421,8 @@ detectors:
     - Admin::ActivityLogsController#download_export
     - Admin::ActivityLogsController#current_export_state
     - Admin::UsersController#create
+    - Admin::UsersController#download_export
+    - Admin::UsersController#current_export_state
     - Admin::UsersController#index
     - Admin::UsersController#update
     - ApplicationController#authenticate_user!
@@ -455,7 +464,10 @@ detectors:
     - Admin::ActivityLogs::IndexQuery#load_filter_options
     - Admin::ActivityLogs::ExportCsvJob#perform
     - Admin::Users::IndexQuery#build_query
+    - Admin::Users::IndexQuery#build_filters
     - Admin::Users::IndexQuery#call
+    - Admin::Users::IndexQuery#export_rows
+    - Admin::Users::ExportCsvJob#perform
     - Categories::IndexQuery#call
     - Categories::OptionsQuery#call
     - Companies::IndexQuery#apply_offers_count_sort
@@ -517,6 +529,7 @@ detectors:
     - Admin::UsersController#reset_password
     - Admin::UsersController#update
     - Admin::ActivityLogs::ExportCsvJob#perform
+    - Admin::Users::IndexQuery#build_filters
     - CategoriesController
     - CategoriesController#create
     - CategoriesController#destroy
@@ -561,6 +574,7 @@ detectors:
     exclude:
     - ApplicationController#current_user
     - Admin::ActivityLogsController#normalized_export_state
+    - Admin::UsersController#normalized_export_state
     - Categories::UpsertForm#normalize_active
     - Companies::UpsertForm#normalize_active
     - Currencies::UpsertForm#normalize_active
@@ -571,6 +585,7 @@ detectors:
     - Admin::ActivityLogs::IndexQuery#build_filters
     - Admin::ActivityLogs::IndexQuery#positive_int
     - Admin::Users::IndexQuery#build_query
+    - Admin::Users::IndexQuery#build_filters
     - Admin::Users::IndexQuery#positive_int
     - Categories::IndexQuery#active
     - Categories::IndexQuery#active_filter

@@ -1,6 +1,7 @@
 ﻿module Admin
   class UsersController < ApplicationController
     before_action :authorize_admin!
+    EXPORT_TTL = 30.minutes
 
     def index
       result = Admin::Users::IndexQuery.new(client: client).call(params: params)
@@ -9,12 +10,14 @@
       @per_page = result[:per_page]
       @has_prev = result[:has_prev]
       @has_next = result[:has_next]
+      @export = current_export_state
     rescue Supabase::Client::ConfigurationError
       @users = []
       @page = 1
       @per_page = 100
       @has_next = false
       @has_prev = false
+      @export = nil
     end
 
     def new
@@ -73,6 +76,37 @@
       redirect_to admin_users_path, alert: "Parola sifirlama baslatilamadi."
     end
 
+    def export
+      token = SecureRandom.hex(12)
+      Rails.cache.write(
+        export_cache_key(token),
+        { status: "pending", actor_id: current_user.id },
+        expires_in: EXPORT_TTL
+      )
+      session[:admin_users_export_token] = token
+
+      Admin::Users::ExportCsvJob.perform_later(token, current_user.id, export_params.to_h)
+      redirect_to admin_users_path(export_params.to_h), notice: "CSV export kuyruğa alındı."
+    end
+
+    def download_export
+      state = normalized_export_state(Rails.cache.read(export_cache_key(params[:token].to_s)))
+      unless state.is_a?(Hash) && state[:actor_id].to_s == current_user.id.to_s
+        return redirect_to admin_users_path, alert: "Export kaydı bulunamadı."
+      end
+
+      if state[:status].to_s != "ready"
+        return redirect_to admin_users_path, alert: "Export henüz hazır değil."
+      end
+
+      file_path = state[:file_path].to_s
+      unless file_path.present? && File.exist?(file_path)
+        return redirect_to admin_users_path, alert: "Export dosyası bulunamadı."
+      end
+
+      send_file file_path, filename: "admin_users_#{Date.current.iso8601}.csv", type: "text/csv"
+    end
+
     private
 
     def client
@@ -83,6 +117,29 @@
       authorize_with_policy!(AdminUsersPolicy)
     end
 
+    def export_params
+      params.permit(:q, :role, :active)
+    end
+
+    def current_export_state
+      token = session[:admin_users_export_token].to_s
+      return nil if token.blank?
+
+      state = normalized_export_state(Rails.cache.read(export_cache_key(token)))
+      return nil unless state.is_a?(Hash)
+      return nil unless state[:actor_id].to_s == current_user.id.to_s
+
+      state.merge(token: token)
+    end
+
+    def export_cache_key(token)
+      "admin/users/export/#{token}"
+    end
+
+    def normalized_export_state(state)
+      return nil unless state.is_a?(Hash)
+
+      state.to_h.symbolize_keys
+    end
   end
 end
-

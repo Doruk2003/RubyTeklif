@@ -23,11 +23,31 @@ module Admin
         }
       end
 
+      def export_rows(params:, max_rows: 5_000)
+        limit = [ max_rows.to_i, 10_000 ].min
+        base = "users?select=id,email,role,active&order=email.asc&limit=#{limit}&offset=0"
+        query = append_filters(base, params)
+        rows = @client.get(query)
+        rows.is_a?(Array) ? rows : []
+      rescue StandardError
+        []
+      end
+
       private
 
       def build_query(params, page:, per_page:)
         offset = (page - 1) * per_page
         base = "users?select=id,email,role,active&order=email.asc"
+        query = append_filters(base, params)
+        "#{query}&limit=#{per_page + 1}&offset=#{offset}"
+      end
+
+      def append_filters(base_query, params)
+        filters = build_filters(params)
+        filters.empty? ? base_query : "#{base_query}&#{filters.join('&')}"
+      end
+
+      def build_filters(params)
         filters = []
 
         if params[:q].present?
@@ -36,9 +56,7 @@ module Admin
         end
         filters << "role=eq.#{Supabase::FilterValue.eq(params[:role])}" if params[:role].present?
         filters << "active=eq.#{Supabase::FilterValue.eq(params[:active])}" if params[:active].present?
-
-        query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
-        "#{query}&limit=#{per_page + 1}&offset=#{offset}"
+        filters
       end
 
       def positive_int(value, default:, max: nil)
@@ -46,7 +64,7 @@ module Admin
         parsed = default if parsed <= 0
         return parsed unless max
 
-        [parsed, max].min
+        [ parsed, max ].min
       end
     end
   end
