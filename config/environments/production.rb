@@ -50,7 +50,7 @@ Rails.application.configure do
   config.cache_store = :solid_cache_store
 
   # Queue backend can be switched per environment variable without code change.
-  queue_adapter = ENV.fetch("ACTIVE_JOB_QUEUE_ADAPTER", "solid_queue").to_s
+  queue_adapter = ENV.fetch("ACTIVE_JOB_QUEUE_ADAPTER", "sidekiq").to_s
   config.active_job.queue_adapter = queue_adapter.to_sym
   if queue_adapter == "solid_queue"
     config.solid_queue.connects_to = { database: { writing: :queue } }

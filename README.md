@@ -23,9 +23,13 @@ Rails + Supabase tabanli teklif/CRM uygulamasi.
    - `SUPABASE_SERVICE_USER_ID`
 4. Uygulamayi baslat:
    - `bin/dev`
-5. Job adapter secimi (opsiyonel):
-   - Varsayilan: `ACTIVE_JOB_QUEUE_ADAPTER=solid_queue`
-   - Sidekiq gecisi icin: `ACTIVE_JOB_QUEUE_ADAPTER=sidekiq` ve `REDIS_URL` tanimli olmalidir.
+5. Job adapter secimi:
+   - Development varsayilan: `ACTIVE_JOB_QUEUE_ADAPTER=async`
+   - Test varsayilan: `:test`
+   - Production varsayilan: `ACTIVE_JOB_QUEUE_ADAPTER=sidekiq`
+   - Sidekiq icin `REDIS_URL` tanimli olmalidir.
+6. Sidekiq calistirma (development/production):
+   - `bundle exec sidekiq -C config/sidekiq.yml`
 
 ## Test ve Kalite Kapisi
 
