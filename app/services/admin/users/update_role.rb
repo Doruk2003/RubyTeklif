@@ -1,6 +1,8 @@
 module Admin
   module Users
     class UpdateRole
+      include AtomicRpc
+
       ALLOWED_ROLES = Roles::ASSIGNABLE_ROLES
 
       def initialize(client:)
@@ -12,14 +14,13 @@ module Admin
         validate_role!(role)
         ensure_last_active_admin_not_demoted!(id: id, role: role)
 
-        response = @client.post(
+        response = call_atomic_rpc!(
           "rpc/admin_update_user_role_with_audit_atomic",
           body: {
             p_actor_id: actor_id,
             p_target_user_id: id,
             p_role: role
-          },
-          headers: { "Prefer" => "return=representation" }
+          }
         )
         raise_from_response!(response, fallback: "Kullanici guncellenemedi.")
       end

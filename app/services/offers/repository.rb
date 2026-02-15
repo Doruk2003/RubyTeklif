@@ -2,6 +2,8 @@ require "bigdecimal"
 
 module Offers
   class Repository
+    include AtomicRpc
+
     attr_reader :client
 
     def initialize(client:)
@@ -46,28 +48,26 @@ module Offers
         end
       }
 
-      @client.post("rpc/create_offer_with_items_atomic", body: payload, headers: { "Prefer" => "return=representation" })
+      call_atomic_rpc!("rpc/create_offer_with_items_atomic", body: payload)
     end
 
     def archive_with_audit_atomic(offer_id:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/archive_offer_with_items_and_audit_atomic",
         body: {
           p_actor_id: actor_id,
           p_offer_id: offer_id
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def restore_with_audit_atomic(offer_id:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/restore_offer_with_items_and_audit_atomic",
         body: {
           p_actor_id: actor_id,
           p_offer_id: offer_id
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 

@@ -1,11 +1,13 @@
 module Companies
   class Repository
+    include AtomicRpc
+
     def initialize(client:)
       @client = client
     end
 
     def create_with_audit_atomic(payload:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/create_company_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
@@ -17,13 +19,12 @@ module Companies
           p_email: payload[:email],
           p_address: payload[:address],
           p_active: payload[:active]
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def update_with_audit_atomic(company_id:, payload:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/update_company_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
@@ -36,30 +37,27 @@ module Companies
           p_email: payload[:email],
           p_address: payload[:address],
           p_active: payload[:active]
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def archive_with_audit_atomic(company_id:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/archive_company_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
           p_company_id: company_id
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def restore_with_audit_atomic(company_id:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/restore_company_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
           p_company_id: company_id
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
   end

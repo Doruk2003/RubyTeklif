@@ -1,11 +1,13 @@
 module Products
   class Repository
+    include AtomicRpc
+
     def initialize(client:)
       @client = client
     end
 
     def create_with_audit_atomic(payload:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/create_product_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
@@ -15,13 +17,12 @@ module Products
           p_item_type: payload[:item_type],
           p_category_id: payload[:category_id],
           p_active: payload[:active]
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def update_with_audit_atomic(product_id:, payload:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/update_product_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
@@ -32,30 +33,27 @@ module Products
           p_item_type: payload[:item_type],
           p_category_id: payload[:category_id],
           p_active: payload[:active]
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def archive_with_audit_atomic(product_id:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/archive_product_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
           p_product_id: product_id
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
 
     def restore_with_audit_atomic(product_id:, actor_id:)
-      @client.post(
+      call_atomic_rpc!(
         "rpc/restore_product_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
           p_product_id: product_id
-        },
-        headers: { "Prefer" => "return=representation" }
+        }
       )
     end
   end
