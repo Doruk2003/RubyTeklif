@@ -264,6 +264,7 @@ detectors:
     - Admin::Users::UpdateRole
     - AuditLog
     - Auth::SessionRefresh
+    - Auth::SendRecoveryEmailJob
     - Categories::Create
     - Categories::Destroy
     - Categories::Repository
@@ -601,4 +602,5 @@ detectors:
     - Products::Update#extract_product_id
     - Supabase::Auth#request
     - Supabase::Client#parse_response_body
+    - Auth::SendRecoveryEmailJob#perform
 

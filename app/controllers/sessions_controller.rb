@@ -31,10 +31,11 @@ class SessionsController < ApplicationController
       return render :recovery, status: :unprocessable_entity
     end
 
-    Supabase::Auth.new.send_recovery(email: email)
+    Auth::SendRecoveryEmailJob.perform_later(email)
     redirect_to login_path, notice: Auth::Messages::RECOVERY_SENT
-  rescue Supabase::Auth::AuthError => e
-    flash.now[:alert] = "#{Auth::Messages::RECOVERY_FAILED_PREFIX}: #{e.message}"
+  rescue StandardError => e
+    report_handled_error(e, source: "sessions#send_recovery")
+    flash.now[:alert] = Auth::Messages::RECOVERY_FAILED_PREFIX
     render :recovery, status: :unprocessable_entity
   end
 
