@@ -197,7 +197,7 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     fake_update = FakeAdminUsersUpdateRole.new(error: error)
 
     with_authenticated_context(role: Roles::ADMIN) do
-      with_stubbed_constructor(Admin::Users::UpdateRole, fake_update) do
+      with_stubbed_constructor(Admin::Users::UpdateUserRole, fake_update) do
         patch admin_user_path("usr-2"), params: { user: { role: "invalid" } }
         assert_redirected_to admin_users_path
       end

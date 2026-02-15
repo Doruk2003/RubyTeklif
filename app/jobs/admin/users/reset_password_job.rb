@@ -14,7 +14,7 @@ module Admin
       end
 
       def perform(target_user_id, actor_id)
-        Admin::Users::ResetPassword.new(client: Supabase::Client.new(role: :service)).call(
+        Admin::Users::ResetUserPassword.new(client: Supabase::Client.new(role: :service)).call(
           id: target_user_id,
           actor_id: actor_id
         )

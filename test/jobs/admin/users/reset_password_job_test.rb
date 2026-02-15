@@ -3,7 +3,7 @@ require "test_helper"
 module Admin
   module Users
     class ResetPasswordJobTest < ActiveSupport::TestCase
-      class FakeResetPasswordService
+      class FakeResetPasswordUseCase
         attr_reader :calls
 
         def initialize(error: nil)
@@ -32,21 +32,21 @@ module Admin
       end
 
       test "delegates to reset password service" do
-        fake_service = FakeResetPasswordService.new
+        fake_use_case = FakeResetPasswordUseCase.new
 
-        with_stubbed_constructor(Admin::Users::ResetPassword, fake_service) do
+        with_stubbed_constructor(Admin::Users::ResetUserPassword, fake_use_case) do
           with_stubbed_constructor(Supabase::Client, Object.new) do
             ResetPasswordJob.perform_now("usr-2", "usr-1")
           end
         end
 
-        assert_equal [{ id: "usr-2", actor_id: "usr-1" }], fake_service.calls
+        assert_equal [{ id: "usr-2", actor_id: "usr-1" }], fake_use_case.calls
       end
 
       test "discards validation errors" do
-        fake_service = FakeResetPasswordService.new(error: ServiceErrors::Validation.new(user_message: "email yok"))
+        fake_use_case = FakeResetPasswordUseCase.new(error: ServiceErrors::Validation.new(user_message: "email yok"))
 
-        with_stubbed_constructor(Admin::Users::ResetPassword, fake_service) do
+        with_stubbed_constructor(Admin::Users::ResetUserPassword, fake_use_case) do
           with_stubbed_constructor(Supabase::Client, Object.new) do
             assert_nothing_raised do
               ResetPasswordJob.perform_now("usr-2", "usr-1")

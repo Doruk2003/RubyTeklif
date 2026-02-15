@@ -23,7 +23,7 @@
 
     def create
       user_params = params.require(:user).permit(:email, :password, :role).to_h
-      Admin::Users::Create.new(client: client).call(form_payload: user_params, actor_id: current_user.id)
+      Admin::Users::CreateUser.new(client: client).call(form_payload: user_params, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici olusturuldu."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#create")
@@ -42,7 +42,7 @@
 
     def update
       role = params.require(:user).permit(:role)[:role].to_s
-      Admin::Users::UpdateRole.new(client: client).call(id: params[:id], role: role, actor_id: current_user.id)
+      Admin::Users::UpdateUserRole.new(client: client).call(id: params[:id], role: role, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici rolu guncellendi."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#update")
@@ -50,7 +50,7 @@
     end
 
     def disable
-      Admin::Users::SetActive.new(client: client).call(id: params[:id], active: false, actor_id: current_user.id)
+      Admin::Users::SetUserActive.new(client: client).call(id: params[:id], active: false, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici devre disi birakildi."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#disable")
@@ -58,7 +58,7 @@
     end
 
     def enable
-      Admin::Users::SetActive.new(client: client).call(id: params[:id], active: true, actor_id: current_user.id)
+      Admin::Users::SetUserActive.new(client: client).call(id: params[:id], active: true, actor_id: current_user.id)
       redirect_to admin_users_path, notice: "Kullanici aktif edildi."
     rescue ServiceErrors::Base => e
       report_handled_error(e, source: "admin/users#enable")
