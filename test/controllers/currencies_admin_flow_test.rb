@@ -98,6 +98,18 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeAdminUsersSetActive
+    def initialize(error: nil)
+      @error = error
+    end
+
+    def call(id:, active:, actor_id:)
+      raise @error if @error
+
+      { action: active ? "users.enable" : "users.disable", target_id: id }
+    end
+  end
+
   class FakeResetPasswordJob
     attr_reader :calls
 
@@ -200,6 +212,45 @@ class CurrenciesAdminFlowTest < ActionDispatch::IntegrationTest
       with_stubbed_constructor(Admin::Users::UseCases::UpdateUserRole, fake_update) do
         patch admin_user_path("usr-2"), params: { user: { role: "invalid" } }
         assert_redirected_to admin_users_path
+      end
+    end
+  end
+
+  test "admin cannot demote last active admin and gets clear alert" do
+    error = ServiceErrors::Validation.new(user_message: "Son aktif adminin rolu degistirilemez.")
+    fake_update = FakeAdminUsersUpdateRole.new(error: error)
+
+    with_authenticated_context(role: Roles::ADMIN) do
+      with_stubbed_constructor(Admin::Users::UseCases::UpdateUserRole, fake_update) do
+        patch admin_user_path("usr-1"), params: { user: { role: Roles::MANAGER } }
+        assert_redirected_to admin_users_path
+        assert_includes flash[:alert], "Son aktif adminin rolu degistirilemez."
+      end
+    end
+  end
+
+  test "admin cannot disable last active admin and gets clear alert" do
+    error = ServiceErrors::Validation.new(user_message: "Son aktif admin kullanicisi devre disi birakilamaz.")
+    fake_set_active = FakeAdminUsersSetActive.new(error: error)
+
+    with_authenticated_context(role: Roles::ADMIN) do
+      with_stubbed_constructor(Admin::Users::UseCases::SetUserActive, fake_set_active) do
+        patch disable_admin_user_path("usr-1")
+        assert_redirected_to admin_users_path
+        assert_includes flash[:alert], "Son aktif admin kullanicisi devre disi birakilamaz."
+      end
+    end
+  end
+
+  test "admin cannot disable self and gets clear alert" do
+    error = ServiceErrors::Validation.new(user_message: "Kendi kullanicinizi devre disi birakamazsiniz.")
+    fake_set_active = FakeAdminUsersSetActive.new(error: error)
+
+    with_authenticated_context(role: Roles::ADMIN) do
+      with_stubbed_constructor(Admin::Users::UseCases::SetUserActive, fake_set_active) do
+        patch disable_admin_user_path("usr-1")
+        assert_redirected_to admin_users_path
+        assert_includes flash[:alert], "Kendi kullanicinizi devre disi birakamazsiniz."
       end
     end
   end
