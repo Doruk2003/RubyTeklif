@@ -91,7 +91,7 @@
   end
 
   def load_category_options
-    rows = Categories::OptionsQuery.new(client: client).call(active_only: false)
+    rows = Categories::OptionsQuery.new(client: client).call(active_only: false, user_id: current_user.id)
     @category_options = rows.map { |row| [row["name"].to_s, row["id"].to_s] }
     @category_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
   rescue StandardError

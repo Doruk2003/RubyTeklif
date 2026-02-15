@@ -147,7 +147,7 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
   end
 
   class FakeCategoriesOptionsQuery
-    def call(active_only: false)
+    def call(active_only: false, user_id: nil)
       []
     end
   end

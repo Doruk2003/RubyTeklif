@@ -96,9 +96,9 @@
 
   def load_form_data(category_id:)
     query = Offers::FormQuery.new(client: supabase_user_client)
-    @companies = query.companies
-    @products = query.products(category_id: category_id)
-    category_rows = Categories::OptionsQuery.new(client: supabase_user_client).call(active_only: true)
+    @companies = query.companies(user_id: current_user.id)
+    @products = query.products(category_id: category_id, user_id: current_user.id)
+    category_rows = Categories::OptionsQuery.new(client: supabase_user_client).call(active_only: true, user_id: current_user.id)
     @category_options = category_rows.map { |row| [row["name"].to_s, row["id"].to_s] }
     @category_labels = category_rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
   rescue StandardError

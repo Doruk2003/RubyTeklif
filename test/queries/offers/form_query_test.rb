@@ -20,7 +20,7 @@ module Offers
       client = FakeClient.new(response: [])
       query = Offers::FormQuery.new(client: client)
 
-      query.products(category_id: "cat-1")
+      query.products(category_id: "cat-1", user_id: "usr-1")
       path = client.paths.first
 
       assert_includes path, "active=eq.true"
@@ -31,11 +31,22 @@ module Offers
       client = FakeClient.new(response: [])
       query = Offers::FormQuery.new(client: client)
 
-      query.products(category_id: "")
+      query.products(category_id: "", user_id: "usr-1")
       path = client.paths.first
 
       assert_includes path, "active=eq.true"
       refute_includes path, "category_id=eq."
+    end
+
+    test "builds companies query" do
+      client = FakeClient.new(response: [])
+      query = Offers::FormQuery.new(client: client)
+
+      query.companies(user_id: "usr-1")
+      path = client.paths.first
+
+      assert_includes path, "companies?deleted_at=is.null"
+      assert_includes path, "order=name.asc"
     end
   end
 end
