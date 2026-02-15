@@ -67,12 +67,27 @@ module Admin
         audit = FakeAuditLog.new
 
         user_id = Admin::Users::Create.new(client: client, auth: auth, audit_log: audit).call(
-          form_payload: { email: "test@example.com", password: "Password12", role: Roles::SALES },
+          form_payload: { email: "test@example.com", password: "Password12", role: Roles::OPERATOR },
           actor_id: "usr-1"
         )
 
         assert_equal "usr-2", user_id
         assert_equal "users.create", audit.payload[:action]
+      end
+
+      test "create user rejects legacy roles" do
+        service = Admin::Users::Create.new(
+          client: FakeClient.new(post_response: []),
+          auth: FakeAuth.new(create_user_response: { "id" => "usr-2" }),
+          audit_log: FakeAuditLog.new
+        )
+
+        assert_raises(ServiceErrors::Validation) do
+          service.call(
+            form_payload: { email: "legacy@example.com", password: "Password12", role: Roles::SALES },
+            actor_id: "usr-1"
+          )
+        end
       end
 
       test "create user cleans up auth user when profile insert fails" do
@@ -171,7 +186,7 @@ module Admin
         service = Admin::Users::UpdateRole.new(client: client)
 
         assert_raises(ServiceErrors::Validation) do
-          service.call(id: "usr-1", role: Roles::SALES, actor_id: "usr-2")
+          service.call(id: "usr-1", role: Roles::MANAGER, actor_id: "usr-2")
         end
       end
 
