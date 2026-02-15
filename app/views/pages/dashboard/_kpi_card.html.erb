@@ -1,0 +1,16 @@
+<article class="alp-card alp-kpi-card">
+  <header>
+    <p class="alp-eyebrow"><%= kpi[:label] %></p>
+    <h2 class="alp-kpi-value"><%= kpi[:value] %></h2>
+  </header>
+  <p class="alp-kpi-delta"><%= kpi[:delta] %></p>
+  <div class="alp-kpi-track">
+    <% width_class = kpi[:bar_width].to_s %>
+    <% width = case width_class
+              when "w-1/4" then "25%"
+              when "w-1/2" then "50%"
+              else "75%"
+              end %>
+    <span style="width: <%= width %>;"></span>
+  </div>
+</article>

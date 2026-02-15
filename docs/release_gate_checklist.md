@@ -31,6 +31,8 @@ Bu liste merge/deploy oncesi "go/no-go" kararini standartlastirir.
 - [ ] `Observability::ErrorReporter` testleri gecerli.
 - [ ] Validation/Policy hatalari Sentry'ye gitmiyor.
 - [ ] Runtime hatalarinda Sentry context/tag set ediliyor.
+- [ ] Yavas istek alarmi aktif (`http.request.slow` eventleri uretiliyor).
+- [ ] `bin/rails observability:performance_report` cikisi gozden gecirildi.
 
 ## 5) Operasyonel Kontrol
 

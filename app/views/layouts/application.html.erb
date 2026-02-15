@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html class="m-0 p-0 bg-[#f1f5f9]" style="margin:0; padding:0;">
+<html>
   <head>
     <title><%= content_for(:title) || "Ruby Teklif App" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -11,30 +11,29 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="m-0 p-0 bg-[#f1f5f9]" style="margin:0; padding:0;">
-    <main class="min-h-screen m-0 p-0 bg-transparent">
-      <% if notice.present? || alert.present? %>
-        <div class="mx-4 mt-4 space-y-2">
-          <% if notice.present? %>
-            <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"><%= notice %></div>
+  <body>
+    <main class="app-main">
+      <% notice_message = notice.to_s.strip.presence %>
+      <% alert_message = alert.to_s.strip.presence %>
+      <% if notice_message || alert_message %>
+        <div class="app-flash-wrap">
+          <% if notice_message %>
+            <div class="app-flash app-flash-notice"><%= notice_message %></div>
           <% end %>
-          <% if alert.present? %>
-            <div class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"><%= alert %></div>
+          <% if alert_message %>
+            <div class="app-flash app-flash-alert"><%= alert_message %></div>
           <% end %>
         </div>
       <% end %>

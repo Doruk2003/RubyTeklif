@@ -1,0 +1,24 @@
+<section class="alp-card">
+  <header class="alp-card-header">
+    <div>
+      <p class="alp-eyebrow">Performance</p>
+      <h3>Haftalik Akis Ozeti</h3>
+    </div>
+    <span class="alp-badge">7 gun</span>
+  </header>
+
+  <div class="alp-flow-grid">
+    <% flow_stats.each do |item| %>
+      <% amount = item[:value].to_i %>
+      <% bar_height = [[(amount * 6), 24].max, 120].min %>
+      <div class="alp-flow-item">
+        <div class="alp-flow-bar-wrap">
+          <div class="alp-flow-bar" style="height: <%= bar_height %>px;"></div>
+        </div>
+        <p class="alp-flow-value"><%= item[:value] %></p>
+        <p class="alp-flow-label"><%= item[:label] %></p>
+        <p class="alp-flow-note"><%= item[:note] %></p>
+      </div>
+    <% end %>
+  </div>
+</section>

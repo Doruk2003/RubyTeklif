@@ -1,0 +1,18 @@
+<section class="alp-card">
+  <header class="alp-card-header">
+    <div>
+      <p class="alp-eyebrow">Team Notes</p>
+      <h3>Hatirlatmalar</h3>
+    </div>
+  </header>
+
+  <ul class="alp-reminders">
+    <% if reminders.blank? %>
+      <li>Bugun icin not bulunmuyor.</li>
+    <% else %>
+      <% reminders.each do |note| %>
+        <li><%= note %></li>
+      <% end %>
+    <% end %>
+  </ul>
+</section>

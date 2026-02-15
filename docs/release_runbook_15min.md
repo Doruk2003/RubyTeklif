@@ -77,7 +77,13 @@ Beklenen: `page/per_page`, filtreler, `Onceki/Sonraki` calisir.
 - Dashboard ve kritik listeleri birkac kez ac.
 - Beklenen: veri tutarli, hata yok.
 
-## 10) Son Onay
+## 10) Performans Ozeti
+
+- `bin/rails observability:performance_report`
+- Beklenen: yavas istek orani ve en yavas endpointler listelenir.
+- `p95 >= 1000ms` endpoint varsa issue acilir.
+
+## 11) Son Onay
 
 - `git status` temiz.
 - Checklistleri isaretle:

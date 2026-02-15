@@ -1,0 +1,123 @@
+﻿<header class="alp-topbar-shell">
+  <div class="alp-topbar-utility">
+    <div class="alp-topbar-inner">
+      <div class="alp-brand">
+        <span class="alp-brand-badge">A</span>
+        <div>
+          <div class="alp-brand-title">ALPINO</div>
+          <div class="alp-brand-subtitle">Dashboard</div>
+        </div>
+      </div>
+
+      <div class="alp-search-wrap">
+        <input type="search" placeholder="Search..." aria-label="Search" />
+      </div>
+
+      <div class="alp-utility-icons is-mid">
+        <button type="button" class="alp-icon-btn" aria-label="Gecici Arac 1" data-tip="Gecici Arac 1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
+          </svg>
+        </button>
+        <button type="button" class="alp-icon-btn" aria-label="Gecici Arac 2" data-tip="Gecici Arac 2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 3v18M3 12h18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="alp-utility-icons is-right">
+        <button type="button" class="alp-icon-btn" aria-label="Zoom" data-tip="Zoom">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>
+          </svg>
+        </button>
+        <button type="button" class="alp-icon-btn" aria-label="Gecici Arac 3" data-tip="Gecici Arac 3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M4 6h16M7 12h10M10 18h4"/>
+          </svg>
+        </button>
+        <button type="button" class="alp-icon-btn" aria-label="Gecici Arac 4" data-tip="Gecici Arac 4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 8.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7z"/>
+            <path d="M19.4 15a1 1 0 00.2 1.1l.1.1a1 1 0 01-1.4 1.4l-.1-.1a1 1 0 00-1.1-.2 1 1 0 00-.6.8V19a1 1 0 01-2 0 1 1 0 00-.7-.9 1 1 0 00-1 .2l-.1.1a1 1 0 01-1.4-1.4l.1-.1a1 1 0 00.2-1.1 1 1 0 00-.8-.6H9a1 1 0 010-2 1 1 0 00.9-.7 1 1 0 00-.2-1l-.1-.1a1 1 0 011.4-1.4l.1.1a1 1 0 001.1.2 1 1 0 00.6-.8V7a1 1 0 012 0 1 1 0 00.7.9 1 1 0 001-.2l.1-.1a1 1 0 011.4 1.4l-.1.1a1 1 0 00-.2 1.1 1 1 0 00.8.6H19a1 1 0 010 2 1 1 0 00-.9.7z"/>
+          </svg>
+        </button>
+        <button type="button" class="alp-icon-btn" aria-label="Kapatma" data-tip="Kapatma">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 2v10M8.2 4.7a8 8 0 103.8-1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="alp-menubar">
+    <div class="alp-topbar-inner">
+      <nav class="alp-menu" aria-label="Primary">
+        <%= link_to "Dashboard", root_path, class: "is-active" %>
+
+        <% if current_user && Roles.catalog_manage?(current_user.role) %>
+          <div class="alp-menu-item">
+            <button type="button" class="alp-menu-trigger">Musteriler</button>
+            <div class="alp-mega-menu">
+              <div class="alp-mega-col">
+                <h4>Musteri Islemleri</h4>
+                <%= link_to "Musteri tanimla", new_company_path %>
+                <%= link_to "Musteri listesi", companies_path %>
+              </div>
+            </div>
+          </div>
+
+          <div class="alp-menu-item">
+            <button type="button" class="alp-menu-trigger">Teklifler</button>
+            <div class="alp-mega-menu">
+              <div class="alp-mega-col">
+                <h4>Teklif Islemleri</h4>
+                <%= link_to "Yeni teklif", new_offer_path %>
+                <%= link_to "Teklif listesi", offers_path %>
+              </div>
+            </div>
+          </div>
+
+          <div class="alp-menu-item">
+            <button type="button" class="alp-menu-trigger">Urunler</button>
+            <div class="alp-mega-menu">
+              <div class="alp-mega-col">
+                <h4>Urun Islemleri</h4>
+                <%= link_to "Urun tanimla", new_product_path %>
+                <%= link_to "Urun listesi", products_path %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if current_user && Roles.finance_manage?(current_user.role) %>
+          <div class="alp-menu-item">
+            <button type="button" class="alp-menu-trigger">Kurlar</button>
+            <div class="alp-mega-menu">
+              <div class="alp-mega-col">
+                <h4>Kur Islemleri</h4>
+                <%= link_to "Kur ekle", new_currency_path %>
+                <%= link_to "Kur listesi", currencies_path %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if current_user && Roles.admin?(current_user.role) %>
+          <div class="alp-menu-item">
+            <button type="button" class="alp-menu-trigger">Ayarlar</button>
+            <div class="alp-mega-menu">
+              <div class="alp-mega-col">
+                <h4>Admin</h4>
+                <%= link_to "Admin Panel", admin_users_path %>
+                <%= link_to "Activity Logs", admin_activity_logs_path %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </nav>
+    </div>
+  </div>
+</header>

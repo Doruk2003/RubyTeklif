@@ -1,0 +1,38 @@
+<section class="alp-card">
+  <header class="alp-card-header">
+    <div>
+      <p class="alp-eyebrow">Pipeline</p>
+      <h3>Son Teklifler</h3>
+    </div>
+    <%= link_to "Tum Teklifler", offers_path, class: "alp-link" %>
+  </header>
+
+  <div class="alp-table-wrap">
+    <table class="alp-table">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Musteri</th>
+          <th>Tutar</th>
+          <th>Durum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if recent_offers.blank? %>
+          <tr>
+            <td colspan="4" class="alp-empty">Kayit bulunamadi.</td>
+          </tr>
+        <% else %>
+          <% recent_offers.each do |offer| %>
+            <tr>
+              <td><%= offer[:number].presence || "-" %></td>
+              <td><%= offer[:company].presence || "-" %></td>
+              <td><%= offer[:amount] %></td>
+              <td><span class="alp-status"><%= offer[:status] %></span></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

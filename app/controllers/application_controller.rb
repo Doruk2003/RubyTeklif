@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :set_request_context
+  around_action :track_request_performance
   rescue_from StandardError, with: :handle_unexpected_error
   rescue_from Pundit::NotAuthorizedError, with: :handle_not_authorized
 
@@ -155,5 +156,23 @@ class ApplicationController < ActionController::Base
       method: request&.request_method,
       user_id: current_user&.id
     }
+  end
+
+  # :reek:DuplicateMethodCall, :reek:TooManyStatements
+  def track_request_performance
+    started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    yield
+  ensure
+    duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(1)
+    threshold_ms = ENV.fetch("SLOW_REQUEST_THRESHOLD_MS", "750").to_f
+    payload = {
+      method: request&.request_method,
+      path: request&.path,
+      status: response&.status,
+      duration_ms: duration_ms
+    }.compact
+
+    Observability::AppLogger.info("http.request", payload)
+    Observability::AppLogger.warn("http.request.slow", payload.merge(threshold_ms: threshold_ms)) if duration_ms >= threshold_ms
   end
 end

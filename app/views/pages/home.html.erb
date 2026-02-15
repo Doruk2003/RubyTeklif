@@ -1,1193 +1,233 @@
-﻿# encoding: UTF-8
-<div class="relative min-h-screen bg-[#f6f3ee]">
-  <div class="fixed inset-0 -z-10 bg-[#f6f3ee]"></div>
-  <div class="flex min-h-screen -mt-12">
-    <input id="sidebar-toggle" type="checkbox" class="peer hidden" />
-
-    <aside id="sidebar" class="sidebar-modern fixed inset-y-0 left-0 z-40 flex w-72 flex-col -translate-x-full text-white shadow-2xl transition-all duration-300 peer-checked:translate-x-0 lg:translate-x-0">
-      <div class="sidebar-glow"></div>
-      <div class="sidebar-grid"></div>
-      <div class="flex h-16 items-center justify-between gap-3 border-b border-white/10 px-6">
-        <div class="flex items-center gap-4">
-          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-xs font-bold tracking-wider">RT</div>
-          <div class="sidebar-text pl-1 text-sm font-semibold">RubyTeklif</div>
-        </div>
-      </div>
-
-      <div class="px-6 py-5">
-        <div class="flex items-center gap-3 rounded-2xl bg-white/5 p-3">
-          <div class="h-12 w-12 rounded-full bg-white/10"></div>
-          <div class="sidebar-text">
-            <div class="text-xs text-white/60">Hoş geldin</div>
-            <div class="text-sm font-semibold">Satış Ekibi</div>
+﻿<div class="rt-dashboard">
+  <header class="rt-topbar">
+    <div class="rt-topbar-utility">
+      <div class="rt-shell">
+        <div class="rt-brand">
+          <span class="rt-brand-badge">A</span>
+          <div>
+            <div class="rt-brand-title">COTIL TENTE</div>
+            <div class="rt-brand-subtitle">Dashboard</div>
           </div>
         </div>
+
+        <div class="rt-search-wrap">
+          <input type="search" placeholder="Search..." aria-label="Search" />
+        </div>
+
+        <div class="rt-icon-group">
+          <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 1" data-tip="Gecici Arac 1">
+            <span class="material-symbols-outlined" aria-hidden="true">apps</span>
+          </button>
+          <button type="button" class="rt-icon-btn" aria-label="Zoom" data-tip="Zoom">
+            <span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>
+          </button>
+          <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 3" data-tip="Gecici Arac 3">
+            <span class="material-symbols-outlined" aria-hidden="true">sort</span>
+          </button>
+          <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 4" data-tip="Gecici Arac 4">
+            <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+          </button>
+          <button type="button" class="rt-icon-btn" aria-label="Kapatma" data-tip="Kapatma">
+            <span class="material-symbols-outlined" aria-hidden="true">power_settings_new</span>
+          </button>
+        </div>
       </div>
+    </div>
 
-      <nav class="flex-1 px-4 pb-6 text-sm">
-        <div class="space-y-1">
-          <%= link_to root_path, class: "group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/90", style: "font-size: 14px; line-height: 1.25rem;", data: { sidebar_item: true } do %>
-            <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9" />
-              </svg>
-            </span>
-           <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Dashboard</span>
-            <span class="sidebar-text">Dashboard</span>
-          <% end %>
+    <div class="rt-topbar-menu">
+      <div class="rt-shell">
+        <nav class="rt-menu" aria-label="Primary">
+          <%= link_to "Dashboard", root_path, class: "is-active" %>
 
           <% if current_user && Roles.catalog_manage?(current_user.role) %>
-          <div class="space-y-1">
-            <input id="menu-companies" type="checkbox" class="peer/menu-companies hidden" />
-            <label for="menu-companies" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
-              <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-              <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 4.5h6v6h-6zM13.5 4.5h6v6h-6zM4.5 13.5h6v6h-6z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 14v5M14 16.5h5" />
-                </svg>
-              </span>
-              <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Müşteriler</span>
-              <span class="sidebar-text">Müşteriler</span><span class="sidebar-text ml-auto text-xs text-white/50">&#9662;</span></label>
-            <div class="sidebar-sub ml-11 space-y-1 hidden peer-checked/menu-companies:block">
-              <%= link_to new_company_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Müşteri tanımla</span>
-                <span class="sidebar-text">Müşteri tanımla</span>
-              <% end %>
-              <%= link_to companies_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Müşteri listesi</span>
-                <span class="sidebar-text">Müşteri listesi</span>
-              <% end %>
+            <div class="rt-menu-item">
+              <button type="button">Müşteriler</button>
+              <div class="rt-submenu">
+                
+                <%= link_to "Musteri tanimla", new_company_path %>
+                <%= link_to "Musteri listesi", companies_path %>
+              </div>
             </div>
-          </div>
-          <% end %>
 
-          <% if current_user && Roles.catalog_manage?(current_user.role) %>
-          <div class="space-y-1">
-            <input id="menu-offers" type="checkbox" class="peer/menu-offers hidden" />
-            <label for="menu-offers" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
-              <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-              <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 2.75h6a2 2 0 012 2V6h1.25A1.75 1.75 0 0120 7.75v11.5A1.75 1.75 0 0118.25 21H5.75A1.75 1.75 0 014 19.25V7.75A1.75 1.75 0 015.75 6H7V4.75a2 2 0 012-2z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 6h6M8.5 11h7M8.5 15h7" />
-                </svg>
-              </span>
-              <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Teklifler</span>
-              <span class="sidebar-text">Teklifler</span><span class="sidebar-text ml-auto text-xs text-white/50">&#9662;</span></label>
-            <div class="sidebar-sub ml-11 space-y-1 hidden peer-checked/menu-offers:block">
-              <%= link_to new_offer_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Yeni teklif</span>
-                <span class="sidebar-text">Yeni teklif</span>
-              <% end %>
-              <%= link_to offers_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Teklif listesi</span>
-                <span class="sidebar-text">Teklif listesi</span>
-              <% end %>
+            <div class="rt-menu-item">
+              <button type="button">Teklifler</button>
+              <div class="rt-submenu">
+                
+                <%= link_to "Yeni teklif", new_offer_path %>
+                <%= link_to "Teklif listesi", offers_path %>
+              </div>
             </div>
-          </div>
-          <% end %>
 
-          <% if current_user && Roles.catalog_manage?(current_user.role) %>
-          <div class="space-y-1">
-            <input id="menu-products" type="checkbox" class="peer/menu-products hidden" />
-            <label for="menu-products" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
-              <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-              <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h2l2 11h11l2-8H7" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 20a1 1 0 100-2 1 1 0 000 2zM17 20a1 1 0 100-2 1 1 0 000 2z" />
-                </svg>
-              </span>
-              <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Ürünler</span>
-              <span class="sidebar-text">Ürünler</span><span class="sidebar-text ml-auto text-xs text-white/50">&#9662;</span></label>
-            <div class="sidebar-sub ml-11 space-y-1 hidden peer-checked/menu-products:block">
-              <%= link_to new_product_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Ürün tanımla</span>
-                <span class="sidebar-text">Ürün tanımla</span>
-              <% end %>
-              <%= link_to products_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Ürün listesi</span>
-                <span class="sidebar-text">Ürün listesi</span>
-              <% end %>
+            <div class="rt-menu-item">
+              <button type="button">Urunler</button>
+              <div class="rt-submenu">
+                
+                <%= link_to "Urun tanimla", new_product_path %>
+                <%= link_to "Urun listesi", products_path %>
+              </div>
             </div>
-          </div>
           <% end %>
 
           <% if current_user && Roles.finance_manage?(current_user.role) %>
-          <%= link_to currencies_path, class: "group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70", style: "font-size: 14px; line-height: 1.25rem;", data: { sidebar_item: true } do %>
-            <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8 rotate-90">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h10l-2-2m2 2l-2 2M17 17H7l2 2m-2-2l2-2" />
-              </svg>
-            </span>
-           <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Kurlar</span>
-            <span class="sidebar-text">Kurlar</span>
-          <% end %>
-          <% end %>
-
-          <div class="sidebar-text mt-4 text-xs font-semibold uppercase tracking-wider text-white/50">Ayarlar</div>
-          <% if current_user && Roles.admin?(current_user.role) %>
-          <div class="space-y-1">
-            <input id="menu-settings" type="checkbox" class="peer/menu-settings hidden" />
-            <label for="menu-settings" class="group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70" style="font-size: 14px; line-height: 1.25rem;" data-sidebar-item="true">
-              <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-              <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1 1 0 00.2 1.1l.1.1a1 1 0 01-1.4 1.4l-.1-.1a1 1 0 00-1.1-.2 1 1 0 00-.6.8V19a1 1 0 01-2 0 1 1 0 00-.7-.9 1 1 0 00-1 .2l-.1.1a1 1 0 01-1.4-1.4l.1-.1a1 1 0 00.2-1.1 1 1 0 00-.8-.6H9a1 1 0 010-2 1 1 0 00.9-.7 1 1 0 00-.2-1l-.1-.1a1 1 0 011.4-1.4l.1.1a1 1 0 001.1.2 1 1 0 00.6-.8V7a1 1 0 012 0 1 1 0 00.7.9 1 1 0 001-.2l.1-.1a1 1 0 011.4 1.4l-.1.1a1 1 0 00-.2 1.1 1 1 0 00.8.6H19a1 1 0 010 2 1 1 0 00-.9.7z" />
-                </svg>
-              </span>
-              <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Ayarlar</span>
-              <span class="sidebar-text">Ayarlar</span><span class="sidebar-text ml-auto text-xs text-white/50">&#9662;</span>
-            </label>
-            <div class="sidebar-sub ml-11 space-y-1 hidden peer-checked/menu-settings:block">
-              <%= link_to admin_users_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1 1 0 00.2 1.1l.1.1a1 1 0 01-1.4 1.4l-.1-.1a1 1 0 00-1.1-.2 1 1 0 00-.6.8V19a1 1 0 01-2 0 1 1 0 00-.7-.9 1 1 0 00-1 .2l-.1.1a1 1 0 01-1.4-1.4l.1-.1a1 1 0 00.2-1.1 1 1 0 00-.8-.6H9a1 1 0 010-2 1 1 0 00.9-.7 1 1 0 00-.2-1l-.1-.1a1 1 0 011.4-1.4l.1.1a1 1 0 001.1.2 1 1 0 00.6-.8V7a1 1 0 012 0 1 1 0 00.7.9 1 1 0 001-.2l.1-.1a1 1 0 011.4 1.4l-.1.1a1 1 0 00-.2 1.1 1 1 0 00.8.6H19a1 1 0 010 2 1 1 0 00-.9.7z" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Admin Panel</span>
-                <span class="sidebar-text">Admin Panel</span>
-              <% end %>
-              <%= link_to admin_activity_logs_path, class: "group sidebar-item sidebar-subitem sidebar-link relative flex items-center gap-3 rounded-lg px-3 py-2 font-semibold text-white/60", style: "font-size: 12px; line-height: 1rem;", data: { sidebar_item: true } do %>
-                <span class="sidebar-indicator absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full"></span>
-                <span class="flex h-6 w-6 items-center justify-center rounded-md">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-7 w-7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
-                  </svg>
-                </span>
-               <span class="sidebar-tooltip pointer-events-none absolute left-[2.75rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100 whitespace-nowrap min-w-[120px] text-center">Aktivite Loglari</span>
-                <span class="sidebar-text">Aktivite Loglari</span>
-              <% end %>
-            </div>
-          </div>
-          <% end %>
-          <%= link_to "#", class: "group sidebar-item sidebar-main sidebar-link relative mt-2 flex items-center gap-3 rounded-xl px-4 py-2.5 font-semibold text-white/70", style: "font-size: 14px; line-height: 1.25rem;", data: { sidebar_item: true } do %>
-            <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 7.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM4 20a8 8 0 0116 0" />
-              </svg>
-            </span>
-           <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Profil</span>
-            <span class="sidebar-text">Profil</span>
-          <% end %>
-          <%= link_to logout_path, method: :delete, class: "group sidebar-item sidebar-main sidebar-link relative flex items-center gap-3 rounded-xl px-4 py-3 font-semibold text-white/70", style: "font-size: 14px; line-height: 1.25rem;", data: { sidebar_item: true } do %>
-            <span class="sidebar-indicator absolute left-0 top-1/2 h-7 w-1.5 -translate-y-1/2 rounded-full"></span>
-            <span class="relative top-[14px] flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold leading-none overflow-visible">
-              <svg viewBox="-1 -1 26 26" fill="none" stroke="currentColor" stroke-width="1.8" class="block h-8 w-8 overflow-visible">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v9" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1112.728 0" />
-              </svg>
-            </span>
-            <span class="sidebar-tooltip pointer-events-none absolute left-[3.25rem] top-1/2 -translate-y-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white opacity-0 shadow-lg transition group-hover:opacity-100">Çıkış</span>
-            <span class="sidebar-text">Çıkış</span>
-          <% end %>
-        </div>
-      </nav>
-
-      <div class="sticky bottom-4 mt-auto px-4 pb-6 pt-2">
-        <button type="button" id="sidebar-collapse-btn" class="hidden w-full items-center justify-center gap-2 rounded-xl bg-transparent px-4 py-2.5 text-xs font-semibold text-white/80 transition lg:flex">
-          <span class="collapse-icon inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
-            </svg>
-          </span>
-          <span class="sidebar-text">Menüyü daralt</span>
-        </button>
-        <label id="sidebar-hide-btn" for="sidebar-toggle" class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-xs font-semibold text-white/80 transition lg:hidden">
-          <span class="collapse-icon inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
-            </svg>
-          </span>
-          <span class="sidebar-text">Menüyü gizle</span>
-        </label>
-      </div>
-    </aside>
-
-    <label for="sidebar-toggle" class="fixed inset-0 z-30 hidden bg-black/30 peer-checked:block lg:hidden"></label>
-    <label for="sidebar-toggle" class="fixed bottom-4 left-4 top-auto z-50 flex h-11 w-11 flex-col items-center justify-center gap-1 rounded-2xl bg-white text-slate-700 shadow-sm peer-checked:hidden lg:hidden">
-      <span class="block h-0.5 w-5 bg-slate-700"></span>
-      <span class="block h-0.5 w-5 bg-slate-700"></span>
-      <span class="block h-0.5 w-5 bg-slate-700"></span>
-      <span class="sr-only">Menüyü aç</label>
-
-    <main id="main-content" class="flex-1 bg-[#f6f3ee] px-4 pb-8 pt-8 lg:px-8">
-      <div class="mt-0 grid grid-cols-1 gap-5 lg:grid-cols-12">
-        <section class="lg:col-span-8">
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <% if @kpis.present? %>
-              <% @kpis.each do |kpi| %>
-                <% glow = kpi[:glow] || kpi[:glow_color] || begin
-                  bar = kpi[:bar_class].to_s
-                  if bar.include?("emerald")
-                    "rgba(16, 185, 129, 0.55)"
-                  elsif bar.include?("amber")
-                    "rgba(245, 158, 11, 0.55)"
-                  elsif bar.include?("rose")
-                    "rgba(244, 63, 94, 0.55)"
-                  elsif bar.include?("sky")
-                    "rgba(56, 189, 248, 0.55)"
-                  else
-                    "rgba(148, 163, 184, 0.55)"
-                  end
-                end %>
-                <div class="kpi-card relative overflow-hidden rounded-3xl bg-white/90 p-4 shadow-[0_8px_18px_-16px_rgba(15,23,42,0.5)] transition hover:shadow-[0_14px_26px_-18px_rgba(15,23,42,0.55)]" style="--kpi-glow:<%= glow %>;">
-                  <span class="kpi-accent"></span>
-                  <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                    <span><%= kpi[:label] %></span>
-                    <span class="<%= kpi[:delta_class] %>" style="color: var(--kpi-accent);"><%= kpi[:delta] %></span>
-                  </div>
-                  <div class="mt-2 text-3xl font-semibold text-slate-900"><%= kpi[:value] %></div>
-                  <div class="kpi-sparkline mt-3">
-                    <% points = kpi[:spark] || [3, 6, 4, 7, 5, 8, 6, 9, 7] %>
-                    <svg viewBox="0 0 120 24" class="h-6 w-full">
-                      <polyline points="<%= points.each_with_index.map { |v, i| "#{i * (120.0 / (points.size - 1))},#{24 - (v.to_f / points.max) * 20}" }.join(' ') %>" />
-                    </svg>
-                  </div>
-                  <div class="mt-3 h-1.5 w-full rounded-full bg-slate-200/70">
-                    <div class="h-1.5 rounded-full <%= kpi[:bar_width] %>" style="background-image: linear-gradient(90deg, var(--kpi-bar-from), var(--kpi-bar-to));"></div>
-                  </div>
-                </div>
-              <% end %>
-            <% else %>
-              <% 3.times do %>
-                <div class="kpi-card relative overflow-hidden rounded-3xl bg-white/90 p-4 shadow-[0_8px_18px_-16px_rgba(15,23,42,0.5)]" style="--kpi-glow: rgba(148, 163, 184, 0.55);">
-                  <span class="kpi-accent bg-slate-200"></span>
-                  <div class="flex items-center justify-between">
-                    <div class="h-3 w-24 rounded-full bg-slate-100 animate-pulse"></div>
-                    <div class="h-3 w-10 rounded-full bg-slate-100 animate-pulse"></div>
-                  </div>
-                  <div class="mt-3 h-8 w-16 rounded-xl bg-slate-100 animate-pulse"></div>
-                  <div class="mt-4 h-2 w-full rounded-full bg-slate-100 animate-pulse"></div>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
-
-          <div class="mt-5 rounded-3xl bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-lg font-semibold text-slate-900">Teklif Aktivitesi</div>
-                <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Bu ay</div>
+            <div class="rt-menu-item">
+              <button type="button">Kurlar</button>
+              <div class="rt-submenu">
+               
+                <%= link_to "Kur ekle", new_currency_path %>
+                <%= link_to "Kur listesi", currencies_path %>
               </div>
-              <div class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">+3,2%</div>
             </div>
-            <% offer_activity = @offer_activity || [
-              { label: "Yeni Teklif", value: 12, amount: 1_250_000_000 },
-              { label: "Oluşturulan Teklif", value: 38, amount: 3_420_000_000 },
-              { label: "Onaylanan Teklif", value: 21, amount: 2_680_000_000 },
-              { label: "Bekleyen Teklif", value: 7, amount: 1_140_000_000 },
-              { label: "Kapanan Teklif", value: 5, amount: 640_000_000 }
-            ] %>
-            <% max_activity = [offer_activity.map { |item| item[:amount].to_f }.max, 1].max %>
-            <% palette = ["#6d28d9", "#7c3aed", "#8b5cf6", "#a78bfa", "#ddd6fe"] %>
-            <% sorted_values = offer_activity.map { |item| item[:amount].to_f }.sort.reverse %>
-            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5">
-              <% offer_activity.each do |item| %>
-                <% height_pct = ((item[:amount].to_f / max_activity) * 100).round %>
-                <% rank = sorted_values.index(item[:amount].to_f) || (palette.length - 1) %>
-                <% bar_color = palette[[rank, palette.length - 1].min] %>
-                <div class="activity-card rounded-2xl pl-10 pr-2 py-2">
-                  <div class="activity-row">
-                    <div class="activity-vertical">
-                      <div class="activity-column">
-                        <div class="activity-bar-wrap">
-                          <div class="activity-bar" style="height: <%= height_pct %>%; background-color: <%= bar_color %>;">
-                            <span class="activity-tooltip">
-                              <% amount_b = (item[:amount].to_f / 1_000_000_000) %>
-                              <span class="activity-currency">?</span>
-                              <%= format("%.2f", amount_b) %>B
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <span class="activity-amount-side"><%= item[:value] %></span>
-                  </div>
-                  <div class="mt-2 text-xs font-semibold text-slate-600"><%= item[:label] %></div>
-                </div>
-              <% end %>
-            </div>
-          </div>
+          <% end %>
 
-          <div class="mt-5 rounded-3xl bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-              <div class="text-sm font-semibold text-slate-900">Son Teklifler</div>
-              <%= link_to "Tümünü gör", offers_path, class: "text-xs font-semibold text-slate-500 hover:text-slate-900" %>
+          <% if current_user && Roles.admin?(current_user.role) %>
+            <div class="rt-menu-item">
+              <button type="button">Ayarlar</button>
+              <div class="rt-submenu">
+               
+                <%= link_to "Admin Panel", admin_users_path %>
+                <%= link_to "Activity Logs", admin_activity_logs_path %>
+              </div>
             </div>
-          <div class="mt-4 overflow-hidden border border-slate-100">
-              <table class="min-w-full text-sm">
-                <thead class="sticky top-0 z-10 text-xs uppercase tracking-wider">
-                  <tr>
-                    <th>Teklif No</th>
-                    <th>Müşteri</th>
-                    <th class="text-right">Tutar</th>
-                    <th class="text-right">Durum</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  <% @recent_offers.each do |offer| %>
-                    <tr class="bg-white hover:bg-slate-50 cursor-pointer" role="link" tabindex="0" data-row-link="<%= offer[:path] || offer[:url] || offer[:link] %>">
-                      <td class="font-semibold text-slate-900"><%= offer[:number] %></td>
-                      <td class="text-slate-600"><%= offer[:company] %></td>
-                      <td class="text-right text-slate-600"><%= offer[:amount] %></td>
-                      <td class="text-right">
-                        <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold <%= offer[:status_class] %>"><%= offer[:status] %></span>
-                      </td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
+          <% end %>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="rt-shell rt-content">
+    <section class="rt-kpi-grid">
+      <% @kpis.first(3).each_with_index do |kpi, index| %>
+        <% icon_name = case index
+                      when 0 then "account_balance"
+                      when 1 then "assignment"
+                      else "shopping_basket"
+                      end %>
+        <% icon_color_class = case index
+                             when 0 then "col-amber"
+                             when 1 then "col-blue"
+                             else "col-slate"
+                             end %>
+        <article class="rt-kpi-card rt-kpi-card-classic text-center">
+          <div class="rt-kpi-body">
+            <p class="rt-kpi-icon-wrap">
+              <span class="material-symbols-outlined rt-kpi-icon <%= icon_color_class %>"><%= icon_name %></span>
+            </p>
+            <span class="rt-kpi-classic-label"><%= kpi[:label] %></span>
+            <h3 class="rt-kpi-classic-value"><%= kpi[:value] %></h3>
+            <small class="rt-kpi-classic-note"><%= kpi[:delta] %></small>
+          </div>
+        </article>
+      <% end %>
+    </section>
+
+    <section class="rt-main-grid">
+      <div class="rt-stack">
+        <section class="rt-card">
+          <header class="rt-card-header">
+            <div>
+              <p class="rt-eyebrow">Performance</p>
+              <h3>Haftalik Akis Ozeti</h3>
             </div>
+            <span class="rt-chip">7 gun</span>
+          </header>
+
+          <div class="rt-flow-grid">
+            <% @flow_stats.each do |item| %>
+              <% amount = item[:value].to_i %>
+              <% bar_height = [[(amount * 6), 24].max, 120].min %>
+              <div class="rt-flow-item">
+                <div class="rt-flow-bar-wrap">
+                  <div class="rt-flow-bar" style="height: <%= bar_height %>px;"></div>
+                </div>
+                <p class="rt-flow-value"><%= item[:value] %></p>
+                <p class="rt-flow-label"><%= item[:label] %></p>
+                <p class="rt-flow-note"><%= item[:note] %></p>
+              </div>
+            <% end %>
           </div>
         </section>
 
-        <aside class="lg:col-span-4">
-          <%
-            perf_source = @monthly_performance || {}
-            raw_segments = perf_source[:segments] || perf_source["segments"]
+        <section class="rt-card">
+          <header class="rt-card-header">
+            <div>
+              <p class="rt-eyebrow">Pipeline</p>
+              <h3>Son Teklifler</h3>
+            </div>
+            <%= link_to "Tum Teklifler", offers_path, class: "rt-link" %>
+          </header>
 
-            segments =
-              if raw_segments.respond_to?(:map) && raw_segments.any?
-                raw_segments.map.with_index do |entry, idx|
-                  seg = entry.respond_to?(:to_h) ? entry.to_h : {}
-                  value = (seg[:value] || seg["value"] || 0).to_f
-                  next if value <= 0
-                  {
-                    label: (seg[:label] || seg["label"] || "Segment #{idx + 1}").to_s,
-                    value: value,
-                    color: (seg[:color] || seg["color"] || "#cbd5e1").to_s,
-                    text_color: (seg[:text_color] || seg["text_color"]).to_s,
-                    kind: (seg[:kind] || seg["kind"]).to_s
-                  }
-                end.compact
-              else
-                [
-                  { label: "Total paid", value: (perf_source[:paid] || perf_source["paid"] || 473).to_f, color: "#b1b4ec", kind: "paid" },
-                  { label: "Total Unpaid", value: (perf_source[:unpaid] || perf_source["unpaid"] || 314).to_f, color: "#6950f2", kind: "unpaid" },
-                  { label: "Total Overdue", value: (perf_source[:overdue] || perf_source["overdue"] || 367).to_f, color: "#010101", kind: "overdue" }
-                ]
-              end
-            segments = segments.select { |seg| seg[:value].to_f > 0 }
-            if segments.empty?
-              segments = [{ label: "Total", value: 1.0, color: "#cbd5e1", text_color: "#1a1a1a" }]
-            end
-
-            total_value = [segments.sum { |seg| seg[:value].to_f }, 1.0].max
-            total_orders = (perf_source[:total] || perf_source["total"] || total_value).to_i
-            total_label = (perf_source[:total_label] || perf_source["total_label"] || "Sistem").to_s
-
-            max_val = segments.map { |seg| seg[:value].to_f }.max || 0.0
-            segment_gap = segments.length > 1 ? 2.8 : 0.0
-            gap_unpaid_overdue = (perf_source[:gap_unpaid_overdue] || perf_source["gap_unpaid_overdue"] || 0.6).to_f
-            label_min_pct = (perf_source[:label_min_pct] || perf_source["label_min_pct"] || 6.0).to_f
-            min_len = segments.length >= 5 ? 1.0 : 2.0
-
-            color_luminance = lambda do |hex|
-              clean = hex.to_s.delete("#")
-              if clean.length == 3
-                clean = clean.chars.map { |ch| ch * 2 }.join
-              end
-              if clean.match?(/\A[0-9a-fA-F]{6}\z/)
-                r = clean[0, 2].to_i(16) / 255.0
-                g = clean[2, 2].to_i(16) / 255.0
-                b = clean[4, 2].to_i(16) / 255.0
-                (0.2126 * r) + (0.7152 * g) + (0.0722 * b)
-              else
-                1.0
-              end
-            end
-
-            auto_label_color = lambda do |hex|
-              color_luminance.call(hex) < 0.45 ? "#ffffff" : "#1a1a1a"
-            end
-
-            segments_layout = []
-            current_start = 0.0
-            segments.each_with_index do |seg, idx|
-              value = seg[:value].to_f
-              pct_f = (value / total_value) * 100.0
-              next_seg = idx < segments.length - 1 ? segments[idx + 1] : nil
-              extra_pair_gap = 0.0
-              if next_seg
-                current_kind = seg[:kind].to_s.downcase
-                next_kind = next_seg[:kind].to_s.downcase
-                current_label = seg[:label].to_s.downcase
-                next_label = next_seg[:label].to_s.downcase
-                unpaid_to_overdue =
-                  (current_kind == "unpaid" && next_kind == "overdue") ||
-                  (current_kind.empty? && next_kind.empty? && current_label.include?("unpaid") && next_label.include?("overdue"))
-                if unpaid_to_overdue
-                  extra_pair_gap = gap_unpaid_overdue
-                end
-              end
-              gap_for_segment = idx < segments.length - 1 ? (segment_gap + extra_pair_gap) : 0.0
-              len = [pct_f - gap_for_segment, min_len].max
-              stroke_width = (value == max_val && segments.length > 1) ? 23 : 18
-
-              angle = -90.0 + ((current_start + (pct_f / 2.0)) * 3.6)
-              radius = 79.0 + (stroke_width / 2.0) + 1.0
-              rad = angle * Math::PI / 180.0
-              x = Math.cos(rad)
-              y = Math.sin(rad)
-              radius -= 10 if x < -0.72
-              radius -= 8 if x > 0.72
-              radius -= 8 if y > 0.78
-              radius -= 3 if y < -0.82
-
-              label_color = seg[:text_color].to_s.strip
-              label_color = auto_label_color.call(seg[:color]) if label_color.empty?
-              dark_segment = color_luminance.call(seg[:color]) < 0.45
-              y_nudge = 0
-              if dark_segment
-                y_nudge += 5 if x < -0.35
-                y_nudge += 3 if y < -0.10
-              end
-
-              segments_layout << {
-                idx: idx,
-                label: seg[:label].to_s,
-                value: value,
-                color: seg[:color].to_s,
-                pct: pct_f.round,
-                len: len,
-                off: -current_start,
-                sw: stroke_width,
-                angle: angle,
-                radius: radius.round,
-                text_color: label_color,
-                y_nudge: y_nudge,
-                show_label: pct_f >= label_min_pct
-              }
-              current_start += pct_f + gap_for_segment
-            end
-
-            render_segments = segments_layout.sort_by { |seg| [seg[:sw], seg[:idx]] }
-            aria_percentages = segments_layout.map { |seg| "#{seg[:pct]} percent #{seg[:label]}" }.join(", ")
-            compact_mode = segments_layout.length > 3
-          %>
-          <div class="monthly-performance-card rounded-3xl bg-white py-5 pl-6 pr-5 shadow-sm lg:min-h-[407px]">
-            <div class="mp-title text-lg font-semibold text-slate-900">Tekliflerin Sistem Dağılımı</div>
-            <div class="mp-wrap <%= 'mp-wrap-compact' if compact_mode %>">
-              <div class="mp-donut" role="img" aria-label="Performance chart: <%= aria_percentages %>.">
-                <svg viewBox="0 0 120 120" class="mp-donut-svg" aria-hidden="true">
-                  <circle class="mp-track" cx="60" cy="60" r="42" pathLength="100"></circle>
-                  <% render_segments.each do |seg| %>
-                    <circle class="mp-segment" cx="60" cy="60" r="42" pathLength="100" style="stroke: <%= seg[:color] %>; stroke-width: <%= seg[:sw] %>; stroke-dasharray: <%= format('%.2f', seg[:len]) %> calc(100 - <%= format('%.2f', seg[:len]) %>); stroke-dashoffset: <%= format('%.2f', seg[:off]) %>;"></circle>
-                  <% end %>
-                </svg>
-                <% segments_layout.each do |seg| %>
-                  <% if seg[:show_label] %>
-                    <span class="mp-pct" style="--angle: <%= format('%.2f', seg[:angle]) %>deg; --radius: <%= seg[:radius] %>px; --dy: <%= seg[:y_nudge] %>px; color: <%= seg[:text_color] %>;"><%= seg[:pct] %>%</span>
+          <div class="rt-table-wrap">
+            <table class="rt-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Musteri</th>
+                  <th>Tutar</th>
+                  <th>Durum</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if @recent_offers.blank? %>
+                  <tr>
+                    <td colspan="4" class="rt-empty">Kayit bulunamadi.</td>
+                  </tr>
+                <% else %>
+                  <% @recent_offers.each do |offer| %>
+                    <tr>
+                      <td><%= offer[:number].presence || "-" %></td>
+                      <td><%= offer[:company].presence || "-" %></td>
+                      <td><%= offer[:amount] %></td>
+                      <td><span class="rt-status"><%= offer[:status] %></span></td>
+                    </tr>
                   <% end %>
                 <% end %>
-                <div class="mp-center">
-                  <div class="mp-total"><%= number_with_delimiter(total_orders, delimiter: ".") %></div>
-                  <div class="mp-total-label"><%= total_label %></div>
-                </div>
-              </div>
-              <div class="mp-legend">
-                <% segments_layout.each do |seg| %>
-                  <div class="mp-legend-item">
-                    <div class="mp-legend-label"><%= seg[:label] %></div>
-                    <div class="mp-legend-value"><span class="mp-dot" style="background: <%= seg[:color] %>;"></span><%= seg[:value].to_i %></div>
-                  </div>
-                <% end %>
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
-
-          <div class="mt-5 rounded-3xl bg-white p-5 shadow-sm">
-            <div class="text-sm font-semibold text-slate-900">Hızlı İşlemler</div>
-            <div class="mt-3 space-y-2 text-sm">
-              <% if current_user && Roles.catalog_manage?(current_user.role) %>
-                <%= link_to "Müşteri listesi", companies_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
-                <%= link_to "Teklif oluştur", new_offer_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
-                <%= link_to "Ürün kataloğu", products_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
-              <% end %>
-              <% if current_user && Roles.finance_manage?(current_user.role) %>
-                <%= link_to "Kurlar", currencies_path, class: "flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-50" %>
-              <% end %>
-            </div>
-          </div>
-
-          <div class="mt-5 rounded-3xl bg-white p-5 shadow-sm">
-            <div class="text-sm font-semibold text-slate-900">Hatırlatmalar</div>
-            <ul class="mt-3 space-y-2 text-sm text-slate-600">
-              <% @reminders.each do |note| %>
-                <li class="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-2"><%= note %></li>
-              <% end %>
-            </ul>
-          </div>
-        </aside>
+        </section>
       </div>
 
-      <footer class="mt-6 text-xs text-slate-500">
-        RubyTeklif • Teklif ve müşteri yönetimi
-      </footer>
-    </main>
+      <aside class="rt-stack">
+        <section class="rt-card">
+          <header class="rt-card-header">
+            <div>
+              <p class="rt-eyebrow">Shortcuts</p>
+              <h3>Hizli Islemler</h3>
+            </div>
+          </header>
+          <div class="rt-actions">
+            <% if current_user && Roles.catalog_manage?(current_user.role) %>
+              <%= link_to "Yeni Musteri", new_company_path %>
+              <%= link_to "Yeni Teklif", new_offer_path %>
+              <%= link_to "Yeni Urun", new_product_path %>
+            <% end %>
+            <% if current_user && Roles.finance_manage?(current_user.role) %>
+              <%= link_to "Kur Yonetimi", currencies_path %>
+            <% end %>
+            <% if current_user && Roles.admin?(current_user.role) %>
+              <%= link_to "Kullanici Yonetimi", admin_users_path %>
+            <% end %>
+          </div>
+        </section>
+
+        <section class="rt-card">
+          <header class="rt-card-header">
+            <div>
+              <p class="rt-eyebrow">Team Notes</p>
+              <h3>Hatirlatmalar</h3>
+            </div>
+          </header>
+          <ul class="rt-reminders">
+            <% if @reminders.blank? %>
+              <li>Bugun icin not bulunmuyor.</li>
+            <% else %>
+              <% @reminders.each do |note| %>
+                <li><%= note %></li>
+              <% end %>
+            <% end %>
+          </ul>
+        </section>
+      </aside>
+    </section>
   </div>
-
-  <style>
-    @media (min-width: 1024px) {
-      #main-content {
-        padding-left: calc(18rem + 2rem);
-      }
-      #sidebar.sidebar-collapsed ~ #main-content {
-        padding-left: calc(5rem + 2rem);
-      }
-    }
-    #sidebar.sidebar-collapsed {
-      width: 5rem;
-      overflow: visible !important;
-    }
-    #sidebar.sidebar-collapsed .sidebar-text,
-    #sidebar.sidebar-collapsed .sidebar-sub {
-      display: none !important;
-    }
-    #sidebar.sidebar-collapsed .sidebar-link {
-      justify-content: center;
-      padding-left: 0.75rem !important;
-      padding-right: 0.75rem !important;
-      overflow: visible !important;
-      position: relative;
-    }
-    #sidebar .sidebar-tooltip {
-      display: none !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
-    #sidebar.sidebar-collapsed .sidebar-link .sidebar-tooltip {
-      display: block !important;
-      left: calc(100% + 0.5rem) !important;
-      top: 50% !important;
-      transform: translateY(-50%) !important;
-      z-index: 120 !important;
-      white-space: nowrap;
-    }
-    #sidebar.sidebar-collapsed .sidebar-link:hover .sidebar-tooltip,
-    #sidebar.sidebar-collapsed .sidebar-link:focus-visible .sidebar-tooltip {
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .sidebar-item.is-active .sidebar-indicator,
-    .sidebar-item:hover .sidebar-indicator {
-      opacity: 1 !important;
-    }
-    .peer\/menu-companies:checked + .sidebar-link > span:first-child svg,
-    .peer\/menu-offers:checked + .sidebar-link > span:first-child svg,
-    .peer\/menu-products:checked + .sidebar-link > span:first-child svg {
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.45));
-      opacity: 0.95;
-    }
-    .kpi-card {
-      border: 1px solid rgba(15, 23, 42, 0.06);
-      background-image: linear-gradient(140deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.9));
-      --kpi-spark: #a855f7;
-    }
-    .kpi-card:nth-child(1) {
-      --kpi-accent: #6d28d9;
-      --kpi-bar-from: #4c1d95;
-      --kpi-bar-to: #a78bfa;
-    }
-    .kpi-card:nth-child(2) {
-      --kpi-accent: #8b5cf6;
-      --kpi-bar-from: #5b21b6;
-      --kpi-bar-to: #c4b5fd;
-    }
-    .kpi-card:nth-child(3) {
-      --kpi-accent: #d946ef;
-      --kpi-bar-from: #7e22ce;
-      --kpi-bar-to: #f5d0fe;
-    }
-    .kpi-accent {
-      position: absolute;
-      left: 0;
-      top: 12px;
-      bottom: 12px;
-      width: 3px;
-      border-radius: 9999px;
-      opacity: 0.95;
-      background: var(--kpi-accent, #7c3aed);
-    }
-    .kpi-card:hover .kpi-accent {
-      box-shadow: 0 0 10px var(--kpi-glow, rgba(56, 189, 248, 0.55));
-    }
-    .kpi-sparkline svg {
-      stroke: var(--kpi-spark, rgba(15, 23, 42, 0.35));
-      stroke-width: 2;
-      fill: none;
-      opacity: 0.6;
-    }
-    .kpi-card:hover .kpi-sparkline svg {
-      stroke: var(--kpi-spark, rgba(15, 23, 42, 0.5));
-      opacity: 0.9;
-    }
-    .sidebar-item.is-active {
-      background: rgba(148, 163, 184, 0.08);
-      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
-    }
-    .activity-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 16px;
-    }
-    .activity-vertical {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      height: 96px;
-    }
-    .activity-column {
-      position: relative;
-      width: 28px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .activity-bar-wrap {
-      height: 72px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      justify-content: flex-end;
-      gap: 6px;
-      margin-top: 10px;
-    }
-    .activity-bar {
-      width: 100%;
-      border-radius: 0;
-      position: relative;
-    }
-    .activity-amount-side {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1f2937;
-      white-space: nowrap;
-      height: 72px;
-      display: flex;
-      align-items: flex-end;
-      line-height: 1;
-    }
-    .activity-currency {
-      font-size: 27px;
-      color: #6b7280;
-      margin-bottom: 2px;
-    }
-    .activity-tooltip {
-      position: absolute;
-      left: 50%;
-      bottom: 100%;
-      transform: translate(-50%, -8px);
-      background: rgba(255, 255, 255, 0.98);
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 9999px;
-      padding: 4px 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #0f172a;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 120ms ease, transform 120ms ease;
-      box-shadow: 0 8px 18px -12px rgba(15, 23, 42, 0.4);
-    }
-    .activity-bar:hover .activity-tooltip {
-      opacity: 1;
-      transform: translate(-50%, -12px);
-    }
-    .monthly-performance-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
-    .mp-title {
-      display: inline-block;
-      padding-left: 4px;
-    }
-    .mp-wrap {
-      min-height: 321px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 34px;
-      margin-top: 10px;
-    }
-    .mp-wrap-compact {
-      gap: 20px;
-    }
-    .mp-wrap-compact .mp-legend {
-      min-width: 130px;
-      gap: 12px;
-    }
-    .mp-wrap-compact .mp-legend-label {
-      font-size: 12px;
-    }
-    .mp-wrap-compact .mp-legend-value {
-      font-size: 33px;
-    }
-    .mp-wrap-compact .mp-dot {
-      width: 12px;
-      height: 12px;
-    }
-    .mp-donut {
-      width: 226px;
-      height: 226px;
-      position: relative;
-      border-radius: 9999px;
-      background: transparent;
-      flex: 0 0 auto;
-    }
-    .mp-donut::after {
-      content: "";
-      position: absolute;
-      right: -10px;
-      bottom: -9px;
-      width: 108px;
-      height: 108px;
-      border-radius: 9999px;
-      background: radial-gradient(circle, rgba(15, 23, 42, 0.16) 0%, rgba(15, 23, 42, 0) 72%);
-      filter: blur(7px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .mp-donut-svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      transform: rotate(-90deg);
-      position: relative;
-      z-index: 1;
-    }
-    .mp-track {
-      fill: none;
-      stroke: #eaedf0;
-      stroke-width: 17;
-    }
-    .mp-segment {
-      fill: none;
-      stroke-width: 18;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .mp-center {
-      position: absolute;
-      inset: 64px;
-      border-radius: 9999px;
-      background: #e7eaed;
-      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.28), 0 10px 22px -14px rgba(15, 23, 42, 0.45), inset 0 1px 2px rgba(148, 163, 184, 0.24);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .mp-total {
-      font-size: 26px;
-      line-height: 1;
-      font-weight: 400;
-      color: #161616;
-      letter-spacing: -0.02em;
-    }
-    .mp-total-label {
-      margin-top: 7px;
-      font-size: 13px;
-      line-height: 1;
-      font-weight: 500;
-      color: #838c95;
-    }
-    .mp-pct {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(var(--dy, 0px));
-      font-size: 12px;
-      line-height: 1;
-      font-weight: 700;
-      color: #1a1a1a;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .mp-legend {
-      min-width: 158px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      flex: 0 0 auto;
-      margin-left: 10px;
-    }
-    .mp-legend-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .mp-legend-label {
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 400;
-      color: #adb3ba;
-    }
-    .mp-legend-value {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-size: 28px;
-      line-height: 0.95;
-      font-weight: 500;
-      color: #171717;
-    }
-    .mp-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 9999px;
-      display: inline-block;
-      flex: 0 0 auto;
-    }
-    @media (max-width: 520px) {
-      .mp-wrap {
-        min-height: 228px;
-        gap: 14px;
-      }
-      .mp-donut {
-        width: 160px;
-        height: 160px;
-      }
-      .mp-center {
-        inset: 45px;
-      }
-      .mp-total {
-        font-size: 15px;
-      }
-      .mp-total-label {
-        font-size: 12px;
-      }
-      .mp-pct {
-        font-size: 11px;
-      }
-      .mp-legend {
-        min-width: 102px;
-        gap: 10px;
-      }
-      .mp-legend-label {
-        font-size: 11px;
-      }
-      .mp-legend-value {
-        font-size: 11px;
-        gap: 6px;
-      }
-      .mp-dot {
-        width: 10px;
-        height: 10px;
-      }
-    }
-    .sidebar-modern {
-      background: linear-gradient(180deg, #14102a 0%, #1a1233 42%, #1a1f42 90%, #16203e 97%, #0f172a 100%);
-      border-right: 1px solid rgba(168, 85, 247, 0.14);
-      color: rgba(237, 233, 254, 0.92);
-    }
-    .sidebar-modern a,
-    .sidebar-modern label,
-    .sidebar-modern svg {
-      color: inherit;
-    }
-    .sidebar-modern .sidebar-text {
-      color: rgba(237, 233, 254, 0.9);
-    }
-    .sidebar-modern nav .sidebar-item,
-    .sidebar-modern nav .sidebar-item *:not(.sidebar-indicator):not(.sidebar-tooltip) {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .sidebar-modern nav .sidebar-main,
-    .sidebar-modern nav .sidebar-subitem {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .sidebar-modern nav .sidebar-link {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .sidebar-modern nav .sidebar-item.is-active {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .sidebar-modern nav .sidebar-main:hover,
-    .sidebar-modern nav .sidebar-subitem:hover {
-      background: rgba(255, 255, 255, 0.06) !important;
-    }
-    .sidebar-modern .sidebar-tooltip {
-      background: rgba(155, 17, 30, 0.95);
-      color: #ffe4e6;
-    }
-    .sidebar-glow {
-      position: absolute;
-      inset: -10% -30% auto -30%;
-      height: 100%;
-      background: radial-gradient(closest-side, rgba(168, 85, 247, 0.35), rgba(15, 23, 42, 0));
-      filter: blur(16px);
-      pointer-events: none;
-    }
-    .sidebar-grid {
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 24px 24px;
-      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent 70%);
-      pointer-events: none;
-    }
-    .sidebar-modern > *:not(.sidebar-glow):not(.sidebar-grid) {
-      position: relative;
-      z-index: 1;
-    }
-    .sidebar-indicator {
-      background: linear-gradient(180deg, #a855f7, #7c3aed) !important;
-      box-shadow: 0 0 12px rgba(124, 58, 237, 0.6) !important;
-      display: block;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .activity-badge {
-      position: absolute;
-      top: -24px;
-      padding: 2px 6px;
-      border-radius: 9999px;
-      font-size: 10px;
-      font-weight: 700;
-      color: #0f172a;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      opacity: 0;
-      transform: translateY(4px);
-      transition: opacity 120ms ease, transform 120ms ease;
-      pointer-events: none;
-    }
-    .activity-card:hover .activity-badge {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .sidebar-link *:not(.sidebar-indicator):not(.sidebar-tooltip) {
-      color: inherit !important;
-      font-size: inherit !important;
-      line-height: inherit !important;
-      font-weight: inherit !important;
-      opacity: 1 !important;
-    }
-    .sidebar-indicator {
-      opacity: 0 !important;
-    }
-    .sidebar-item:hover .sidebar-indicator,
-    .sidebar-link:hover .sidebar-indicator,
-    .sidebar-item.is-active .sidebar-indicator {
-      opacity: 1 !important;
-    }
-    .sidebar-link:hover .sidebar-text,
-    .sidebar-link:focus .sidebar-text,
-    .sidebar-link:active .sidebar-text {
-      font-size: inherit !important;
-      line-height: inherit !important;
-      font-weight: inherit !important;
-      opacity: 1 !important;
-    }
-    .sidebar-main {
-      font-size: 0.875rem !important;
-      line-height: 1.25rem !important;
-      font-weight: 400 !important;
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-    .sidebar-subitem {
-      font-size: 0.75rem !important;
-      line-height: 1rem !important;
-      font-weight: 400 !important;
-      color: rgba(255, 255, 255, 0.6) !important;
-    }
-    #sidebar-collapse-btn:hover {
-      background: rgba(155, 17, 30, 0.28) !important;
-      color: #ffe4e6 !important;
-    }
-    #sidebar-collapse-btn:hover .collapse-icon {
-      background: rgba(155, 17, 30, 0.5) !important;
-    }
-    #sidebar-hide-btn:hover {
-      background: rgba(155, 17, 30, 0.28) !important;
-      color: #ffe4e6 !important;
-    }
-    #sidebar-hide-btn:hover .collapse-icon {
-      background: rgba(155, 17, 30, 0.5) !important;
-    }
-    #sidebar-collapse-btn .collapse-icon svg {
-      transition: transform 180ms ease;
-    }
-    #sidebar.sidebar-collapsed #sidebar-collapse-btn .collapse-icon svg {
-      transform: rotate(180deg);
-    }
-  </style>
-
-  <script>
-    const initSidebar = () => {
-      const sidebar = document.getElementById("sidebar");
-      const collapseBtn = document.getElementById("sidebar-collapse-btn");
-      const toggle = document.getElementById("sidebar-toggle");
-      const submenuIds = ["menu-companies", "menu-offers", "menu-products", "menu-settings"];
-
-      if (!sidebar || sidebar.dataset.bound) return;
-      sidebar.dataset.bound = "true";
-
-      if (collapseBtn) {
-        collapseBtn.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          sidebar.classList.toggle("sidebar-collapsed");
-        });
-      }
-
-      const items = Array.from(document.querySelectorAll("[data-sidebar-item]"));
-      if (items.length) {
-        items.forEach((item) => {
-          item.addEventListener("click", () => {
-            items.forEach((el) => el.classList.remove("is-active"));
-            item.classList.add("is-active");
-          });
-        });
-
-        const path = window.location.pathname || "/";
-        let bestMatch = null;
-        let bestLen = -1;
-        items.forEach((item) => {
-          const link = item.tagName === "A" ? item : item.querySelector("a");
-          if (!link) return;
-          const href = link.getAttribute("href");
-          if (!href || !href.startsWith("/")) return;
-          if (href === "/" && path === "/") {
-            bestMatch = item;
-            bestLen = 1;
-            return;
-          }
-          if (href !== "/" && path.startsWith(href) && href.length > bestLen) {
-            bestMatch = item;
-            bestLen = href.length;
-          }
-        });
-        if (bestMatch) {
-          items.forEach((el) => el.classList.remove("is-active"));
-          bestMatch.classList.add("is-active");
-        }
-      }
-
-      submenuIds.forEach((id) => {
-        const input = document.getElementById(id);
-        if (!input) return;
-        const stored = window.localStorage.getItem(`sidebar:${id}`);
-        if (stored !== null) {
-          input.checked = stored === "1";
-        }
-        input.addEventListener("change", () => {
-          window.localStorage.setItem(`sidebar:${id}`, input.checked ? "1" : "0");
-        });
-      });
-
-      if (toggle) {
-        const lockScroll = () => {
-          if (window.innerWidth < 1024 && toggle.checked) {
-            document.body.style.overflow = "hidden";
-          } else {
-            document.body.style.overflow = "";
-          }
-        };
-        lockScroll();
-        toggle.addEventListener("change", lockScroll);
-        window.addEventListener("resize", lockScroll);
-
-        const closeOnMobile = () => {
-          if (window.innerWidth < 1024) toggle.checked = false;
-        };
-        items.forEach((item) => {
-          item.addEventListener("click", closeOnMobile);
-        });
-      }
-    };
-
-    document.addEventListener("DOMContentLoaded", initSidebar);
-    document.addEventListener("turbo:load", initSidebar);
-
-    const initTableLinks = () => {
-      document.querySelectorAll("[data-row-link]").forEach((row) => {
-        const url = row.getAttribute("data-row-link");
-        if (!url) return;
-        row.addEventListener("click", () => {
-          window.location.href = url;
-        });
-        row.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            window.location.href = url;
-          }
-        });
-      });
-    };
-
-    document.addEventListener("DOMContentLoaded", initTableLinks);
-    document.addEventListener("turbo:load", initTableLinks);
-  </script>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
