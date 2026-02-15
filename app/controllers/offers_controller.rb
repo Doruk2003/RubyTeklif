@@ -57,9 +57,10 @@
   end
 
   def create
-    payload = offer_params.to_h.deep_symbolize_keys
-    @selected_category_id = payload.delete(:product_category_id).to_s.presence
-    payload[:items] = Array(payload[:items]).map { |item| item.to_h.deep_symbolize_keys }
+    permitted = offer_params.to_h
+    @selected_category_id = permitted.delete("product_category_id").to_s.presence
+    permitted["items"] = Array(permitted["items"]).map { |item| item.to_h.deep_symbolize_keys }
+    payload = Offers::CreateForm.new(permitted).normalized_attributes
 
     offer_id = Sales::UseCases::Offers::Create.new(client: supabase_user_client).call(payload: payload, user_id: current_user.id)
     redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
