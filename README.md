@@ -30,6 +30,9 @@ Rails + Supabase tabanli teklif/CRM uygulamasi.
    - Sidekiq icin `REDIS_URL` tanimli olmalidir.
 6. Sidekiq calistirma (development/production):
    - `bundle exec sidekiq -C config/sidekiq.yml`
+7. Cache adapter secimi:
+   - Production varsayilan: `CACHE_STORE_ADAPTER=solid_cache_store`
+   - Redis cache icin: `CACHE_STORE_ADAPTER=redis_cache_store` ve `REDIS_URL` tanimli olmalidir.
 
 ## Test ve Kalite Kapisi
 

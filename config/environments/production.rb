@@ -46,8 +46,16 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Replace the default in-process memory cache store with a durable alternative.
-  config.cache_store = :solid_cache_store
+  # Cache backend can be switched per environment variable without code change.
+  cache_store_adapter = ENV.fetch("CACHE_STORE_ADAPTER", "solid_cache_store").to_s
+  if cache_store_adapter == "redis_cache_store"
+    config.cache_store = :redis_cache_store, {
+      url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
+      namespace: "rubyteklif:cache"
+    }
+  else
+    config.cache_store = :solid_cache_store
+  end
 
   # Queue backend can be switched per environment variable without code change.
   queue_adapter = ENV.fetch("ACTIVE_JOB_QUEUE_ADAPTER", "sidekiq").to_s
