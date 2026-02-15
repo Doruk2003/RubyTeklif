@@ -20,21 +20,21 @@ class SessionsController < ApplicationController
     session[:last_seen_at] = Time.now.to_i
     redirect_to root_path
   rescue Supabase::Auth::AuthError => e
-    flash.now[:alert] = "Giriş yapılamadı: #{e.message}"
+    flash.now[:alert] = "#{Auth::Messages::LOGIN_FAILED_PREFIX}: #{e.message}"
     render :new, status: :unprocessable_entity
   end
 
   def send_recovery
     email = params[:email].to_s.strip
     if email.blank?
-      flash.now[:alert] = "Lütfen e-posta adresinizi girin."
+      flash.now[:alert] = Auth::Messages::RECOVERY_EMAIL_REQUIRED
       return render :recovery, status: :unprocessable_entity
     end
 
     Supabase::Auth.new.send_recovery(email: email)
-    redirect_to login_path, notice: "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi."
+    redirect_to login_path, notice: Auth::Messages::RECOVERY_SENT
   rescue Supabase::Auth::AuthError => e
-    flash.now[:alert] = "Şifre sıfırlama e-postası gönderilemedi: #{e.message}"
+    flash.now[:alert] = "#{Auth::Messages::RECOVERY_FAILED_PREFIX}: #{e.message}"
     render :recovery, status: :unprocessable_entity
   end
 

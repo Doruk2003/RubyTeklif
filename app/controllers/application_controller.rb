@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-    return expire_session!(message: "Oturum süreniz doldu. Lütfen tekrar giriş yapın.") if session_timed_out?
+    return expire_session!(message: Auth::Messages::SESSION_TIMEOUT) if session_timed_out?
 
     refresh_failed = !refresh_session_if_needed
 
@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
     allowed = roles.map(&:to_s)
     return if current_user && allowed.include?(current_user.role)
 
-    redirect_to root_path, alert: "Bu işlem için yetkiniz yok."
+    redirect_to root_path, alert: Auth::Messages::UNAUTHORIZED
   end
 
   def authorize_with_policy!(policy_class, query: :access?)
@@ -62,7 +62,7 @@ class ApplicationController < ActionController::Base
     policy = policy_class.new(current_user)
     return if policy.public_send(query)
 
-    redirect_to root_path, alert: "Bu işlem için yetkiniz yok."
+    redirect_to root_path, alert: Auth::Messages::UNAUTHORIZED
   end
 
   def load_current_user(auth_user)
@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
     if db_user && db_user.key?("active") && db_user["active"] == false
       Current.user = nil
       reset_session
-      return redirect_to login_path, alert: "Hesabınız devre dışı."
+      return redirect_to login_path, alert: Auth::Messages::ACCOUNT_DISABLED
     end
 
     role = db_user&.fetch("role", nil).presence || ENV.fetch("APP_DEFAULT_ROLE", Roles::ADMIN)
@@ -85,7 +85,7 @@ class ApplicationController < ActionController::Base
     session_refresh.call(session: session, force: true)
   end
 
-  def expire_session!(message: "Oturumunuz sona erdi. Lütfen tekrar giriş yapın.")
+  def expire_session!(message: Auth::Messages::SESSION_ENDED)
     Current.user = nil
     reset_session
     redirect_to login_path, alert: message
@@ -114,9 +114,9 @@ class ApplicationController < ActionController::Base
   end
 
   def expired_message(refresh_failed:)
-    return "Oturum yenilenemedi. Lütfen tekrar giriş yapın." if refresh_failed
+    return Auth::Messages::SESSION_REFRESH_FAILED if refresh_failed
 
-    "Oturumunuz sona erdi. Lütfen tekrar giriş yapın."
+    Auth::Messages::SESSION_ENDED
   end
 
   def report_handled_error(error, source:)
@@ -131,7 +131,7 @@ class ApplicationController < ActionController::Base
     report_handled_error(error, source: "unhandled_exception")
     raise error if Rails.env.development? || Rails.env.test?
 
-    redirect_to root_path, alert: "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+    redirect_to root_path, alert: Auth::Messages::UNEXPECTED_ERROR
   end
 
   def error_context
