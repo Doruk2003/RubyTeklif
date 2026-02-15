@@ -1,0 +1,52 @@
+require "test_helper"
+
+module Categories
+  class ServicesTest < ActiveSupport::TestCase
+    class FakeClient
+      attr_reader :last_post_path, :last_post_body
+
+      def initialize(post_response:)
+        @post_response = post_response
+      end
+
+      def post(path, body:, headers:)
+        @last_post_path = path
+        @last_post_body = body
+        @post_response
+      end
+    end
+
+    test "create returns id via atomic rpc" do
+      client = FakeClient.new(post_response: [{ "category_id" => "cat-1" }])
+      service = Categories::Create.new(client: client)
+
+      id = service.call(
+        form_payload: { code: "raw_material", name: "Raw Material", active: "1" },
+        actor_id: "usr-1"
+      )
+
+      assert_equal "cat-1", id
+      assert_equal "rpc/create_category_with_audit_atomic", client.last_post_path
+      assert_equal "usr-1", client.last_post_body[:p_actor_id]
+      assert_equal "raw_material", client.last_post_body[:p_code]
+      assert_equal true, client.last_post_body[:p_active]
+    end
+
+    test "create raises validation for invalid payload" do
+      service = Categories::Create.new(client: FakeClient.new(post_response: [{ "category_id" => "cat-1" }]))
+
+      assert_raises(ServiceErrors::Validation) do
+        service.call(form_payload: { code: "", name: "", active: "1" }, actor_id: "usr-1")
+      end
+    end
+
+    test "create raises policy error for forbidden response" do
+      client = FakeClient.new(post_response: { "code" => "42501", "message" => "forbidden" })
+      service = Categories::Create.new(client: client)
+
+      assert_raises(ServiceErrors::Policy) do
+        service.call(form_payload: { code: "raw_material", name: "Raw Material", active: "1" }, actor_id: "usr-1")
+      end
+    end
+  end
+end
