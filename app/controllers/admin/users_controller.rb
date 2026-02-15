@@ -84,12 +84,12 @@
       )
       session[:admin_users_export_token] = token
 
-      Admin::Users::ExportCsvJob.perform_later(token, current_user.id, export_params.to_h)
-      redirect_to admin_users_path(export_params.to_h), notice: "CSV export kuyruğa alındı."
+      Admin::Users::ExportCsvJob.perform_later(token, current_user.id, export_params)
+      redirect_to admin_users_path(export_params), notice: "CSV export kuyruğa alındı."
     end
 
     def download_export
-      state = normalized_export_state(Rails.cache.read(export_cache_key(params[:token].to_s)))
+      state = current_export_state
       unless state.is_a?(Hash) && state[:actor_id].to_s == current_user.id.to_s
         return redirect_to admin_users_path, alert: "Export kaydı bulunamadı."
       end
@@ -103,7 +103,7 @@
         return redirect_to admin_users_path, alert: "Export dosyası bulunamadı."
       end
 
-      send_file file_path, filename: "admin_users_#{Date.current.iso8601}.csv", type: "text/csv"
+      send_data File.binread(file_path), filename: "admin_users_#{Date.current.iso8601}.csv", type: "text/csv"
     end
 
     private
@@ -117,7 +117,11 @@
     end
 
     def export_params
-      params.permit(:q, :role, :active)
+      {
+        q: params[:q].to_s.presence,
+        role: normalized_role_param(params[:role]),
+        active: normalized_active_param(params[:active])
+      }.compact
     end
 
     def current_export_state
@@ -139,6 +143,21 @@
       return nil unless state.is_a?(Hash)
 
       state.to_h.symbolize_keys
+    end
+
+    def normalized_role_param(value)
+      role = value.to_s
+      return nil if role.blank?
+      return role if Roles::ACCEPTED_ROLES.include?(role)
+
+      nil
+    end
+
+    def normalized_active_param(value)
+      raw = value.to_s
+      return nil if raw.blank?
+
+      %w[true false].include?(raw) ? raw : nil
     end
   end
 end

@@ -1,4 +1,4 @@
-module Admin
+﻿module Admin
   class ActivityLogsController < ApplicationController
     before_action :authorize_admin!
     EXPORT_TTL = 30.minutes
@@ -37,25 +37,25 @@ module Admin
       session[:activity_logs_export_token] = token
 
       Admin::ActivityLogs::ExportCsvJob.perform_later(token, current_user.id, export_params.to_h)
-      redirect_to admin_activity_logs_path(export_params.to_h), notice: "CSV export kuyruğa alındı."
+      redirect_to admin_activity_logs_path(export_params.to_h), notice: "CSV export kuyruga alindi."
     end
 
     def download_export
-      state = normalized_export_state(Rails.cache.read(export_cache_key(params[:token].to_s)))
+      state = current_export_state
       unless state.is_a?(Hash) && state[:actor_id].to_s == current_user.id.to_s
-        return redirect_to admin_activity_logs_path, alert: "Export kaydı bulunamadı."
+        return redirect_to admin_activity_logs_path, alert: "Export kaydi bulunamadi."
       end
 
       if state[:status].to_s != "ready"
-        return redirect_to admin_activity_logs_path, alert: "Export henüz hazır değil."
+        return redirect_to admin_activity_logs_path, alert: "Export henuz hazir degil."
       end
 
       file_path = state[:file_path].to_s
       unless file_path.present? && File.exist?(file_path)
-        return redirect_to admin_activity_logs_path, alert: "Export dosyası bulunamadı."
+        return redirect_to admin_activity_logs_path, alert: "Export dosyasi bulunamadi."
       end
 
-      send_file file_path, filename: "activity_logs_#{Date.current.iso8601}.csv", type: "text/csv"
+      send_data File.binread(file_path), filename: "activity_logs_#{Date.current.iso8601}.csv", type: "text/csv"
     end
 
     private
