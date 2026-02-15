@@ -117,17 +117,14 @@
     end
 
     def export_params
-      role = params[:role].to_s
-      role = nil unless Roles::ACCEPTED_ROLES.include?(role)
+      form = Admin::Users::ExportForm.new(
+        q: params[:q],
+        role: params[:role],
+        active: params[:active]
+      )
+      return form.to_h if form.valid?
 
-      active = params[:active].to_s
-      active = nil unless %w[true false].include?(active)
-
-      {
-        q: params[:q].to_s.presence,
-        role: role.presence,
-        active: active.presence
-      }.compact
+      { q: params[:q].to_s.presence }.compact
     end
 
     def current_export_state
