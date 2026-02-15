@@ -21,6 +21,12 @@ class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
     end
   end
 
+  class FakeAuthInvalidUser < FakeAuth
+    def user(access_token)
+      nil
+    end
+  end
+
   class FakeSessionRefreshFail
     def call(session:, force: false)
       false
@@ -84,6 +90,18 @@ class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
         with_stubbed_constructor(Companies::IndexQuery, FakeCompaniesIndexQuery.new) do
           get companies_path
           assert_response :success
+        end
+      end
+    end
+  end
+
+  test "refresh failure with invalid token resets session and redirects to login" do
+    with_authenticated_context(role: Roles::OPERATOR) do
+      with_stubbed_constructor(Supabase::Auth, FakeAuthInvalidUser.new(user_id: "usr-1")) do
+        with_stubbed_constructor(Auth::SessionRefresh, FakeSessionRefreshFail.new) do
+          get companies_path
+          assert_redirected_to login_path
+          assert_equal Auth::Messages::SESSION_REFRESH_FAILED, flash[:alert]
         end
       end
     end
