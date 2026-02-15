@@ -30,7 +30,7 @@ class CategoriesController < ApplicationController
 
   def create
     payload = category_params
-    Categories::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    Categories::CreateCategory.new(client: client).call(form_payload: payload, actor_id: current_user.id)
     redirect_to safe_return_to || categories_path, notice: "Kategori oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#create")
@@ -41,7 +41,7 @@ class CategoriesController < ApplicationController
 
   def update
     payload = category_params
-    Categories::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    Categories::UpdateCategory.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
     redirect_to categories_path, notice: "Kategori güncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#update")
@@ -51,7 +51,7 @@ class CategoriesController < ApplicationController
   end
 
   def destroy
-    Categories::Destroy.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Categories::ArchiveCategory.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to categories_path, notice: "Kategori arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#destroy")
@@ -59,7 +59,7 @@ class CategoriesController < ApplicationController
   end
 
   def restore
-    Categories::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    Categories::RestoreCategory.new(client: client).call(id: params[:id], actor_id: current_user.id)
     redirect_to categories_path(scope: "archived"), notice: "Kategori geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#restore")
