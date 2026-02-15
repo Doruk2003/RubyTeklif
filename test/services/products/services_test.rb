@@ -83,5 +83,16 @@ module Products
         service.call(id: "prd-1", actor_id: "usr-1")
       end
     end
+
+    test "restore calls atomic rpc endpoint" do
+      client = FakeClient.new(post_response: [{ "product_id" => "prd-1" }])
+      service = Products::Restore.new(client: client)
+
+      service.call(id: "prd-1", actor_id: "usr-1")
+
+      assert_equal "rpc/restore_product_with_audit_atomic", client.last_post_path
+      assert_equal "prd-1", client.last_post_body[:p_product_id]
+      assert_equal "usr-1", client.last_post_body[:p_actor_id]
+    end
   end
 end

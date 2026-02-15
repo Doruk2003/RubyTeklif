@@ -63,5 +63,16 @@ module Currencies
         service.call(id: "cur-1", actor_id: "usr-1")
       end
     end
+
+    test "restore calls atomic rpc endpoint" do
+      client = FakeClient.new(post_response: [{ "currency_id" => "cur-1" }])
+      service = Currencies::Restore.new(client: client)
+
+      service.call(id: "cur-1", actor_id: "usr-1")
+
+      assert_equal "rpc/restore_currency_with_audit_atomic", client.last_post_path
+      assert_equal "cur-1", client.last_post_body[:p_currency_id]
+      assert_equal "usr-1", client.last_post_body[:p_actor_id]
+    end
   end
 end
