@@ -14,14 +14,14 @@ module Auth
 
       response = @auth_client.refresh(refresh_token)
       access_token = response["access_token"].to_s
-      return false if access_token.blank?
+      return handle_refresh_failure(force: force) if access_token.blank?
 
       session[:access_token] = access_token
       session[:refresh_token] = response["refresh_token"].to_s if response["refresh_token"].present?
       session[:expires_at] = @now.call + response["expires_in"].to_i if response["expires_in"].present?
       true
     rescue Supabase::Auth::AuthError
-      false
+      handle_refresh_failure(force: force)
     end
 
     private
@@ -34,6 +34,11 @@ module Auth
 
       @now.call >= (expires_at - REFRESH_THRESHOLD_SECONDS)
     end
+
+    def handle_refresh_failure(force:)
+      # In non-force mode we allow request flow to continue with current access token.
+      # Controller can still force-refresh or expire session if token is invalid.
+      !force
+    end
   end
 end
-

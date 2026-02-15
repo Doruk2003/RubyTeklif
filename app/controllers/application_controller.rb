@@ -2,10 +2,7 @@ class ApplicationController < ActionController::Base
   STANDARD_IDLE_TIMEOUT_SECONDS = 8.hours.to_i
   REMEMBER_ME_IDLE_TIMEOUT_SECONDS = 30.days.to_i
 
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
-
-  # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
   before_action :authenticate_user!
@@ -26,31 +23,30 @@ class ApplicationController < ActionController::Base
   def authenticate_user!
     return expire_session!(message: "Oturum süreniz doldu. Lütfen tekrar giriş yapın.") if session_timed_out?
 
-    refresh_session_if_needed
-    return expire_session! if @session_refresh_failed
+    refresh_failed = !refresh_session_if_needed
 
     access_token = session[:access_token].to_s
     if access_token.blank?
       Current.user = nil
-      return redirect_to login_path
+      return expire_session!(message: expired_message(refresh_failed: refresh_failed))
     end
 
     auth_user = Supabase::Auth.new.user(access_token)
     if auth_user.is_a?(Hash) && auth_user["id"].present?
       load_current_user(auth_user)
-    else
-      refreshed = refresh_session
-      if refreshed
-        auth_user = Supabase::Auth.new.user(session[:access_token].to_s)
-        if auth_user.is_a?(Hash) && auth_user["id"].present?
-          load_current_user(auth_user)
-        else
-          expire_session!
-        end
-      else
-        expire_session!
+      return
+    end
+
+    refreshed = refresh_session
+    if refreshed
+      auth_user = Supabase::Auth.new.user(session[:access_token].to_s)
+      if auth_user.is_a?(Hash) && auth_user["id"].present?
+        load_current_user(auth_user)
+        return
       end
     end
+
+    expire_session!(message: expired_message(refresh_failed: refresh_failed))
   end
 
   def require_role!(*roles)
@@ -82,7 +78,7 @@ class ApplicationController < ActionController::Base
   end
 
   def refresh_session_if_needed
-    @session_refresh_failed = !session_refresh.call(session: session)
+    session_refresh.call(session: session)
   end
 
   def refresh_session
@@ -115,6 +111,12 @@ class ApplicationController < ActionController::Base
 
   def remember_me_enabled?
     ActiveModel::Type::Boolean.new.cast(session[:remember_me])
+  end
+
+  def expired_message(refresh_failed:)
+    return "Oturum yenilenemedi. Lütfen tekrar giriş yapın." if refresh_failed
+
+    "Oturumunuz sona erdi. Lütfen tekrar giriş yapın."
   end
 
   def report_handled_error(error, source:)
