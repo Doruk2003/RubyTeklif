@@ -41,7 +41,7 @@ module Observability
 
       with_env("SENTRY_DSN", "http://example.invalid/1") do
         with_stubbed_singleton_method(Observability::AppLogger, :warn, ->(event, payload = {}) { logged << [event, payload] }) do
-          with_stubbed_singleton_method(Observability::AppLogger, :error, ->(_event, _payload = {}) {}) do
+          with_stubbed_singleton_method(Observability::AppLogger, :error, ->(_event, _payload = {}) { }) do
             with_stubbed_singleton_method(Sentry, :with_scope, ->(&blk) { blk.call(FakeScope.new) }) do
               with_stubbed_singleton_method(Sentry, :capture_exception, ->(error) { captured << error }) do
                 Observability::ErrorReporter.report(

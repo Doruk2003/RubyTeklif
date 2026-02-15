@@ -117,10 +117,16 @@
     end
 
     def export_params
+      role = params[:role].to_s
+      role = nil unless Roles::ACCEPTED_ROLES.include?(role)
+
+      active = params[:active].to_s
+      active = nil unless %w[true false].include?(active)
+
       {
         q: params[:q].to_s.presence,
-        role: normalized_role_param(params[:role]),
-        active: normalized_active_param(params[:active])
+        role: role.presence,
+        active: active.presence
       }.compact
     end
 
@@ -143,21 +149,6 @@
       return nil unless state.is_a?(Hash)
 
       state.to_h.symbolize_keys
-    end
-
-    def normalized_role_param(value)
-      role = value.to_s
-      return nil if role.blank?
-      return role if Roles::ACCEPTED_ROLES.include?(role)
-
-      nil
-    end
-
-    def normalized_active_param(value)
-      raw = value.to_s
-      return nil if raw.blank?
-
-      %w[true false].include?(raw) ? raw : nil
     end
   end
 end
