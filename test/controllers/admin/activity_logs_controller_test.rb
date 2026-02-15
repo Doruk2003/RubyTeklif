@@ -122,4 +122,28 @@ class AdminActivityLogsControllerTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "normalizes export filters before queueing" do
+    fake_query = FakeIndexQuery.new
+    fake_job = FakeExportJob.new
+
+    with_admin_auth do
+      with_stubbed_constructor(Admin::ActivityLogs::IndexQuery, fake_query) do
+        with_stubbed_constructor(Supabase::Client, FakeClient.new) do
+          original_perform_later = Admin::ActivityLogs::ExportCsvJob.method(:perform_later)
+          Admin::ActivityLogs::ExportCsvJob.singleton_class.send(:define_method, :perform_later) do |token, actor_id, filters|
+            fake_job.perform_later(token, actor_id, filters)
+          end
+
+          post export_admin_activity_logs_path, params: { event_action: "offers.create", actor: "", target_type: "offer" }
+          assert_redirected_to admin_activity_logs_path(event_action: "offers.create", target_type: "offer")
+          assert_equal({ event_action: "offers.create", target_type: "offer" }, fake_job.calls.first[:filters])
+        ensure
+          Admin::ActivityLogs::ExportCsvJob.singleton_class.send(:define_method, :perform_later) do |token, actor_id, filters|
+            original_perform_later.call(token, actor_id, filters)
+          end
+        end
+      end
+    end
+  end
 end

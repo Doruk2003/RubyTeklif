@@ -73,7 +73,14 @@
     end
 
     def export_params
-      params.permit(:event_action, :actor, :target, :target_type, :from, :to)
+      Admin::ActivityLogs::ExportForm.new(
+        event_action: params[:event_action],
+        actor: params[:actor],
+        target: params[:target],
+        target_type: params[:target_type],
+        from: params[:from],
+        to: params[:to]
+      ).to_h
     end
 
     def current_export_state
