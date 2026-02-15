@@ -98,6 +98,14 @@ class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
     end
   end
 
+  private def with_stubbed_instance_method(klass, method_name, replacement_proc)
+    original = klass.instance_method(method_name)
+    klass.send(:define_method, method_name, &replacement_proc)
+    yield
+  ensure
+    klass.send(:define_method, method_name, original)
+  end
+
   private def with_authenticated_context(role:, user_id: "usr-1", follow_after_login: true)
     fake_auth = FakeAuth.new(user_id: user_id)
     fake_repo = FakeUsersRepository.new(user_id: user_id, role: role)
@@ -177,6 +185,16 @@ class AuthSessionResilienceTest < ActionDispatch::IntegrationTest
       get companies_path
       assert_redirected_to login_path
       assert_equal Auth::Messages::ACCOUNT_DISABLED, flash[:alert]
+    end
+  end
+
+  test "session timeout redirects to login with timeout warning" do
+    with_authenticated_context(role: Roles::OPERATOR) do
+      with_stubbed_instance_method(ApplicationController, :session_timed_out?, -> { true }) do
+        get companies_path
+        assert_redirected_to login_path
+        assert_equal Auth::Messages::SESSION_TIMEOUT, flash[:alert]
+      end
     end
   end
 end
