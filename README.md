@@ -51,6 +51,13 @@ CI pipeline su ana joblari icerir:
 - `test`
 - `system-test`
 
+## Environment Ayrimi
+
+- `development`: lokal gelistirme
+- `test`: otomatik testler
+- `staging`: canli oncesi dogrulama (`RAILS_ENV=staging`)
+- `production`: canli trafik
+
 ## Supabase SQL
 
 SQL migration dosyalari `db/supabase` altindadir.
