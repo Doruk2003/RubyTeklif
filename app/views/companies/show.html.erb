@@ -1,16 +1,16 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-2">
     <div class="mt-0 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900"><%= @company.name %></h1>
-          <p class="text-sm text-slate-500">Müşteri Detayı</p>
+          <p class="text-sm text-slate-500">M�steri Detayi</p>
         </div>
 
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Düzenle", edit_company_path(@company), class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Arşivle", company_path(@company), method: :delete, data: { confirm: "Bu müşteriyi arşivlemek istediğinize emin misiniz?" }, class: "btn-danger w-full sm:w-auto" %>
-          <%= link_to "Listeye Dön", companies_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "D�zenle", edit_company_path(@company), class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Arsivle", company_path(@company), method: :delete, data: { confirm: "Bu m�steriyi arsivlemek istediginize emin misiniz?" }, class: "btn-danger w-full sm:w-auto" %>
+          <%= link_to "Listeye D�n", companies_path, class: "btn-secondary w-full sm:w-auto" %>
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
       </div>
@@ -20,7 +20,7 @@
           <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead>
               <tr>
-                <th>Yetkili Kişi</th>
+                <th>Yetkili Kisi</th>
                 <th>Telefon</th>
                 <th>Mail</th>
                 <th>Vergi No</th>
@@ -71,7 +71,7 @@
                   <td class="text-right"><%= offer.net_total %></td>
                   <td class="text-right"><%= offer.gross_total %></td>
                   <td class="text-right">
-                    <%= link_to "Gör", offer_path(offer), class: "text-sky-700" %>
+                    <%= link_to "G�r", offer_path(offer), class: "text-sky-700" %>
                   </td>
                 </tr>
               <% end %>
@@ -81,7 +81,7 @@
                   <td colspan="5" class="py-10 text-center">
                     <div class="mx-auto max-w-sm">
                       <div class="mb-2 text-sm font-semibold text-slate-700">Bu firmaya ait teklif yok</div>
-                      <div class="text-sm text-slate-500">Yeni teklif oluşturarak başlayabilirsiniz.</div>
+                      <div class="text-sm text-slate-500">Yeni teklif olusturarak baslayabilirsiniz.</div>
                     </div>
                   </td>
                 </tr>
@@ -97,6 +97,7 @@
     </div>
   </div>
 </div>
+
 
 
 

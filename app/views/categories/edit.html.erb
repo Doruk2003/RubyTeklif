@@ -1,10 +1,10 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-4">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-2">
     <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Kategori Düzenle</h1>
-          <p class="text-sm text-slate-500">Kategori bilgilerini güncelleyin.</p>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Kategori DÃ¼zenle</h1>
+          <p class="text-sm text-slate-500">Kategori bilgilerini gÃ¼ncelleyin.</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Kategori Listesi", categories_path, class: "btn-secondary w-full sm:w-auto" %>
@@ -19,11 +19,12 @@
                 category: @category,
                 form_url: category_path(@category["id"] || @category[:id] || params[:id]),
                 form_method: :patch,
-                submit_label: "Kategoriyi Güncelle" %>
+                submit_label: "Kategoriyi GÃ¼ncelle" %>
         <% else %>
-          <div class="text-sm text-slate-500">Kategori bulunamadı.</div>
+          <div class="text-sm text-slate-500">Kategori bulunamadÄ±.</div>
         <% end %>
       </div>
     </div>
   </div>
 </div>
+

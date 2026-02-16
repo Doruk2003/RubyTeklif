@@ -1,13 +1,13 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-4">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-2">
     <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Admin Panel</h1>
-          <p class="text-sm text-slate-500">Kullanıcı rolleri</p>
+          <p class="text-sm text-slate-500">KullanÄ±cÄ± rolleri</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni Kullanıcı", new_admin_user_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= link_to "Yeni KullanÄ±cÄ±", new_admin_user_path, class: "btn-primary w-full sm:w-auto" %>
           <%= button_to "CSV Export", export_admin_users_path(request.query_parameters), method: :post, class: "btn-secondary w-full sm:w-auto" %>
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
@@ -19,16 +19,16 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div class="text-sm text-slate-700">
             <% if @export[:status].to_s == "ready" %>
-              Son kullanıcı export'u hazır.
+              Son kullanÄ±cÄ± export'u hazÄ±r.
             <% elsif @export[:status].to_s == "failed" %>
-              Kullanıcı export'u başarısız oldu. Tekrar deneyin.
+              KullanÄ±cÄ± export'u baÅŸarÄ±sÄ±z oldu. Tekrar deneyin.
             <% else %>
-              Kullanıcı export'u hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
+              KullanÄ±cÄ± export'u hazÄ±rlanÄ±yor. BirkaÃ§ saniye sonra sayfayÄ± yenileyin.
             <% end %>
           </div>
           <div>
             <% if @export[:status].to_s == "ready" %>
-              <%= link_to "CSV İndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
+              <%= link_to "CSV Ä°ndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
             <% elsif @export[:status].to_s == "pending" %>
               <%= link_to "Yenile", admin_users_path(request.query_parameters), class: "btn-secondary" %>
             <% end %>
@@ -48,7 +48,7 @@
             <%= f.label :role, "Rol", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :role,
                   options_for_select([
-                    ["Tüm Roller", ""],
+                    ["TÃ¼m Roller", ""],
                     *Roles::ASSIGNABLE_ROLE_OPTIONS
                   ], params[:role].to_s),
                   {},
@@ -58,7 +58,7 @@
             <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :active,
                   options_for_select([
-                    ["Tüm", ""],
+                    ["TÃ¼m", ""],
                     ["Aktif", "true"],
                     ["Pasif", "false"]
                   ], params[:active].to_s),
@@ -99,11 +99,11 @@
                   <% end %>
                 </td>
                 <td class="text-right">
-                  <%= link_to "Düzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
-                  <%= link_to "Şifre Sıfırla",
+                  <%= link_to "DÃ¼zenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
+                  <%= link_to "Åifre SÄ±fÄ±rla",
                         reset_password_admin_user_path(user["id"]),
                         method: :post,
-                        data: { confirm: "Parola sıfırlama maili gönderilsin mi?" },
+                        data: { confirm: "Parola sÄ±fÄ±rlama maili gÃ¶nderilsin mi?" },
                         class: "btn-secondary" %>
                   <% if user["active"] == false %>
                     <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), method: :patch, class: "btn-secondary" %>
@@ -116,7 +116,7 @@
 
             <% if @users.empty? %>
               <tr>
-                <td colspan="4" class="py-12 text-center text-slate-500">Kullanıcı yok.</td>
+                <td colspan="4" class="py-12 text-center text-slate-500">KullanÄ±cÄ± yok.</td>
               </tr>
             <% end %>
           </tbody>
@@ -129,7 +129,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
+          <span><%= @per_page %> kayÄ±t</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -141,9 +141,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Önceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Ã–nceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Ã–nceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -156,6 +156,7 @@
     </div>
   </div>
 </div>
+
 
 
 

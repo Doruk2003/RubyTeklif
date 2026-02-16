@@ -1,9 +1,9 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-4">
     <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Döviz Kurları</h1>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">D�viz Kurlari</h1>
           <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @currencies.size %></span> kur</p>
         </div>
 
@@ -20,8 +20,8 @@
             <%= f.select :scope,
                   options_for_select([
                     ["Aktif", "active"],
-                    ["Arşiv", "archived"],
-                    ["Tüm Kayıtlar", "all"]
+                    ["Arsiv", "archived"],
+                    ["T�m Kayitlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
@@ -45,7 +45,7 @@
               <th>Kod</th>
               <th>Ad</th>
               <th>Sembol</th>
-              <th class="text-right">1 Döviz = TL</th>
+              <th class="text-right">1 D�viz = TL</th>
               <th class="text-center">Aktif</th>
               <th class="text-right">Aksiyon</th>
             </tr>
@@ -68,8 +68,8 @@
                 <td class="text-right">
                   <div class="inline-flex items-center gap-2">
                     <%= link_to edit_currency_path(currency["id"]),
-                          title: "Düzenle",
-                          aria: { label: "Düzenle" },
+                          title: "D�zenle",
+                          aria: { label: "D�zenle" },
                           class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-amber-600" do %>
                       <svg viewBox="0 0 24 24" class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 20h5l9-9-5-5-9 9v5z"/>
@@ -80,9 +80,9 @@
                     <% if currency["deleted_at"].present? %>
                       <%= link_to restore_currency_path(currency["id"]),
                             method: :patch,
-                            data: { confirm: "Bu kuru geri yüklemek istediğinize emin misiniz?" },
-                            title: "Geri Yükle",
-                            aria: { label: "Geri Yükle" },
+                            data: { confirm: "Bu kuru geri y�klemek istediginize emin misiniz?" },
+                            title: "Geri Y�kle",
+                            aria: { label: "Geri Y�kle" },
                             class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-emerald-700" do %>
                         <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M3 12a9 9 0 1 0 3-6.7"/>
@@ -92,9 +92,9 @@
                     <% else %>
                       <%= link_to currency_path(currency["id"]),
                             method: :delete,
-                            data: { confirm: "Bu kuru arşivlemek istediğinize emin misiniz?" },
-                            title: "Arşivle",
-                            aria: { label: "Arşivle" },
+                            data: { confirm: "Bu kuru arsivlemek istediginize emin misiniz?" },
+                            title: "Arsivle",
+                            aria: { label: "Arsivle" },
                             class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
                         <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                           <path d="M5 7h14"/>
@@ -112,8 +112,8 @@
               <tr>
                 <td colspan="6" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kur tanımlanmadı</div>
-                    <div class="text-sm text-slate-500">İlk kuru eklemek için sağ üstteki butonu kullanın.</div>
+                    <div class="mb-2 text-sm font-semibold text-slate-700">Hen�z kur tanimlanmadi</div>
+                    <div class="text-sm text-slate-500">Ilk kuru eklemek i�in sag �stteki butonu kullanin.</div>
                   </div>
                 </td>
               </tr>
@@ -128,7 +128,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
+          <span><%= @per_page %> kayit</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -140,9 +140,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Önceki", currencies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "�nceki", currencies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">�nceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -155,5 +155,7 @@
     </div>
   </div>
 </div>
+
+
 
 

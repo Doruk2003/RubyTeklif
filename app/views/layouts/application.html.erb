@@ -23,7 +23,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="<%= 'auth-page' if controller_name == 'sessions' %>">
     <main class="app-main">
       <% notice_message = notice.to_s.strip.presence %>
       <% alert_message = alert.to_s.strip.presence %>

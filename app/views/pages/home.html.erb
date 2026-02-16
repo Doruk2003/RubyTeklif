@@ -27,9 +27,13 @@
           <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 4" data-tip="Gecici Arac 4">
             <span class="material-symbols-outlined" aria-hidden="true">settings</span>
           </button>
-          <button type="button" class="rt-icon-btn" aria-label="Kapatma" data-tip="Kapatma">
+          <%= link_to logout_path,
+                      data: { turbo_method: :delete, turbo_confirm: "Oturumu kapatmak istiyor musunuz?" },
+                      class: "rt-icon-btn",
+                      "data-tip": "Kapatma",
+                      aria: { label: "Kapatma" } do %>
             <span class="material-symbols-outlined" aria-hidden="true">power_settings_new</span>
-          </button>
+          <% end %>
         </div>
       </div>
     </div>
@@ -125,7 +129,6 @@
         <section class="rt-card">
           <header class="rt-card-header">
             <div>
-              <p class="rt-eyebrow">Performance</p>
               <h3>Haftalik Akis Ozeti</h3>
             </div>
             <span class="rt-chip">7 gun</span>
@@ -150,14 +153,13 @@
         <section class="rt-card">
           <header class="rt-card-header">
             <div>
-              <p class="rt-eyebrow">Pipeline</p>
               <h3>Son Teklifler</h3>
             </div>
             <%= link_to "Tum Teklifler", offers_path, class: "rt-link" %>
           </header>
 
           <div class="rt-table-wrap">
-            <table class="rt-table">
+            <table class="rt-table rt-pipeline-table">
               <thead>
                 <tr>
                   <th>No</th>
@@ -173,11 +175,30 @@
                   </tr>
                 <% else %>
                   <% @recent_offers.each do |offer| %>
+                    <% status_text = offer[:status].to_s %>
+                    <% normalized_status = I18n.transliterate(status_text).downcase %>
+                    <% status_kind =
+                        if normalized_status.include?("onay")
+                          :approved
+                        elsif normalized_status.include?("kapan") || normalized_status.include?("closed")
+                          :closed
+                        else
+                          :waiting
+                        end %>
+                    <% status_icon = { waiting: "hourglass_empty", approved: "check_circle", closed: "cancel" }[status_kind] %>
                     <tr>
                       <td><%= offer[:number].presence || "-" %></td>
-                      <td><%= offer[:company].presence || "-" %></td>
+                      <td>
+                        <span class="rt-list-name"><%= offer[:company].presence || "-" %></span>
+                        <span class="rt-list-sub">Teklif No: <%= offer[:number].presence || "-" %></span>
+                      </td>
                       <td><%= offer[:amount] %></td>
-                      <td><span class="rt-status"><%= offer[:status] %></span></td>
+                      <td>
+                        <span class="rt-status rt-status-<%= status_kind %>">
+                          <span class="material-symbols-outlined rt-status-icon" aria-hidden="true"><%= status_icon %></span>
+                          <span><%= status_text.presence || "-" %></span>
+                        </span>
+                      </td>
                     </tr>
                   <% end %>
                 <% end %>
@@ -191,7 +212,6 @@
         <section class="rt-card">
           <header class="rt-card-header">
             <div>
-              <p class="rt-eyebrow">Shortcuts</p>
               <h3>Hizli Islemler</h3>
             </div>
           </header>
@@ -213,7 +233,6 @@
         <section class="rt-card">
           <header class="rt-card-header">
             <div>
-              <p class="rt-eyebrow">Team Notes</p>
               <h3>Hatirlatmalar</h3>
             </div>
           </header>

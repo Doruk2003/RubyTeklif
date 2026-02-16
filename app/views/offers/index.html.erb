@@ -1,4 +1,4 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-5">
     <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -19,8 +19,8 @@
             <%= f.select :scope,
                   options_for_select([
                     ["Aktif", "active"],
-                    ["Arşiv", "archived"],
-                    ["Tüm Kayıtlar", "all"]
+                    ["Arsiv", "archived"],
+                    ["T�m Kayitlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
@@ -42,7 +42,7 @@
           <thead class="sticky top-0 z-10">
             <tr>
               <th>Teklif No</th>
-              <th>Müşteri</th>
+              <th>M�steri</th>
               <th>Tarih</th>
               <th class="text-right">Toplam</th>
               <th class="text-right">Durum</th>
@@ -59,18 +59,18 @@
                 <td class="text-right"><%= offer["status"].to_s %></td>
                 <td class="text-right">
                   <div class="inline-flex items-center gap-2">
-                    <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
+                    <%= link_to "G�r", offer_path(offer["id"]), class: "btn-secondary" %>
                     <% if offer["deleted_at"].present? %>
-                      <%= link_to "Geri Yükle",
+                      <%= link_to "Geri Y�kle",
                             restore_offer_path(offer["id"]),
                             method: :patch,
-                            data: { confirm: "Bu teklifi geri yüklemek istediğinize emin misiniz?" },
+                            data: { confirm: "Bu teklifi geri y�klemek istediginize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% else %>
-                      <%= link_to "Arşivle",
+                      <%= link_to "Arsivle",
                             offer_path(offer["id"]),
                             method: :delete,
-                            data: { confirm: "Bu teklifi arşivlemek istediğinize emin misiniz?" },
+                            data: { confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% end %>
                   </div>
@@ -82,8 +82,8 @@
               <tr>
                 <td colspan="6" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı teklif yok</div>
-                    <div class="text-sm text-slate-500">İlk teklifi oluşturmak için yukarıdaki butonu kullanın.</div>
+                    <div class="mb-2 text-sm font-semibold text-slate-700">Hen�z kayitli teklif yok</div>
+                    <div class="text-sm text-slate-500">Ilk teklifi olusturmak i�in yukaridaki butonu kullanin.</div>
                   </div>
                 </td>
               </tr>
@@ -98,7 +98,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
+          <span><%= @per_page %> kayit</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -110,9 +110,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Önceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "�nceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">�nceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -125,5 +125,7 @@
     </div>
   </div>
 </div>
+
+
 
 
