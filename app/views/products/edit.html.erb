@@ -1,14 +1,14 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-2">
     <div class="mt-0 rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Ürün Düzenle</h1>
-          <p class="text-sm text-slate-500">Ürün bilgilerini güncelleyin.</p>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">ÃœrÃ¼n DÃ¼zenle</h1>
+          <p class="text-sm text-slate-500">ÃœrÃ¼n bilgilerini gÃ¼ncelleyin.</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Ürün Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
-          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= link_to "ÃœrÃ¼n Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= home_nav_button(home_path) %>
         </div>
       </div>
     </div>
@@ -18,15 +18,15 @@
         <% if @product.present? %>
           <%= form_with url: product_path(@product["id"]), method: :patch, scope: :product, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
             <div>
-              <%= f.label :name, "Ürün Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-              <%= f.text_field :name, value: @product["name"], placeholder: "Örn: Çelik Kapı", class: "form-input" %>
+              <%= f.label :name, "ÃœrÃ¼n AdÄ±", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+              <%= f.text_field :name, value: @product["name"], placeholder: "Ã–rn: Ã‡elik KapÄ±", class: "form-input" %>
             </div>
 
             <div>
               <%= f.label :item_type, "Tip", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
               <%= f.select :item_type,
-                    options_for_select([["Ürün", "product"], ["Demonte", "demonte"], ["Hizmet", "service"]], @product["item_type"] || "product"),
-                    {},
+                    options_for_select([["Demonte", "demonte"], ["Hizmet", "hizmet"], ["Malzeme", "malzeme"], ["Sistem Bileşeni", "sistem_bileseni"]], @product["item_type"]),
+                    { prompt: "Tip Seçin" },
                     class: "form-input" %>
             </div>
 
@@ -37,7 +37,7 @@
               </div>
               <%= f.select :category_id,
                     options_for_select(@category_options, @product["category_id"]),
-                    { prompt: "Kategori seçin" },
+                    { prompt: "Kategori seÃ§in" },
                     class: "form-input" %>
             </div>
 
@@ -47,7 +47,7 @@
             </div>
 
             <div>
-              <%= f.label :vat_rate, "KDV Oranı (%)", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+              <%= f.label :vat_rate, "KDV OranÄ± (%)", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
               <%= f.number_field :vat_rate, value: @product["vat_rate"] || 0, step: "0.01", class: "form-input" %>
             </div>
 
@@ -57,13 +57,14 @@
             </div>
 
             <div class="md:col-span-2">
-              <%= f.submit "Güncelle", class: "btn-primary w-full" %>
+              <%= f.submit "GÃ¼ncelle", class: "btn-primary w-full", data: { turbo_confirm: "ÃœrÃ¼n gÃ¼ncellensin mi?" } %>
             </div>
           <% end %>
         <% else %>
-          <div class="text-sm text-slate-600">Ürün bulunamadı.</div>
+          <div class="text-sm text-slate-600">ÃœrÃ¼n bulunamadÄ±.</div>
         <% end %>
       </div>
     </div>
   </div>
 </div>
+

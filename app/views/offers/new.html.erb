@@ -22,7 +22,7 @@
                 class: "form-input" %>
         </div>
         <div>
-          <%= f.submit "Ürünleri Filtrele", class: "btn-secondary w-full" %>
+          <%= filter_submit_button(label: "Ürünleri Filtrele") %>
         </div>
       <% end %>
     </div>
@@ -148,7 +148,7 @@
           </div>
 
           <div class="md:col-span-2">
-            <%= f.submit "Teklifi Kaydet", class: "btn-primary w-full" %>
+            <%= f.submit "Teklifi Kaydet", class: "btn-primary w-full", data: { turbo_confirm: "Teklif kaydedilsin mi?" } %>
           </div>
         <% end %>
       </div>

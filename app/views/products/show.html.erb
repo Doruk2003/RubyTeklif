@@ -10,9 +10,9 @@
           <%= link_to "Ürün Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
           <% if @product.present? %>
             <%= link_to "Düzenle", edit_product_path(@product["id"]), class: "btn-secondary w-full sm:w-auto" %>
-            <%= link_to "Arşivle", product_path(@product["id"]), method: :delete, data: { confirm: "Bu ürünü silmek istediğinize emin misiniz?" }, class: "btn-secondary w-full sm:w-auto" %>
+            <%= link_to "Arşivle", product_path(@product["id"]), data: { turbo_method: :delete, turbo_confirm: "Bu ürünü silmek istediğinize emin misiniz?" }, class: "btn-secondary w-full sm:w-auto" %>
           <% end %>
-          <%= link_to "Yeni Ürün", new_product_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= new_record_button("Yeni Ürün", new_product_path) %>
         </div>
       </div>
     </div>

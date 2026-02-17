@@ -8,7 +8,7 @@
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <%= link_to "Kur Listesi", currencies_path, class: "btn-secondary w-full sm:w-auto" %>
-          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= home_nav_button(home_path) %>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="md:col-span-2">
-              <%= f.submit "Guncelle", class: "btn-primary w-full" %>
+              <%= f.submit "Guncelle", class: "btn-primary w-full", data: { turbo_confirm: "Kur güncellensin mi?" } %>
             </div>
           <% end %>
         <% else %>

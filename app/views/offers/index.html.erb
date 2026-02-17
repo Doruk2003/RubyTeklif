@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
   <div class="w-full space-y-5">
     <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -7,12 +7,13 @@
           <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @offers.size %></span> teklif</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni Teklif", new_offer_path, class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+          <%= filter_panel_toggle_button %>
+          <%= new_record_button("Yeni Teklif", new_offer_path) %>
+          <%= home_nav_button(home_path) %>
         </div>
       </div>
 
-      <div class="mt-4">
+      <div class="mt-4 hidden" data-filter-panel>
         <%= form_with url: offers_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
           <div>
             <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
@@ -20,17 +21,17 @@
                   options_for_select([
                     ["Aktif", "active"],
                     ["Arsiv", "archived"],
-                    ["T�m Kayitlar", "all"]
+                    ["Tüm Kayıtlar", "all"]
                   ], @scope || params[:scope] || "active"),
                   {},
                   class: "form-input" %>
           </div>
           <div>
             <%= f.hidden_field :per_page, value: @per_page %>
-            <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
+            <%= filter_submit_button %>
           </div>
           <div>
-            <%= link_to "Temizle", offers_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
+            <%= clear_filter_button(offers_path(per_page: @per_page)) %>
           </div>
         <% end %>
       </div>
@@ -42,7 +43,7 @@
           <thead class="sticky top-0 z-10">
             <tr>
               <th>Teklif No</th>
-              <th>M�steri</th>
+              <th>Müşteri</th>
               <th>Tarih</th>
               <th class="text-right">Toplam</th>
               <th class="text-right">Durum</th>
@@ -59,18 +60,16 @@
                 <td class="text-right"><%= offer["status"].to_s %></td>
                 <td class="text-right">
                   <div class="inline-flex items-center gap-2">
-                    <%= link_to "G�r", offer_path(offer["id"]), class: "btn-secondary" %>
+                    <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
                     <% if offer["deleted_at"].present? %>
-                      <%= link_to "Geri Y�kle",
+                      <%= link_to "Geri Yükle",
                             restore_offer_path(offer["id"]),
-                            method: :patch,
-                            data: { confirm: "Bu teklifi geri y�klemek istediginize emin misiniz?" },
+                            data: { turbo_method: :patch, turbo_confirm: "Bu teklifi geri yüklemek istediginize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% else %>
                       <%= link_to "Arsivle",
                             offer_path(offer["id"]),
-                            method: :delete,
-                            data: { confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
+                            data: { turbo_method: :delete, turbo_confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
                             class: "btn-secondary" %>
                     <% end %>
                   </div>
@@ -82,8 +81,8 @@
               <tr>
                 <td colspan="6" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Hen�z kayitli teklif yok</div>
-                    <div class="text-sm text-slate-500">Ilk teklifi olusturmak i�in yukaridaki butonu kullanin.</div>
+                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayitli teklif yok</div>
+                    <div class="text-sm text-slate-500">İlk teklifi olusturmak için yukaridaki butonu kullanin.</div>
                   </div>
                 </td>
               </tr>
@@ -110,9 +109,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "�nceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Önceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">�nceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -125,6 +124,10 @@
     </div>
   </div>
 </div>
+
+
+
+
 
 
 

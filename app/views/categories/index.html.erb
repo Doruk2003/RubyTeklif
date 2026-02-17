@@ -1,61 +1,95 @@
-<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-4">
-    <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-0 pb-3 pt-0">
+  <div class="w-full space-y-2">
+    <% active_filters = request.query_parameters.slice("q", "active", "scope").reject { |_, v| v.blank? } %>
+
+    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Kategoriler</h1>
           <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @categories.size %></span> kategori</p>
         </div>
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni Kategori", new_category_path, class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Ürünler", products_path, class: "btn-secondary w-full sm:w-auto" %>
-        </div>
-      </div>
 
-      <div class="mt-4">
-        <%= form_with url: categories_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-6 md:items-end" do |f| %>
-          <div class="md:col-span-2">
-            <%= f.label :q, "Kategori Ara", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
-            <%= f.search_field :q, value: @q, placeholder: "Ad veya kod", class: "form-input" %>
-          </div>
-          <div>
-            <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
-            <%= f.select :active,
-                  options_for_select([
-                    ["Tümü", ""],
-                    ["Aktif", "1"],
-                    ["Pasif", "0"]
-                  ], @active),
-                  {},
-                  class: "form-input" %>
-          </div>
-          <div>
-            <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
-            <%= f.select :scope,
-                  options_for_select([
-                    ["Aktif", "active"],
-                    ["Arşiv", "archived"],
-                    ["Tüm Kayıtlar", "all"]
-                  ], @scope || "active"),
-                  {},
-                  class: "form-input" %>
-          </div>
-          <div>
-            <%= f.hidden_field :per_page, value: @per_page %>
-            <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
-          </div>
-          <div>
-            <%= link_to "Temizle", categories_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
-          </div>
-        <% end %>
+        <div class="flex flex-row gap-2 sm:w-auto sm:items-center sm:justify-end">
+          <%= filter_panel_toggle_button %>
+          <%= new_record_button("Yeni Kategori", new_category_path) %>
+          <%= list_nav_button(products_path, label: "Ürünler") %>
+        </div>
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+    <div class="hidden rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]" data-filter-panel>
+      <div class="mb-4 flex items-center gap-3">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
+      </div>
+
+      <% if active_filters.any? %>
+        <div class="mb-4 flex flex-wrap items-center gap-2 text-xs">
+          <div class="font-semibold text-slate-500">Aktif filtreler:</div>
+          <% active_filters.each do |key, value| %>
+            <% label = case key
+                      when "q" then "Ara"
+                      when "active" then "Durum"
+                      when "scope" then "Kapsam"
+                      end %>
+            <% display = case key
+                        when "active" then value.to_s == "1" ? "Aktif" : "Pasif"
+                        when "scope" then value.to_s == "archived" ? "Arşiv" : (value.to_s == "all" ? "Tüm Kayıtlar" : "Aktif")
+                        else value
+                        end %>
+            <%= link_to categories_path(request.query_parameters.except(key)),
+                  class: "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700 hover:border-slate-300" do %>
+              <span class="font-semibold text-slate-600"><%= label %>:</span>
+              <span><%= display %></span>
+              <span class="text-slate-400">×</span>
+            <% end %>
+          <% end %>
+          <%= link_to "Tümünü temizle", categories_path, class: "ml-1 text-slate-500 hover:text-slate-700" %>
+        </div>
+      <% end %>
+
+      <%= form_with url: categories_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_1fr_auto]" do |f| %>
+        <div>
+          <%= f.label :q, "Kategori Ara", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+          <%= f.search_field :q, value: @q, placeholder: "Ad veya kod", class: "form-input" %>
+        </div>
+
+        <div>
+          <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+          <%= f.select :active,
+                options_for_select([
+                  ["Tümü", ""],
+                  ["Aktif", "1"],
+                  ["Pasif", "0"]
+                ], @active),
+                {},
+                class: "form-input" %>
+        </div>
+
+        <div>
+          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+          <%= f.select :scope,
+                options_for_select([
+                  ["Aktif", "active"],
+                  ["Arşiv", "archived"],
+                  ["Tüm Kayıtlar", "all"]
+                ], @scope || "active"),
+                {},
+                class: "form-input" %>
+          <%= f.hidden_field :per_page, value: @per_page %>
+        </div>
+
+        <div class="flex w-full items-end justify-end gap-2 md:justify-end">
+          <%= filter_submit_button %>
+          <%= clear_filter_button(categories_path(per_page: @per_page)) %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="rounded-md bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <% current_sort = @sort.to_s %>
       <% current_dir = @dir.to_s == "desc" ? "desc" : "asc" %>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <div class="overflow-x-auto rt-categories-table-wrap">
+        <table class="rt-table rt-pipeline-table min-w-full">
           <thead>
             <tr>
               <th>
@@ -76,54 +110,71 @@
                   <% end %>
                 <% end %>
               </th>
-              <th class="text-center">
+              <th class="rt-col-center">
                 <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to categories_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to categories_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "inline-flex w-full items-center justify-center gap-2" do %>
                   <span>Durum</span>
                   <% if current_sort == "active" %>
                     <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
-              <th class="text-right">Aksiyon</th>
+              <th class="rt-col-center">Aksiyon</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-200 bg-white">
+
+          <tbody>
             <% @categories.each do |category| %>
-              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+              <tr>
                 <td class="font-medium text-slate-900"><%= category["name"].to_s %></td>
                 <td><%= category["code"].to_s %></td>
-                <td class="text-center">
-                  <% if category["active"] %>
-                    <span class="badge-success">Aktif</span>
+                <td class="rt-col-center">
+                  <% if category["deleted_at"].present? %>
+                    <span class="status-circle bg-rose-600 text-white" title="Arşivde" aria-label="Arşivde">P</span>
+                  <% elsif category["active"] %>
+                    <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
                   <% else %>
-                    <span class="badge-info">Pasif</span>
+                    <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
                   <% end %>
                 </td>
-                <td class="text-right">
-                  <div class="inline-flex items-center gap-2">
-                    <%= link_to "Düzenle", edit_category_path(category["id"]), class: "btn-secondary" %>
-                    <% if category["deleted_at"].present? %>
-                      <%= link_to "Geri Yükle",
-                            restore_category_path(category["id"]),
-                            method: :patch,
-                            data: { confirm: "Bu kategoriyi geri yüklemek istediğinize emin misiniz?" },
-                            class: "btn-secondary" %>
-                    <% else %>
-                      <%= link_to "Arşivle",
-                            category_path(category["id"]),
-                            method: :delete,
-                            data: { confirm: "Bu kategoriyi arşivlemek istediğinize emin misiniz?" },
-                            class: "btn-secondary" %>
-                    <% end %>
-                  </div>
+                <td class="rt-col-center rt-action-cell">
+                  <details class="relative inline-block text-left rt-action-details">
+                    <summary class="list-none">
+                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-slate-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="5" cy="12" r="1.6"/>
+                          <circle cx="12" cy="12" r="1.6"/>
+                          <circle cx="19" cy="12" r="1.6"/>
+                        </svg>
+                      </span>
+                    </summary>
+                    <div class="rt-action-menu absolute right-0 z-20 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg">
+                      <%= link_to "Düzenle", edit_category_path(category["id"]), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
+                      <% if category["deleted_at"].present? %>
+                        <%= link_to "Geri Yükle",
+                              restore_category_path(category["id"]),
+                              data: { turbo_method: :patch, turbo_confirm: "Bu kategoriyi geri yüklemek istiyor musunuz?" },
+                              class: "block rounded-lg px-3 py-2 text-emerald-700 hover:bg-emerald-50" %>
+                      <% else %>
+                        <%= link_to "Arşivle",
+                              category_path(category["id"]),
+                              data: { turbo_method: :delete, turbo_confirm: "Bu kategoriyi arşivlemek istediğinize emin misiniz?" },
+                              class: "block rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50" %>
+                      <% end %>
+                    </div>
+                  </details>
                 </td>
               </tr>
             <% end %>
 
             <% if @categories.empty? %>
               <tr>
-                <td colspan="4" class="py-10 text-center text-sm text-slate-500">Henüz kategori yok.</td>
+                <td colspan="4" class="py-12 text-center">
+                  <div class="mx-auto max-w-sm">
+                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kategori yok</div>
+                    <div class="text-sm text-slate-500">Sağ üstten yeni kategori ekleyebilirsiniz.</div>
+                  </div>
+                </td>
               </tr>
             <% end %>
           </tbody>
@@ -131,7 +182,7 @@
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+    <div class="rounded-md bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex items-center justify-between gap-3 text-sm">
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
@@ -147,6 +198,7 @@
                     class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
             <% end %>
           </div>
+
           <% if @has_prev %>
             <%= link_to "Önceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
@@ -164,4 +216,47 @@
   </div>
 </div>
 
+<script>
+  document.addEventListener("turbo:load", function () {
+    var tableWrap = document.querySelector(".rt-categories-table-wrap");
+    if (!tableWrap) return;
+    if (tableWrap.dataset.menuInit === "1") return;
+    tableWrap.dataset.menuInit = "1";
 
+    var actionMenus = function () {
+      return Array.from(tableWrap.querySelectorAll("details.rt-action-details"));
+    };
+
+    tableWrap.addEventListener("click", function (event) {
+      var clickedMenu = event.target.closest("details.rt-action-details");
+      var clickedSummary = event.target.closest("details.rt-action-details > summary");
+
+      if (!clickedMenu) {
+        actionMenus().forEach(function (menu) {
+          menu.open = false;
+        });
+        return;
+      }
+
+      if (clickedSummary) {
+        actionMenus().forEach(function (menu) {
+          if (menu !== clickedMenu) menu.open = false;
+        });
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (tableWrap.contains(event.target)) return;
+      actionMenus().forEach(function (menu) {
+        menu.open = false;
+      });
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      actionMenus().forEach(function (menu) {
+        menu.open = false;
+      });
+    });
+  });
+</script>

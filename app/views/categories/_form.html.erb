@@ -1,29 +1,22 @@
-<%= form_with url: form_url, scope: :category, method: form_method, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
+﻿<%= form_with url: form_url, scope: :category, method: form_method, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
   <%= hidden_field_tag :return_to, params[:return_to].to_s %>
 
-  <div>
+  <% existing_code = category[:code] || category["code"] %>
+  <% existing_active = category.key?(:active) ? category[:active] : category["active"] %>
+  <% if existing_code.present? %>
+    <%= f.hidden_field :code, value: existing_code %>
+  <% end %>
+  <% unless existing_active.nil? %>
+    <%= f.hidden_field :active, value: (existing_active ? "1" : "0") %>
+  <% end %>
+
+  <div class="md:col-span-2">
     <%= f.label :name, "Kategori Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
     <%= f.text_field :name, value: category[:name] || category["name"], placeholder: "Örn: Mobilya Aksesuar", class: "form-input" %>
-  </div>
-
-  <div>
-    <%= f.label :code, "Kategori Kodu", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-    <%= f.text_field :code, value: category[:code] || category["code"], placeholder: "orn: furniture_accessory", class: "form-input" %>
-  </div>
-
-  <div class="flex items-center gap-3">
-    <% checked = if category.key?(:active)
-                   category[:active]
-                 elsif category.key?("active")
-                   category["active"]
-                 else
-                   true
-                 end %>
-    <%= f.check_box :active, { checked: checked, class: "h-4 w-4 rounded border-slate-300" }, "1", "0" %>
-    <%= f.label :active, "Aktif", class: "text-sm text-slate-700" %>
+    <p class="mt-2 text-xs text-slate-500">Kategori kodu otomatik oluşturulur.</p>
   </div>
 
   <div class="md:col-span-2">
-    <%= f.submit submit_label, class: "btn-primary w-full" %>
+    <%= f.submit submit_label, class: "btn-primary w-full", data: { turbo_confirm: "Kategori kaydı kaydedilsin mi?" } %>
   </div>
 <% end %>

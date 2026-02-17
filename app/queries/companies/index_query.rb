@@ -52,6 +52,7 @@ module Companies
         scope: normalized_scope(params),
         q: params[:q].to_s.strip,
         tax_number: params[:tax_number].to_s.strip,
+        phone: params[:phone].to_s.strip,
         active: params[:active].to_s,
         has_offers: params[:has_offers].to_s,
         sort: params[:sort].to_s,
@@ -85,6 +86,9 @@ module Companies
 
       tax_number = params[:tax_number].to_s.strip
       query_parts << "tax_number=ilike.*#{escape_like_value(tax_number)}*" if tax_number.present?
+
+      phone = params[:phone].to_s.strip
+      query_parts << "phone=ilike.*#{escape_like_value(phone)}*" if phone.present?
 
       if params[:active].present?
         active = params[:active].to_s == "1"

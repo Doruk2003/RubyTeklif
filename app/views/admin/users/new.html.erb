@@ -30,7 +30,7 @@
                   {},
                   class: "form-input" %>
           </div>
-          <%= f.submit "Oluştur", class: "btn-primary w-full" %>
+          <%= f.submit "Oluştur", class: "btn-primary w-full", data: { turbo_confirm: "Yeni kullanıcı oluşturulsun mu?" } %>
         <% end %>
       </div>
     </div>

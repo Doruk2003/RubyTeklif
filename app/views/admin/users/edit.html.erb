@@ -27,7 +27,7 @@
                     {},
                     class: "form-input" %>
             </div>
-            <%= f.submit "Kaydet", class: "btn-primary w-full" %>
+            <%= f.submit "Kaydet", class: "btn-primary w-full", data: { turbo_confirm: "Kullanıcı rolü güncellensin mi?" } %>
           <% end %>
         <% else %>
           <div class="text-sm text-slate-500">Kullanici bulunamadi.</div>

@@ -1,30 +1,36 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+﻿<div class="min-h-screen bg-[#f6f3ee] px-0 pb-3 pt-0">
   <div class="w-full space-y-2">
-    <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Ürünler</h1>
           <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @products.size %></span> ürün</p>
         </div>
 
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni Ürün", new_product_path, class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+        <div class="flex flex-row gap-2 sm:w-auto sm:items-center sm:justify-end">
+          <%= filter_panel_toggle_button %>
+          <%= new_record_button("Yeni Ürün", new_product_path) %>
+          <%= home_nav_button(home_path) %>
         </div>
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 p-4 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <%= form_with url: products_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end" do |f| %>
-        <div class="md:col-span-2">
-          <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+    <div class="hidden rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]" data-filter-panel>
+      <div class="mb-4 flex items-center gap-3">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
+      </div>
+
+      <%= form_with url: products_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_auto]" do |f| %>
+        <div>
+          <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
           <%= f.select :category,
                 options_for_select([["Tüm Kategoriler", ""]] + @category_options, @category),
                 {},
                 class: "form-input" %>
         </div>
+
         <div>
-          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
+          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
           <%= f.select :scope,
                 options_for_select([
                   ["Aktif", "active"],
@@ -33,20 +39,19 @@
                 ], @scope || params[:scope] || "active"),
                 {},
                 class: "form-input" %>
-        </div>
-        <div>
           <%= f.hidden_field :per_page, value: @per_page %>
-          <%= f.submit "Filtrele", class: "btn-secondary w-full" %>
         </div>
-        <div>
-          <%= link_to "Temizle", products_path(per_page: @per_page), class: "btn-secondary w-full text-center" %>
+
+        <div class="flex w-full items-end justify-end gap-2 md:justify-end">
+          <%= filter_submit_button %>
+          <%= clear_filter_button(products_path(per_page: @per_page)) %>
         </div>
       <% end %>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200 text-sm">
+    <div class="rounded-md bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
+      <div class="overflow-x-auto rt-products-table-wrap">
+        <table class="rt-table rt-pipeline-table min-w-full">
           <thead>
             <tr>
               <th>Ürün</th>
@@ -54,75 +59,55 @@
               <th>Tip</th>
               <th class="text-right">Fiyat</th>
               <th class="text-right">KDV %</th>
-              <th class="text-center">Aktif</th>
-              <th class="text-right">Aksiyon</th>
+              <th class="rt-col-center">Durum</th>
+              <th class="rt-col-center">Aksiyon</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-slate-200 bg-white">
+          <tbody>
             <% @products.each do |product| %>
-              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
+              <tr>
                 <td class="font-medium text-slate-900"><%= product["name"].to_s %></td>
                 <td><%= product.dig("categories", "name").to_s.presence || @category_labels[product["category_id"].to_s].presence || "-" %></td>
                 <td><%= product["item_type"].to_s %></td>
                 <td class="text-right"><%= number_to_currency(product["price"], unit: "TL ", format: "%u%n") %></td>
                 <td class="text-right"><%= product["vat_rate"].to_s %></td>
-                <td class="text-center">
-                  <% if product["active"] %>
-                    <span class="badge-success">Aktif</span>
+                <td class="rt-col-center">
+                  <% if product["deleted_at"].present? %>
+                    <span class="status-circle bg-rose-600 text-white" title="Arşivde" aria-label="Arşivde">P</span>
+                  <% elsif product["active"] %>
+                    <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
                   <% else %>
-                    <span class="badge-info">Pasif</span>
+                    <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
                   <% end %>
                 </td>
-                <td class="text-right">
-                  <div class="inline-flex items-center gap-2">
-                    <%= link_to product_path(product["id"]),
-                          title: "Gör",
-                          aria: { label: "Gör" },
-                          class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-sky-700" do %>
-                      <svg viewBox="0 0 24 24" class="h-5 w-5 text-sky-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2.5 12c2.7-4.5 6.3-6.7 9.5-6.7s6.8 2.2 9.5 6.7c-2.7 4.5-6.3 6.7-9.5 6.7s-6.8-2.2-9.5-6.7z"/>
-                        <circle cx="12" cy="12" r="3.5"/>
-                      </svg>
-                    <% end %>
-
-                    <%= link_to edit_product_path(product["id"]),
-                          title: "Düzenle",
-                          aria: { label: "Düzenle" },
-                          class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-amber-600" do %>
-                      <svg viewBox="0 0 24 24" class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 20h5l9-9-5-5-9 9v5z"/>
-                        <path d="M14 6l4 4"/>
-                      </svg>
-                    <% end %>
-
-                    <% if product["deleted_at"].present? %>
-                      <%= link_to restore_product_path(product["id"]),
-                            method: :patch,
-                            data: { confirm: "Bu ürünü geri yüklemek istediğinize emin misiniz?" },
-                            title: "Geri Yükle",
-                            aria: { label: "Geri Yükle" },
-                            class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-emerald-700" do %>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M3 12a9 9 0 1 0 3-6.7"/>
-                          <path d="M3 4v5h5"/>
+                <td class="rt-col-center rt-action-cell">
+                  <details class="relative inline-block text-left rt-action-details">
+                    <summary class="list-none">
+                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-slate-300">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="5" cy="12" r="1.6"/>
+                          <circle cx="12" cy="12" r="1.6"/>
+                          <circle cx="19" cy="12" r="1.6"/>
                         </svg>
+                      </span>
+                    </summary>
+                    <div class="rt-action-menu absolute right-0 z-20 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg">
+                      <%= link_to "Gör", product_path(product["id"]), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
+                      <%= link_to "Düzenle", edit_product_path(product["id"]), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
+                      <% if product["deleted_at"].present? %>
+                        <%= link_to "Geri Yükle",
+                              restore_product_path(product["id"]),
+                              data: { turbo_method: :patch, turbo_confirm: "Bu ürünü geri yüklemek istiyor musunuz?" },
+                              class: "block rounded-lg px-3 py-2 text-emerald-700 hover:bg-emerald-50" %>
+                      <% else %>
+                        <%= link_to "Arşivle",
+                              product_path(product["id"]),
+                              data: { turbo_method: :delete, turbo_confirm: "Bu ürünü arşivlemek istediğinize emin misiniz?" },
+                              class: "block rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50" %>
                       <% end %>
-                    <% else %>
-                      <%= link_to product_path(product["id"]),
-                            method: :delete,
-                            data: { confirm: "Bu ürünü silmek istediğinize emin misiniz?" },
-                            title: "Arşivle",
-                            aria: { label: "Arşivle" },
-                            class: "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-rose-600" do %>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M5 7h14"/>
-                          <path d="M10 5h4"/>
-                          <path d="M8 7l1 12h6l1-12"/>
-                        </svg>
-                      <% end %>
-                    <% end %>
-                  </div>
+                    </div>
+                  </details>
                 </td>
               </tr>
             <% end %>
@@ -142,7 +127,7 @@
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
+    <div class="rounded-md bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
       <div class="flex items-center justify-between gap-3 text-sm">
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
@@ -158,6 +143,7 @@
                     class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
             <% end %>
           </div>
+
           <% if @has_prev %>
             <%= link_to "Önceki", products_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
@@ -175,3 +161,47 @@
   </div>
 </div>
 
+<script>
+  document.addEventListener("turbo:load", function () {
+    var tableWrap = document.querySelector(".rt-products-table-wrap");
+    if (!tableWrap) return;
+    if (tableWrap.dataset.menuInit === "1") return;
+    tableWrap.dataset.menuInit = "1";
+
+    var actionMenus = function () {
+      return Array.from(tableWrap.querySelectorAll("details.rt-action-details"));
+    };
+
+    tableWrap.addEventListener("click", function (event) {
+      var clickedMenu = event.target.closest("details.rt-action-details");
+      var clickedSummary = event.target.closest("details.rt-action-details > summary");
+
+      if (!clickedMenu) {
+        actionMenus().forEach(function (menu) {
+          menu.open = false;
+        });
+        return;
+      }
+
+      if (clickedSummary) {
+        actionMenus().forEach(function (menu) {
+          if (menu !== clickedMenu) menu.open = false;
+        });
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (tableWrap.contains(event.target)) return;
+      actionMenus().forEach(function (menu) {
+        menu.open = false;
+      });
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      actionMenus().forEach(function (menu) {
+        menu.open = false;
+      });
+    });
+  });
+</script>

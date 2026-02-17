@@ -5,7 +5,7 @@ module Products
     include ActiveModel::Model
     include ActiveModel::Attributes
 
-    ALLOWED_TYPES = %w[product demonte service].freeze
+    ALLOWED_TYPES = %w[product service demonte hizmet malzeme sistem_bileseni].freeze
 
     attribute :name, :string
     attribute :price

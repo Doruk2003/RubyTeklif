@@ -1,4 +1,4 @@
-<%= form_with model: company, class: "space-y-6" do |f| %>
+﻿<%= form_with model: company, class: "space-y-6" do |f| %>
   <% if company.errors.any? %>
     <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
       <div class="mb-2 font-semibold">Formda hata var:</div>
@@ -47,14 +47,15 @@
     <%= f.text_area :address, rows: 3, class: "form-textarea" %>
   </div>
 
-  <div class="rounded-lg border border-slate-200 bg-white px-4 py-3">
-    <div class="flex items-center gap-3">
-      <%= f.check_box :active, class: "h-4 w-4 rounded border-slate-300" %>
-      <%= f.label :active, "Aktif Müşteri", class: "text-sm text-slate-700" %>
-    </div>
+  <div>
+    <%= f.label :active, "Müşteri Durumu", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
+    <%= f.select :active,
+          options_for_select([["Aktif", "true"], ["Pasif", "false"]], company.active == false ? "false" : "true"),
+          {},
+          class: "form-input" %>
   </div>
 
   <div>
-    <%= f.submit class: "btn-primary w-full" %>
+    <%= f.submit class: "btn-primary w-full", data: { turbo_confirm: "Müşteri kaydı kaydedilsin mi?" } %>
   </div>
 <% end %>

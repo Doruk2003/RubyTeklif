@@ -4,10 +4,11 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Admin Panel</h1>
-          <p class="text-sm text-slate-500">KullanÄ±cÄ± rolleri</p>
+          <p class="text-sm text-slate-500">Kullanıcı rolleri</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Yeni KullanÄ±cÄ±", new_admin_user_path, class: "btn-primary w-full sm:w-auto" %>
+          <%= filter_panel_toggle_button %>
+          <%= new_record_button("Yeni Kullanıcı", new_admin_user_path) %>
           <%= button_to "CSV Export", export_admin_users_path(request.query_parameters), method: :post, class: "btn-secondary w-full sm:w-auto" %>
           <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
         </div>
@@ -19,16 +20,16 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div class="text-sm text-slate-700">
             <% if @export[:status].to_s == "ready" %>
-              Son kullanÄ±cÄ± export'u hazÄ±r.
+              Son kullanıcı export'u hazır.
             <% elsif @export[:status].to_s == "failed" %>
-              KullanÄ±cÄ± export'u baÅŸarÄ±sÄ±z oldu. Tekrar deneyin.
+              Kullanıcı export'u başarısız oldu. Tekrar deneyin.
             <% else %>
-              KullanÄ±cÄ± export'u hazÄ±rlanÄ±yor. BirkaÃ§ saniye sonra sayfayÄ± yenileyin.
+              Kullanıcı export'u hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
             <% end %>
           </div>
           <div>
             <% if @export[:status].to_s == "ready" %>
-              <%= link_to "CSV Ä°ndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
+              <%= link_to "CSV İndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
             <% elsif @export[:status].to_s == "pending" %>
               <%= link_to "Yenile", admin_users_path(request.query_parameters), class: "btn-secondary" %>
             <% end %>
@@ -38,7 +39,7 @@
     <% end %>
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="p-4">
+      <div class="p-4 hidden" data-filter-panel>
         <%= form_with url: admin_users_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4" do |f| %>
           <div>
             <%= f.label :q, "E-posta", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
@@ -48,7 +49,7 @@
             <%= f.label :role, "Rol", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :role,
                   options_for_select([
-                    ["TÃ¼m Roller", ""],
+                    ["Tüm Roller", ""],
                     *Roles::ASSIGNABLE_ROLE_OPTIONS
                   ], params[:role].to_s),
                   {},
@@ -58,7 +59,7 @@
             <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :active,
                   options_for_select([
-                    ["TÃ¼m", ""],
+                    ["Tüm", ""],
                     ["Aktif", "true"],
                     ["Pasif", "false"]
                   ], params[:active].to_s),
@@ -66,8 +67,8 @@
                   class: "form-input" %>
           </div>
           <div class="flex items-end gap-2">
-            <%= f.submit "Filtrele", class: "btn-primary w-full" %>
-            <%= link_to "Temizle", admin_users_path, class: "btn-secondary w-full" %>
+            <%= filter_submit_button %>
+            <%= clear_filter_button(admin_users_path) %>
           </div>
         <% end %>
       </div>
@@ -99,16 +100,16 @@
                   <% end %>
                 </td>
                 <td class="text-right">
-                  <%= link_to "DÃ¼zenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
-                  <%= link_to "Åifre SÄ±fÄ±rla",
+                  <%= link_to "Düzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
+                  <%= link_to "Şifre Sıfırla",
                         reset_password_admin_user_path(user["id"]),
                         method: :post,
-                        data: { confirm: "Parola sÄ±fÄ±rlama maili gÃ¶nderilsin mi?" },
+                        data: { turbo_confirm: "Parola sıfırlama maili gönderilsin mi?" },
                         class: "btn-secondary" %>
                   <% if user["active"] == false %>
-                    <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), method: :patch, class: "btn-secondary" %>
+                    <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
                   <% else %>
-                    <%= link_to "Pasif Et", disable_admin_user_path(user["id"]), method: :patch, class: "btn-secondary" %>
+                    <%= link_to "Pasif Et", disable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
                   <% end %>
                 </td>
               </tr>
@@ -116,7 +117,7 @@
 
             <% if @users.empty? %>
               <tr>
-                <td colspan="4" class="py-12 text-center text-slate-500">KullanÄ±cÄ± yok.</td>
+                <td colspan="4" class="py-12 text-center text-slate-500">Kullanıcı yok.</td>
               </tr>
             <% end %>
           </tbody>
@@ -129,7 +130,7 @@
         <div class="text-slate-600">
           Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
           <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayÄ±t</span>
+          <span><%= @per_page %> kayıt</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="hidden sm:flex items-center gap-1 text-xs">
@@ -141,9 +142,9 @@
             <% end %>
           </div>
           <% if @has_prev %>
-            <%= link_to "Ã–nceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <%= link_to "Önceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
           <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Ã–nceki</span>
+            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
           <% end %>
 
           <% if @has_next %>
@@ -156,6 +157,9 @@
     </div>
   </div>
 </div>
+
+
+
 
 
 

@@ -7,6 +7,7 @@
           <p class="text-sm text-slate-500">Rol değişiklikleri ve admin aksiyonları</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <%= filter_panel_toggle_button %>
           <%= link_to "Admin Panel", admin_users_path, class: "btn-secondary w-full sm:w-auto" %>
           <%= button_to "CSV Export", export_admin_activity_logs_path(request.query_parameters), method: :post, class: "btn-primary w-full sm:w-auto" %>
         </div>
@@ -37,7 +38,7 @@
     <% end %>
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="p-4">
+      <div class="p-4 hidden" data-filter-panel>
         <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-7" do |f| %>
           <div>
             <%= f.label :event_action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
@@ -76,8 +77,8 @@
             <%= f.date_field :to, value: params[:to], class: "form-input" %>
           </div>
           <div class="flex items-end gap-2">
-            <%= f.submit "Filtrele", class: "btn-primary w-full" %>
-            <%= link_to "Temizle", admin_activity_logs_path, class: "btn-secondary w-full" %>
+            <%= filter_submit_button %>
+            <%= clear_filter_button(admin_activity_logs_path) %>
           </div>
         <% end %>
       </div>
@@ -148,6 +149,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 
