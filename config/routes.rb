@@ -41,6 +41,8 @@ Rails.application.routes.draw do
   resources :products, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
     member do
       patch :restore
+      delete "images/:image_id", action: :destroy_image, as: :destroy_image
+      patch "images/:image_id/move", action: :move_image, as: :move_image
     end
   end
   resources :currencies, only: [:index, :new, :create, :edit, :update, :destroy] do
@@ -53,4 +55,5 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
+  resources :brands, only: [:new, :create]
 end

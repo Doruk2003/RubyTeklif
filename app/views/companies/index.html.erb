@@ -53,7 +53,7 @@
         </div>
       <% end %>
 
-      <%= form_with url: companies_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-[2.9fr_1fr_1fr_1fr_1fr_1fr_auto]" do |f| %>
+      <%= filter_form_with url: companies_path, layout: :seven_wide_first do |f| %>
         <div>
           <%= f.label :q, "Firma Adı / Yetkili", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
           <%= f.search_field :q,
@@ -114,10 +114,10 @@
                 class: "form-input" %>
         </div>
 
-        <div class="flex w-full items-end justify-end gap-2 md:justify-end">
+        <%= filter_actions_row do %>
           <%= filter_submit_button %>
           <%= clear_filter_button(companies_path) %>
-        </div>
+        <% end %>
       <% end %>
     </div>
 <!-- Card 2: List -->

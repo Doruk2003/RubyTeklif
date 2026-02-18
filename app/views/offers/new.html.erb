@@ -13,7 +13,7 @@
     </div>
 
     <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <%= form_with url: new_offer_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-3 md:items-end" do |f| %>
+      <%= filter_form_with url: new_offer_path, layout: :two do |f| %>
         <div>
           <%= f.label :category_id, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
           <%= f.select :category_id,
@@ -21,9 +21,9 @@
                 {},
                 class: "form-input" %>
         </div>
-        <div>
+        <%= filter_actions_row do %>
           <%= filter_submit_button(label: "Ürünleri Filtrele") %>
-        </div>
+        <% end %>
       <% end %>
     </div>
 

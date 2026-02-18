@@ -1,0 +1,22 @@
+<%= form_with url: form_url, scope: :brand, method: form_method, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
+  <%= hidden_field_tag :return_to, params[:return_to].to_s %>
+
+  <% existing_code = brand[:code] || brand["code"] %>
+  <% existing_active = brand.key?(:active) ? brand[:active] : brand["active"] %>
+  <% if existing_code.present? %>
+    <%= f.hidden_field :code, value: existing_code %>
+  <% end %>
+  <% unless existing_active.nil? %>
+    <%= f.hidden_field :active, value: (existing_active ? "1" : "0") %>
+  <% end %>
+
+  <div class="md:col-span-2">
+    <%= f.label :name, "Marka Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
+    <%= f.text_field :name, value: brand[:name] || brand["name"], placeholder: "Örn: Acme", class: "form-input" %>
+    <p class="mt-2 text-xs text-slate-500">Marka kodu otomatik oluşturulur.</p>
+  </div>
+
+  <div class="md:col-span-2">
+    <%= f.submit submit_label, class: "btn-primary w-full", data: { turbo_confirm: "Marka kaydı kaydedilsin mi?" } %>
+  </div>
+<% end %>

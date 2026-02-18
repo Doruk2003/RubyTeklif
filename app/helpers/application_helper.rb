@@ -1,4 +1,28 @@
 ﻿module ApplicationHelper
+  FILTER_GRID_LAYOUTS = {
+    standard: "rt-filter-grid--4-wide-first",
+    two: "rt-filter-grid--2",
+    three_wide_first: "rt-filter-grid--3-wide-first",
+    four: "rt-filter-grid--4",
+    four_wide_first: "rt-filter-grid--4-wide-first",
+    seven: "rt-filter-grid--7",
+    seven_wide_first: "rt-filter-grid--7-wide-first"
+  }.freeze
+
+  def filter_form_with(url:, layout: :standard, class_name: nil, **options, &block)
+    layout_class = FILTER_GRID_LAYOUTS.fetch(layout.to_sym) { FILTER_GRID_LAYOUTS[:standard] }
+    classes = ["rt-filter-grid", layout_class, class_name, options.delete(:class)].compact.join(" ")
+
+    form_options = { url: url, method: :get, local: true }.merge(options)
+    form_options[:class] = classes
+    form_with(**form_options, &block)
+  end
+
+  def filter_actions_row(class_name: nil, **options, &block)
+    classes = ["rt-filter-grid-actions", "flex", "w-full", "items-end", "justify-end", "gap-2", class_name, options.delete(:class)].compact.join(" ")
+    content_tag(:div, capture(&block), options.merge(class: classes))
+  end
+
   def icon_link_button(path, label:, icon:, variant: :nav, class_name: nil, **options)
     variant_class = case variant.to_sym
                     when :new then "btn-new-record"
@@ -65,5 +89,16 @@
         data: { filter_panel_icon: true }
       )
     end
+  end
+
+  def product_image_public_url(storage_path)
+    path = storage_path.to_s
+    return "" if path.blank?
+
+    bucket = ENV.fetch("SUPABASE_PRODUCTS_BUCKET", "product-images")
+    encoded_path = path.split("/").map { |segment| ERB::Util.url_encode(segment).gsub("+", "%20") }.join("/")
+    "#{ENV.fetch("SUPABASE_URL")}/storage/v1/object/public/#{bucket}/#{encoded_path}"
+  rescue KeyError
+    ""
   end
 end

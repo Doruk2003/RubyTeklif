@@ -14,7 +14,7 @@
       </div>
 
       <div class="mt-4 hidden" data-filter-panel>
-        <%= form_with url: offers_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end" do |f| %>
+        <%= filter_form_with url: offers_path, layout: :two do |f| %>
           <div>
             <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-700/80" %>
             <%= f.select :scope,
@@ -26,13 +26,11 @@
                   {},
                   class: "form-input" %>
           </div>
-          <div>
+          <%= filter_actions_row do %>
             <%= f.hidden_field :per_page, value: @per_page %>
             <%= filter_submit_button %>
-          </div>
-          <div>
             <%= clear_filter_button(offers_path(per_page: @per_page)) %>
-          </div>
+          <% end %>
         <% end %>
       </div>
     </div>

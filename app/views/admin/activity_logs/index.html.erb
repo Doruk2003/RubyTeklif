@@ -39,7 +39,7 @@
 
     <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
       <div class="p-4 hidden" data-filter-panel>
-        <%= form_with url: admin_activity_logs_path, method: :get, local: true, class: "grid grid-cols-1 gap-3 md:grid-cols-7" do |f| %>
+        <%= filter_form_with url: admin_activity_logs_path, layout: :seven do |f| %>
           <div>
             <%= f.label :event_action, "Aksiyon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.select :event_action,
@@ -76,10 +76,10 @@
             <%= f.label :to, "Bitiş", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
             <%= f.date_field :to, value: params[:to], class: "form-input" %>
           </div>
-          <div class="flex items-end gap-2">
+          <%= filter_actions_row(class_name: "items-end") do %>
             <%= filter_submit_button %>
             <%= clear_filter_button(admin_activity_logs_path) %>
-          </div>
+          <% end %>
         <% end %>
       </div>
 

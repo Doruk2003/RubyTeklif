@@ -20,7 +20,7 @@
         <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
       </div>
 
-      <%= form_with url: currencies_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto]" do |f| %>
+      <%= filter_form_with url: currencies_path, layout: :two do |f| %>
         <div>
           <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
           <%= f.select :scope,
@@ -34,10 +34,10 @@
           <%= f.hidden_field :per_page, value: @per_page %>
         </div>
 
-        <div class="flex w-full items-end justify-end gap-2 md:justify-end">
+        <%= filter_actions_row do %>
           <%= filter_submit_button %>
           <%= clear_filter_button(currencies_path(per_page: @per_page)) %>
-        </div>
+        <% end %>
       <% end %>
     </div>
 

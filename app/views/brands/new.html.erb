@@ -1,0 +1,25 @@
+<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
+  <div class="w-full space-y-2">
+    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Yeni Marka</h1>
+          <p class="text-sm text-slate-500">Ürünler için yeni marka tanımlayın.</p>
+        </div>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <% return_path = params[:return_to].to_s.start_with?("/") ? params[:return_to].to_s : products_path %>
+          <%= list_nav_button(return_path, label: "Ürün Formuna Dön") %>
+          <%= home_nav_button(home_path) %>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+      <%= render "form",
+            brand: @brand || {},
+            form_url: brands_path,
+            form_method: :post,
+            submit_label: "Markayı Kaydet" %>
+    </div>
+  </div>
+</div>
