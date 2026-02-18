@@ -11,11 +11,23 @@ module Products
         "rpc/create_product_with_audit_atomic",
         body: {
           p_actor_id: actor_id,
+          p_sku: payload[:sku],
           p_name: payload[:name],
+          p_description: payload[:description],
+          p_barcode: payload[:barcode],
           p_price: payload[:price],
+          p_cost_price: payload[:cost_price],
+          p_stock_quantity: payload[:stock_quantity],
+          p_min_stock_level: payload[:min_stock_level],
           p_vat_rate: payload[:vat_rate],
           p_item_type: payload[:item_type],
           p_category_id: payload[:category_id],
+          p_brand_id: payload[:brand_id],
+          p_currency_id: payload[:currency_id],
+          p_unit: payload[:unit],
+          p_is_stock_item: payload[:is_stock_item],
+          p_sale_price_vat_included: payload[:sale_price_vat_included],
+          p_cost_price_vat_included: payload[:cost_price_vat_included],
           p_active: payload[:active]
         }
       )
@@ -27,11 +39,23 @@ module Products
         body: {
           p_actor_id: actor_id,
           p_product_id: product_id,
+          p_sku: payload[:sku],
           p_name: payload[:name],
+          p_description: payload[:description],
+          p_barcode: payload[:barcode],
           p_price: payload[:price],
+          p_cost_price: payload[:cost_price],
+          p_stock_quantity: payload[:stock_quantity],
+          p_min_stock_level: payload[:min_stock_level],
           p_vat_rate: payload[:vat_rate],
           p_item_type: payload[:item_type],
           p_category_id: payload[:category_id],
+          p_brand_id: payload[:brand_id],
+          p_currency_id: payload[:currency_id],
+          p_unit: payload[:unit],
+          p_is_stock_item: payload[:is_stock_item],
+          p_sale_price_vat_included: payload[:sale_price_vat_included],
+          p_cost_price_vat_included: payload[:cost_price_vat_included],
           p_active: payload[:active]
         }
       )

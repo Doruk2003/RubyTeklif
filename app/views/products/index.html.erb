@@ -20,7 +20,7 @@
         <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
       </div>
 
-      <%= form_with url: products_path, method: :get, local: true, class: "grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_auto]" do |f| %>
+      <%= filter_form_with url: products_path, layout: :three_wide_first do |f| %>
         <div>
           <%= f.label :category, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
           <%= f.select :category,
@@ -42,10 +42,10 @@
           <%= f.hidden_field :per_page, value: @per_page %>
         </div>
 
-        <div class="flex w-full items-end justify-end gap-2 md:justify-end">
+        <%= filter_actions_row do %>
           <%= filter_submit_button %>
           <%= clear_filter_button(products_path(per_page: @per_page)) %>
-        </div>
+        <% end %>
       <% end %>
     </div>
 
@@ -54,9 +54,15 @@
         <table class="rt-table rt-pipeline-table min-w-full">
           <thead>
             <tr>
+              <th>SKU</th>
+              <th>Barkod</th>
               <th>Ürün</th>
               <th>Kategori</th>
+              <th>Marka</th>
+              <th>Doviz</th>
               <th>Tip</th>
+              <th>Birim</th>
+              <th>Stok</th>
               <th class="text-right">Fiyat</th>
               <th class="text-right">KDV %</th>
               <th class="rt-col-center">Durum</th>
@@ -67,9 +73,15 @@
           <tbody>
             <% @products.each do |product| %>
               <tr>
+                <td><%= product["sku"].to_s.presence || "-" %></td>
+                <td><%= product["barcode"].to_s.presence || "-" %></td>
                 <td class="font-medium text-slate-900"><%= product["name"].to_s %></td>
                 <td><%= product.dig("categories", "name").to_s.presence || @category_labels[product["category_id"].to_s].presence || "-" %></td>
+                <td><%= product.dig("brands", "name").to_s.presence || @brand_labels[product["brand_id"].to_s].presence || "-" %></td>
+                <td><%= product.dig("currencies", "code").to_s.presence || @currency_labels[product["currency_id"].to_s].presence || "TRY" %></td>
                 <td><%= product["item_type"].to_s %></td>
+                <td><%= product["unit"].to_s.presence || "-" %></td>
+                <td><%= product["is_stock_item"] ? product["stock_quantity"].to_s.presence || "0" : "-" %></td>
                 <td class="text-right"><%= number_to_currency(product["price"], unit: "TL ", format: "%u%n") %></td>
                 <td class="text-right"><%= product["vat_rate"].to_s %></td>
                 <td class="rt-col-center">
@@ -114,7 +126,7 @@
 
             <% if @products.empty? %>
               <tr>
-                <td colspan="7" class="py-12 text-center">
+                <td colspan="13" class="py-12 text-center">
                   <div class="mx-auto max-w-sm">
                     <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı ürün yok</div>
                     <div class="text-sm text-slate-500">İlk ürününüzü eklemek için sağ üstteki butonu kullanın.</div>

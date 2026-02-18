@@ -25,8 +25,9 @@ body {
   --rt-space-5: 20px;
 
   --rt-page-pad-x: 10px;
+  --rt-page-pad-top: 8px;
   --rt-page-pad-bottom: 12px;
-  --rt-page-offset-top: -2rem;
+  --rt-page-offset-top: -1rem;
 
   --rt-focus-border: #cbd5e1;
   --rt-focus-shadow: 0 0 14px 2px rgba(15, 23, 42, 0.35);
@@ -209,6 +210,132 @@ select option:focus {
   cursor: not-allowed;
 }
 
+.rt-price-inline-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .rt-price-inline-row {
+    grid-template-columns: minmax(0, 1fr) 11rem;
+    align-items: end;
+  }
+
+  .rt-price-inline-row .rt-custom-select-trigger {
+    margin-top: 0;
+  }
+}
+
+/* Product form: compact + viewport-friendly layout */
+.rt-product-new-shell {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: none;
+  align-content: start;
+  gap: var(--rt-card-gap);
+}
+
+.rt-product-form-card {
+  min-height: 0;
+  overflow: visible;
+}
+
+.rt-product-form-grid {
+  gap: 12px !important;
+}
+
+.rt-product-form-compact .form-input {
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.rt-product-form-compact label {
+  font-size: 0.68rem !important;
+  line-height: 1.15;
+}
+
+.rt-product-form-compact .rt-price-inline-row {
+  gap: 6px;
+}
+
+@media (min-width: 640px) {
+  .rt-product-form-compact .rt-price-inline-row {
+    grid-template-columns: minmax(0, 1fr) 8.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .rt-product-form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+.rt-product-accordion {
+  display: grid;
+  gap: 8px;
+}
+
+.rt-product-section {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.75);
+}
+
+.rt-product-section[open] {
+  background: rgba(248, 250, 252, 0.92);
+}
+
+.rt-product-section-title {
+  list-style: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rt-product-section-title::-webkit-details-marker {
+  display: none;
+}
+
+.rt-product-section-title::after {
+  content: "+";
+  font-size: 16px;
+  line-height: 1;
+  color: #475569;
+}
+
+.rt-product-section[open] .rt-product-section-title::after {
+  content: "-";
+}
+
+.rt-product-section-body {
+  padding: 4px 12px 12px;
+}
+
+.rt-product-section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.rt-col-span-full {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+  .rt-product-section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Global page spacing standard for new screens/components */
 .rt-page-stack,
 .rt-page-grid {
@@ -226,8 +353,8 @@ select option:focus {
   background: var(--rt-page-bg);
   padding-left: var(--rt-page-pad-x);
   padding-right: var(--rt-page-pad-x);
+  padding-top: var(--rt-page-pad-top);
   padding-bottom: var(--rt-page-pad-bottom);
-  padding-top: 0;
 }
 
 .rt-page-inner {
@@ -238,6 +365,20 @@ select option:focus {
 
 .rt-page-offset-top {
   margin-top: var(--rt-page-offset-top);
+}
+
+/* Standardized header card height across pages */
+.rt-page-card.rt-page-offset-top {
+  height: 96px;
+  min-height: 96px;
+  max-height: 96px;
+  display: flex;
+  align-items: center;
+  overflow: visible;
+}
+
+.rt-page-card.rt-page-offset-top > * {
+  width: 100%;
 }
 
 .rt-page-card {
@@ -1374,6 +1515,46 @@ body:has(.rt-dashboard) .app-flash-wrap {
   font-size: 12px;
   line-height: 1.45;
   padding: 7px 9px;
+}
+
+.rt-filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .rt-filter-grid {
+    align-items: end;
+  }
+
+  .rt-filter-grid--2 {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rt-filter-grid--3-wide-first {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  }
+
+  .rt-filter-grid--4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  }
+
+  .rt-filter-grid--4-wide-first {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+
+  .rt-filter-grid--7 {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  }
+
+  .rt-filter-grid--7-wide-first {
+    grid-template-columns: minmax(0, 2.6fr) repeat(5, minmax(0, 1fr)) auto;
+  }
+
+  .rt-filter-grid-actions {
+    justify-content: flex-end;
+  }
 }
 
 @media (min-width: 900px) {

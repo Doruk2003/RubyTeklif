@@ -1,66 +1,27 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
+<div class="rt-page">
+  <div class="rt-page-inner rt-product-new-shell">
+    <div class="rt-page-card rt-page-offset-top">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Yeni Ürün</h1>
-          <p class="text-sm text-slate-500">Yeni bir ürün kaydı oluştur.</p>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Yeni Urun</h1>
+          <p class="text-sm text-slate-500">Yeni bir urun kaydi olustur.</p>
         </div>
         <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= list_nav_button(products_path, label: "Ürün Listesi") %>
+          <%= list_nav_button(products_path, label: "Urun Listesi") %>
           <%= home_nav_button(home_path) %>
         </div>
       </div>
     </div>
 
-    <div class="rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <%= form_with url: products_path, scope: :product, local: true, class: "grid grid-cols-1 gap-5 md:grid-cols-2" do |f| %>
-        <div>
-          <%= f.label :name, "Ürün Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.text_field :name, value: @product[:name], placeholder: "Örn: Çelik Kapı", class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :item_type, "Tip", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :item_type,
-                options_for_select([["Demonte", "demonte"], ["Hizmet", "hizmet"], ["Malzeme", "malzeme"], ["Sistem Bileşeni", "sistem_bileseni"]], @product[:item_type] || @product["item_type"]),
-                { prompt: "Tip Seçin" },
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between gap-2">
-            <%= f.label :category_id, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= link_to "Yeni Kategori", new_category_path(return_to: request.fullpath), class: "text-xs font-medium text-sky-700 hover:text-sky-800" %>
-          </div>
-          <%= f.select :category_id,
-                options_for_select(@category_options, @product[:category_id] || @product["category_id"]),
-                { prompt: "Kategori seçin" },
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :price, "Birim Fiyat", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.number_field :price, value: @product[:price], step: "0.01", class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :vat_rate, "KDV Oranı (%)", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.number_field :vat_rate, value: @product[:vat_rate] || 0, step: "0.01", class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :active,
-                options_for_select([["Aktif", "1"], ["Pasif", "0"]], (@product.key?(:active) ? (@product[:active] ? "1" : "0") : "1")),
-                {},
-                class: "form-input" %>
-        </div>
-
-        <div class="md:col-span-2">
-          <%= f.submit "Kaydet", class: "btn-primary w-full", data: { turbo_confirm: "Yeni ürün kaydedilsin mi?" } %>
-        </div>
-      <% end %>
+    <div class="rt-page-card rt-product-form-card">
+      <%= render "form",
+            product: @product,
+            url: products_path,
+            method: :post,
+            submit_label: "Kaydet",
+            submit_confirm: "Yeni urun kaydedilsin mi?",
+            remaining_photo_count: nil,
+            existing_photo_count: 0 %>
     </div>
   </div>
 </div>

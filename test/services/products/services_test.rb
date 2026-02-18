@@ -24,17 +24,20 @@ module Products
       end
     end
 
-    class FakeAuditLog
-      def log(**kwargs); end
-    end
-
     def valid_payload
       {
+        sku: "PRD-00001",
         name: "Urun A",
+        description: "Aciklama",
+        barcode: "8691234567890",
         price: "10.5",
+        cost_price: "7.0",
+        stock_quantity: "5",
+        min_stock_level: "1",
         vat_rate: "20",
         item_type: "product",
         category_id: "11111111-1111-1111-1111-111111111111",
+        unit: "adet",
         active: "1"
       }
     end
@@ -77,7 +80,7 @@ module Products
 
     test "destroy raises system error for generic failure" do
       client = FakeClient.new(post_response: { "message" => "boom" })
-      service = Products::Destroy.new(client: client, audit_log: FakeAuditLog.new)
+      service = Products::Destroy.new(client: client)
 
       assert_raises(ServiceErrors::System) do
         service.call(id: "prd-1", actor_id: "usr-1")
