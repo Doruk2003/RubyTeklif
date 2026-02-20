@@ -1,64 +1,68 @@
-<div class="relative min-h-screen overflow-hidden bg-[#f6f3ee] px-4 py-0">
-  <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center">
-    <div class="rounded-3xl border border-white/60 bg-white/90 p-6 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.55)] sm:p-8">
-      <div class="mb-6 text-center">
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Cotil Tente A.Ş. </p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Hoş geldiniz</h1>
-        <p class="mt-2 text-sm text-slate-600">Devam etmek için hesabınıza giriş yapın.</p>
+<div class="container-fluid py-2">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4 p-sm-5">
+          <div class="text-center mb-4">
+            <p class="small fw-semibold text-uppercase text-secondary mb-1">Cotil Tente A.Ş.</p>
+            <h1 class="h3 mb-2">Hoş geldiniz</h1>
+            <p class="text-secondary mb-0">Devam etmek için hesabınıza giriş yapın.</p>
+          </div>
+
+          <%= form_with url: login_path, method: :post, local: true, class: "d-grid gap-3" do |f| %>
+            <div>
+              <%= f.label :email, "E-posta", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.email_field :email,
+                    class: "form-input",
+                    required: true,
+                    autocomplete: "email",
+                    placeholder: "••••••••" %>
+            </div>
+
+            <div>
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <%= f.label :password, "Şifre", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
+                <%= link_to "Şifremi unuttum", password_recovery_path, class: "small link-secondary text-decoration-none" %>
+              </div>
+              <div class="position-relative">
+                <%= f.password_field :password,
+                      class: "form-input pe-5",
+                      required: true,
+                      autocomplete: "current-password",
+                      id: "login-password",
+                      placeholder: "••••••••" %>
+                <button type="button"
+                        id="toggle-password"
+                        class="btn btn-link position-absolute top-50 end-0 translate-middle-y px-3 text-secondary"
+                        aria-label="Şifreyi göster"
+                        aria-pressed="false">
+                  <svg id="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 12c2.7-4.5 6.3-6.7 9.5-6.7s6.8 2.2 9.5 6.7c-2.7 4.5-6.3 6.7-9.5 6.7s-6.8-2.2-9.5-6.7z"/>
+                    <circle cx="12" cy="12" r="3.5"/>
+                  </svg>
+                  <svg id="eye-closed" viewBox="0 0 24 24" class="hidden" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3l18 18"/>
+                    <path d="M10.5 10.5a2.12 2.12 0 0 0 3 3"/>
+                    <path d="M9.9 5.2A9.7 9.7 0 0 1 12 5.3c3.2 0 6.8 2.2 9.5 6.7a14.8 14.8 0 0 1-4.2 4.8"/>
+                    <path d="M6.2 6.2A14.7 14.7 0 0 0 2.5 12c2.7 4.5 6.3 6.7 9.5 6.7a9.6 9.6 0 0 0 4.2-.9"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="alert alert-light border mb-0 py-2 px-3 small text-secondary">
+              Güvenlik notu: Oturum süresi dolarsa sistem sizden tekrar giriş yapmanızı ister.
+            </div>
+
+            <label class="d-flex align-items-center gap-2 border rounded px-3 py-2 bg-light">
+              <%= check_box_tag :remember_me, "1", params[:remember_me].to_s == "1", class: "form-check-input mt-0" %>
+              <span class="small text-body">Beni hatırla (30 gün)</span>
+            </label>
+
+            <%= f.submit "Giriş Yap", class: "btn-primary w-100" %>
+          <% end %>
+        </div>
       </div>
-
-      <%= form_with url: login_path, method: :post, local: true, class: "space-y-4" do |f| %>
-        <div>
-          <%= f.label :email, "E-posta", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.email_field :email,
-                class: "form-input",
-                required: true,
-                autocomplete: "email",
-                placeholder: "ornek@firma.com" %>
-        </div>
-
-        <div>
-          <div class="mb-2 flex items-center justify-between">
-            <%= f.label :password, "Şifre", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= link_to "Şifremi unuttum", password_recovery_path, class: "text-xs font-medium text-sky-700 hover:text-sky-800" %>
-          </div>
-          <div class="relative">
-            <%= f.password_field :password,
-                  class: "form-input pr-12",
-                  required: true,
-                  autocomplete: "current-password",
-                  id: "login-password",
-                  placeholder: "••••••••" %>
-            <button type="button"
-                    id="toggle-password"
-                    class="absolute inset-y-0 right-0 inline-flex items-center px-3 text-slate-500 hover:text-slate-700"
-                    aria-label="Şifreyi göster"
-                    aria-pressed="false">
-              <svg id="eye-open" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2.5 12c2.7-4.5 6.3-6.7 9.5-6.7s6.8 2.2 9.5 6.7c-2.7 4.5-6.3 6.7-9.5 6.7s-6.8-2.2-9.5-6.7z"/>
-                <circle cx="12" cy="12" r="3.5"/>
-              </svg>
-              <svg id="eye-closed" viewBox="0 0 24 24" class="hidden h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3l18 18"/>
-                <path d="M10.5 10.5a2.12 2.12 0 0 0 3 3"/>
-                <path d="M9.9 5.2A9.7 9.7 0 0 1 12 5.3c3.2 0 6.8 2.2 9.5 6.7a14.8 14.8 0 0 1-4.2 4.8"/>
-                <path d="M6.2 6.2A14.7 14.7 0 0 0 2.5 12c2.7 4.5 6.3 6.7 9.5 6.7a9.6 9.6 0 0 0 4.2-.9"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
-          Güvenlik notu: Oturum süresi dolarsa sistem sizden tekrar giriş yapmanızı ister.
-        </div>
-
-        <label class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-          <%= check_box_tag :remember_me, "1", params[:remember_me].to_s == "1", class: "h-4 w-4 rounded border-slate-300" %>
-          <span>Beni hatırla (30 gün)</span>
-        </label>
-
-        <%= f.submit "Giriş Yap", class: "btn-primary w-full" %>
-      <% end %>
     </div>
   </div>
 </div>
@@ -83,3 +87,5 @@
     });
   });
 </script>
+
+

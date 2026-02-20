@@ -121,7 +121,7 @@ function initFilterPanelToggles(root = document) {
     const panelSelector = toggle.dataset.filterPanelTarget
     const panel = panelSelector
       ? document.querySelector(panelSelector)
-      : (toggle.closest(".min-h-screen, main, body") || document).querySelector("[data-filter-panel]")
+      : (toggle.closest("main, body") || document).querySelector("[data-filter-panel]")
 
     if (!panel) return
 
@@ -151,3 +151,4 @@ document.addEventListener("turbo:load", () => {
   applyAutoConfirmDefaults()
   initFilterPanelToggles()
 })
+

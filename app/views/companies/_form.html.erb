@@ -1,8 +1,8 @@
-﻿<%= form_with model: company, class: "space-y-6" do |f| %>
+<%= form_with model: company, class: "d-grid gap-3" do |f| %>
   <% if company.errors.any? %>
-    <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-      <div class="mb-2 font-semibold">Formda hata var:</div>
-      <ul class="list-disc pl-5">
+    <div class="alert alert-danger mb-0" role="alert">
+      <div class="fw-semibold mb-2">Formda hata var:</div>
+      <ul class="mb-0 ps-3">
         <% company.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -10,52 +10,52 @@
     </div>
   <% end %>
 
-  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-    <div>
-      <%= f.label :name, "Firma Adı", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-      <%= f.text_field :name, class: "form-input", required: true %>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <%= f.label :name, "Firma Adı", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :name, class: "form-control form-control-sm", required: true %>
     </div>
 
-    <div>
-      <%= f.label :tax_number, "Vergi No", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-      <%= f.text_field :tax_number, class: "form-input", required: true %>
+    <div class="col-md-6">
+      <%= f.label :tax_number, "Vergi No", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :tax_number, class: "form-control form-control-sm", required: true %>
     </div>
 
-    <div>
-      <%= f.label :tax_office, "Vergi Dairesi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-      <%= f.text_field :tax_office, class: "form-input" %>
+    <div class="col-md-6">
+      <%= f.label :tax_office, "Vergi Dairesi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :tax_office, class: "form-control form-control-sm" %>
     </div>
 
-    <div>
-      <%= f.label :authorized_person, "Yetkili Kişi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-      <%= f.text_field :authorized_person, class: "form-input" %>
+    <div class="col-md-6">
+      <%= f.label :authorized_person, "Yetkili Kişi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :authorized_person, class: "form-control form-control-sm" %>
     </div>
 
-    <div>
-      <%= f.label :phone, "Telefon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-      <%= f.telephone_field :phone, class: "form-input" %>
+    <div class="col-md-6">
+      <%= f.label :phone, "Telefon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.telephone_field :phone, class: "form-control form-control-sm" %>
     </div>
 
-    <div>
-      <%= f.label :email, "Mail Adresi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-      <%= f.email_field :email, class: "form-input", autocomplete: "email" %>
+    <div class="col-md-6">
+      <%= f.label :email, "Mail Adresi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.email_field :email, class: "form-control form-control-sm", autocomplete: "email" %>
+    </div>
+
+    <div class="col-12">
+      <%= f.label :address, "Adres", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_area :address, rows: 3, class: "form-control form-control-sm" %>
+    </div>
+
+    <div class="col-12">
+      <%= f.label :active, "Durumu", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :active,
+            options_for_select([["Aktif", "true"], ["Pasif", "false"]], company.active == false ? "false" : "true"),
+            {},
+            class: "form-control form-control-sm" %>
     </div>
   </div>
 
   <div>
-    <%= f.label :address, "Adres", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-    <%= f.text_area :address, rows: 3, class: "form-textarea" %>
-  </div>
-
-  <div>
-    <%= f.label :active, "Müşteri Durumu", class: "block text-xs font-semibold uppercase tracking-wide text-slate-500" %>
-    <%= f.select :active,
-          options_for_select([["Aktif", "true"], ["Pasif", "false"]], company.active == false ? "false" : "true"),
-          {},
-          class: "form-input" %>
-  </div>
-
-  <div>
-    <%= f.submit class: "btn-primary w-full", data: { turbo_confirm: "Müşteri kaydı kaydedilsin mi?" } %>
+    <%= f.submit "CREATE COMPANY", class: "btn btn-dark w-100", data: { turbo_confirm: "Müşteri kaydı kaydedilsin mi?" } %>
   </div>
 <% end %>

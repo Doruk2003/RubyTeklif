@@ -1,66 +1,74 @@
-<div class="rt-page">
-  <div class="rt-page-inner rt-product-new-shell">
-    <div class="rt-page-card rt-page-offset-top">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Urun Duzenle</h1>
-          <p class="text-sm text-slate-500">Urun bilgilerini guncelleyin.</p>
-        </div>
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Urun Listesi", products_path, class: "btn-secondary w-full sm:w-auto" %>
-          <%= home_nav_button(home_path) %>
+<div class="container-fluid py-2">
+  <div class="row g-2">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div>
+            <h1 class="h4 mb-1">Urun Duzenle</h1>
+            <p class="text-secondary mb-0">Urun bilgilerini guncelleyin.</p>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <%= link_to "Urun Listesi", products_path, class: "btn-secondary w-100" %>
+            <%= home_nav_button(home_path) %>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="rt-page-card rt-product-form-card">
-      <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <% if @product.present? %>
-          <% existing_photo_count = @product_images.to_a.size %>
-          <% remaining_photo_count = [6 - existing_photo_count, 0].max %>
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <% if @product.present? %>
+            <% existing_photo_count = @product_images.to_a.size %>
+            <% remaining_photo_count = [6 - existing_photo_count, 0].max %>
 
-          <% if @product_images.present? %>
-            <div class="mb-5">
-              <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-700">Mevcut Fotograf(lar)</div>
-              <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-                <% @product_images.each_with_index do |image, index| %>
-                  <% image_url = product_image_public_url(image["storage_path"]) %>
-                  <div class="overflow-hidden rounded-md border border-slate-200 bg-slate-50">
-                    <a href="<%= image_url %>" target="_blank" rel="noopener" class="block">
-                      <img src="<%= image_url %>" alt="<%= image["file_name"].to_s.presence || "Urun fotografi" %>" class="h-24 w-full object-cover" loading="lazy" />
-                    </a>
-                    <div class="flex items-center justify-between gap-1 border-t border-slate-200 bg-white p-1">
-                      <%= link_to "Yukari",
-                            move_image_product_path(@product["id"], image_id: image["id"], direction: "up"),
-                            data: { turbo_method: :patch },
-                            class: "inline-flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-xs text-slate-700 hover:bg-slate-100 #{'opacity-40 pointer-events-none' if index.zero?}" %>
-                      <%= link_to "Asagi",
-                            move_image_product_path(@product["id"], image_id: image["id"], direction: "down"),
-                            data: { turbo_method: :patch },
-                            class: "inline-flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-xs text-slate-700 hover:bg-slate-100 #{'opacity-40 pointer-events-none' if index == (@product_images.size - 1)}" %>
-                      <%= link_to "Sil",
-                            destroy_image_product_path(@product["id"], image_id: image["id"]),
-                            data: { turbo_method: :delete, turbo_confirm: "Bu fotograf silinsin mi?" },
-                            class: "inline-flex h-7 items-center justify-center rounded border border-rose-200 px-2 text-xs text-rose-700 hover:bg-rose-50" %>
+            <% if @product_images.present? %>
+              <div class="mb-4">
+                <div class="small fw-semibold text-uppercase text-secondary mb-2">Mevcut Fotograf(lar)</div>
+                <div class="row g-2">
+                  <% @product_images.each_with_index do |image, index| %>
+                    <% image_url = product_image_public_url(image["storage_path"]) %>
+                    <div class="col-6 col-sm-4 col-md-2">
+                      <div class="border rounded overflow-hidden bg-light">
+                        <a href="<%= image_url %>" target="_blank" rel="noopener" class="d-block">
+                          <img src="<%= image_url %>" alt="<%= image["file_name"].to_s.presence || "Urun fotografi" %>" class="w-100" style="height:96px;object-fit:cover;" loading="lazy" />
+                        </a>
+                        <div class="d-flex align-items-center justify-content-between gap-1 border-top bg-white p-1">
+                          <%= link_to "Yukari",
+                                move_image_product_path(@product["id"], image_id: image["id"], direction: "up"),
+                                data: { turbo_method: :patch },
+                                class: "btn btn-sm btn-outline-secondary #{'disabled' if index.zero?}" %>
+                          <%= link_to "Asagi",
+                                move_image_product_path(@product["id"], image_id: image["id"], direction: "down"),
+                                data: { turbo_method: :patch },
+                                class: "btn btn-sm btn-outline-secondary #{'disabled' if index == (@product_images.size - 1)}" %>
+                          <%= link_to "Sil",
+                                destroy_image_product_path(@product["id"], image_id: image["id"]),
+                                data: { turbo_method: :delete, turbo_confirm: "Bu fotograf silinsin mi?" },
+                                class: "btn btn-sm btn-outline-danger" %>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                <% end %>
+                  <% end %>
+                </div>
               </div>
-            </div>
-          <% end %>
+            <% end %>
 
-          <%= render "form",
-                product: @product,
-                url: product_path(@product["id"]),
-                method: :patch,
-                submit_label: "Guncelle",
-                submit_confirm: "Urun guncellensin mi?",
-                remaining_photo_count: remaining_photo_count,
-                existing_photo_count: existing_photo_count %>
-        <% else %>
-          <div class="text-sm text-slate-600">Urun bulunamadi.</div>
-        <% end %>
+            <%= render "form",
+                  product: @product,
+                  url: product_path(@product["id"]),
+                  method: :patch,
+                  submit_label: "Guncelle",
+                  submit_confirm: "Urun guncellensin mi?",
+                  remaining_photo_count: remaining_photo_count,
+                  existing_photo_count: existing_photo_count %>
+          <% else %>
+            <div class="text-secondary">Urun bulunamadi.</div>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+

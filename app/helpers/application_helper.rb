@@ -19,7 +19,7 @@
   end
 
   def filter_actions_row(class_name: nil, **options, &block)
-    classes = ["rt-filter-grid-actions", "flex", "w-full", "items-end", "justify-end", "gap-2", class_name, options.delete(:class)].compact.join(" ")
+    classes = ["rt-filter-grid-actions", "d-flex", "w-100", "align-items-end", "justify-content-end", "gap-2", class_name, options.delete(:class)].compact.join(" ")
     content_tag(:div, capture(&block), options.merge(class: classes))
   end
 

@@ -1,27 +1,30 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Müşteriyi Düzenle</h1>
-          <p class="text-sm text-slate-500">Firma bilgilerini güncelle.</p>
-        </div>
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Görüntüle", company_path(@company), class: "btn-primary w-full sm:w-auto" %>
-          <%= link_to "Arşivle", company_path(@company), data: { turbo_method: :delete, turbo_confirm: "Bu müşteriyi arşivlemek istediğinize emin misiniz?" }, class: "btn-danger w-full sm:w-auto" %>
-          <%= link_to "Listeye Dön", companies_path, class: "btn-secondary w-full sm:w-auto" %>
-          <%= home_nav_button(home_path) %>
+<div class="container-fluid py-2">
+  <div class="row g-2">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div>
+            <h1 class="h4 mb-1">Müşteriyi Düzenle</h1>
+            <p class="text-secondary mb-0">Firma bilgilerini güncelle.</p>
+          </div>
+          <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 w-100">
+            <%= link_to "Görüntüle", company_path(@company), class: "btn-primary w-100" %>
+            <%= link_to "Arşivle", company_path(@company), data: { turbo_method: :delete, turbo_confirm: "Bu müşteriyi arşivlemek istedişinize emin misiniz?" }, class: "btn-danger w-100" %>
+            <%= link_to "Listeye Dön", companies_path, class: "btn-secondary w-100" %>
+            <%= home_nav_button(home_path) %>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.45)]">
-      <%= render "form", company: @company %>
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <%= render "form", company: @company %>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-
-
-
 
 

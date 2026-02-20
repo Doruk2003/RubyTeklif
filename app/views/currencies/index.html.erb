@@ -1,149 +1,159 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-0 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Döviz Kurları</h1>
-          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @currencies.size %></span> kur</p>
-        </div>
-
-        <div class="flex flex-row gap-2 sm:w-auto sm:items-center sm:justify-end">
-          <%= filter_panel_toggle_button %>
-          <%= new_record_button("Yeni Kur", new_currency_path) %>
-          <%= home_nav_button(home_path) %>
-        </div>
-      </div>
-    </div>
-
-    <div class="hidden rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]" data-filter-panel>
-      <div class="mb-4 flex items-center gap-3">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
-      </div>
-
-      <%= filter_form_with url: currencies_path, layout: :two do |f| %>
-        <div>
-          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :scope,
-                options_for_select([
-                  ["Aktif", "active"],
-                  ["Arşiv", "archived"],
-                  ["Tüm Kayıtlar", "all"]
-                ], @scope || params[:scope] || "active"),
-                {},
-                class: "form-input" %>
-          <%= f.hidden_field :per_page, value: @per_page %>
-        </div>
-
-        <%= filter_actions_row do %>
-          <%= filter_submit_button %>
-          <%= clear_filter_button(currencies_path(per_page: @per_page)) %>
-        <% end %>
-      <% end %>
-    </div>
-
-    <div class="rounded-md bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="overflow-x-auto rt-currencies-table-wrap">
-        <table class="rt-table rt-pipeline-table min-w-full">
-          <thead>
-            <tr>
-              <th>Kod</th>
-              <th>Ad</th>
-              <th>Sembol</th>
-              <th class="text-right">1 Döviz = TL</th>
-              <th class="rt-col-center">Durum</th>
-              <th class="rt-col-center">Aksiyon</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% @currencies.each do |currency| %>
-              <tr>
-                <td class="font-medium text-slate-900"><%= currency["code"].to_s %></td>
-                <td><%= currency["name"].to_s %></td>
-                <td><%= currency["symbol"].to_s %></td>
-                <td class="text-right"><%= number_to_currency(currency["rate_to_try"], unit: "TL ", format: "%u%n") %></td>
-                <td class="rt-col-center">
-                  <% if currency["deleted_at"].present? %>
-                    <span class="status-circle bg-rose-600 text-white" title="Arşivde" aria-label="Arşivde">P</span>
-                  <% elsif currency["active"] %>
-                    <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
-                  <% else %>
-                    <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
-                  <% end %>
-                </td>
-                <td class="rt-col-center rt-action-cell">
-                  <details class="relative inline-block text-left rt-action-details">
-                    <summary class="list-none">
-                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-slate-300">
-                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="5" cy="12" r="1.6"/>
-                          <circle cx="12" cy="12" r="1.6"/>
-                          <circle cx="19" cy="12" r="1.6"/>
-                        </svg>
-                      </span>
-                    </summary>
-                    <div class="rt-action-menu absolute right-0 z-20 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg">
-                      <%= link_to "Düzenle", edit_currency_path(currency["id"]), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
-                      <% if currency["deleted_at"].present? %>
-                        <%= link_to "Geri Yükle",
-                              restore_currency_path(currency["id"]),
-                              data: { turbo_method: :patch, turbo_confirm: "Bu kuru geri yüklemek istiyor musunuz?" },
-                              class: "block rounded-lg px-3 py-2 text-emerald-700 hover:bg-emerald-50" %>
-                      <% else %>
-                        <%= link_to "Arşivle",
-                              currency_path(currency["id"]),
-                              data: { turbo_method: :delete, turbo_confirm: "Bu kuru arşivlemek istediğinize emin misiniz?" },
-                              class: "block rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50" %>
-                      <% end %>
-                    </div>
-                  </details>
-                </td>
-              </tr>
-            <% end %>
-
-            <% if @currencies.empty? %>
-              <tr>
-                <td colspan="6" class="py-12 text-center">
-                  <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kur tanımlanmadı</div>
-                    <div class="text-sm text-slate-500">İlk kuru eklemek için sağ üstteki butonu kullanın.</div>
-                  </div>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="rounded-md bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="flex items-center justify-between gap-3 text-sm">
-        <div class="text-slate-600">
-          Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
-          <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-1 text-xs">
-            <span class="text-slate-500">Sayfa boyutu:</span>
-            <% [25, 50, 100].each do |size| %>
-              <% active = @per_page == size %>
-              <%= link_to size.to_s, currencies_path(request.query_parameters.merge(page: 1, per_page: size)),
-                    class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
-            <% end %>
+<div class="container-fluid py-2">
+  <div class="row g-2">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div>
+            <h1 class="h4 mb-1">Döviz Kurları</h1>
+            <p class="text-secondary mb-0">Toplam <strong><%= @currencies.size %></strong> kur</p>
           </div>
 
-          <% if @has_prev %>
-            <%= link_to "Önceki", currencies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
-          <% end %>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <%= filter_panel_toggle_button %>
+            <%= new_record_button("Yeni Kur", new_currency_path) %>
+            <%= home_nav_button(home_path) %>
+          </div>
+        </div>
+      </div>
+    </div>
 
-          <% if @has_next %>
-            <%= link_to "Sonraki", currencies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+    <div class="col-12">
+      <div class="card shadow-sm hidden" data-filter-panel>
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <h2 class="h6 text-uppercase text-secondary mb-0">Filtreler</h2>
+          </div>
+
+          <%= filter_form_with url: currencies_path, layout: :two do |f| %>
+            <div>
+              <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :scope,
+                    options_for_select([
+                      ["Aktif", "active"],
+                      ["Arşiv", "archived"],
+                      ["Tüm Kayıtlar", "all"]
+                    ], @scope || params[:scope] || "active"),
+                    {},
+                    class: "form-input" %>
+              <%= f.hidden_field :per_page, value: @per_page %>
+            </div>
+
+            <%= filter_actions_row do %>
+              <%= filter_submit_button %>
+              <%= clear_filter_button(currencies_path(per_page: @per_page)) %>
+            <% end %>
           <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive rt-currencies-table-wrap">
+            <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
+              <thead>
+                <tr>
+                  <th>Kod</th>
+                  <th>Ad</th>
+                  <th>Sembol</th>
+                  <th class="text-end">1 Döviz = TL</th>
+                  <th class="rt-col-center">Durum</th>
+                  <th class="rt-col-center">Aksiyon</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% @currencies.each do |currency| %>
+                  <tr>
+                    <td class="fw-semibold"><%= currency["code"].to_s %></td>
+                    <td><%= currency["name"].to_s %></td>
+                    <td><%= currency["symbol"].to_s %></td>
+                    <td class="text-end"><%= number_to_currency(currency["rate_to_try"], unit: "TL ", format: "%u%n") %></td>
+                    <td class="rt-col-center">
+                      <% if currency["deleted_at"].present? %>
+                        <span class="status-circle bg-danger text-white" title="Arşivde" aria-label="Arşivde">P</span>
+                      <% elsif currency["active"] %>
+                        <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
+                      <% else %>
+                        <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
+                      <% end %>
+                    </td>
+                    <td class="rt-col-center rt-action-cell">
+                      <details class="position-relative d-inline-block text-start rt-action-details">
+                        <summary class="list-unstyled">
+                          <span class="d-inline-flex align-items-center justify-content-center rounded border bg-white text-secondary" style="width:2.25rem;height:2.25rem;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="5" cy="12" r="1.6"/>
+                              <circle cx="12" cy="12" r="1.6"/>
+                              <circle cx="19" cy="12" r="1.6"/>
+                            </svg>
+                          </span>
+                        </summary>
+                        <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm">
+                          <%= link_to "Düzenle", edit_currency_path(currency["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                          <% if currency["deleted_at"].present? %>
+                            <%= link_to "Geri Yükle",
+                                  restore_currency_path(currency["id"]),
+                                  data: { turbo_method: :patch, turbo_confirm: "Bu kuru geri yüklemek istiyor musunuz?" },
+                                  class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
+                          <% else %>
+                            <%= link_to "Arşivle",
+                                  currency_path(currency["id"]),
+                                  data: { turbo_method: :delete, turbo_confirm: "Bu kuru arşivlemek istedişinize emin misiniz?" },
+                                  class: "d-block rounded px-3 py-2 text-decoration-none text-danger rt-arrow-hover" %>
+                          <% end %>
+                        </div>
+                      </details>
+                    </td>
+                  </tr>
+                <% end %>
+
+                <% if @currencies.empty? %>
+                  <tr>
+                    <td colspan="6" class="text-center py-5">
+                      <div class="mx-auto" style="max-width: 420px;">
+                        <div class="fw-semibold mb-1">Henüz kur tanımlanmadı</div>
+                        <div class="text-secondary">İlk kuru eklemek için saş üstteki butonu kullanın.</div>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          <div class="text-secondary">
+            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="d-none d-sm-flex align-items-center gap-1">
+              <span class="small text-secondary">Sayfa boyutu:</span>
+              <% [25, 50, 100].each do |size| %>
+                <% active = @per_page == size %>
+                <%= link_to size.to_s, currencies_path(request.query_parameters.merge(page: 1, per_page: size)),
+                      class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
+              <% end %>
+            </div>
+
+            <% if @has_prev %>
+              <%= link_to "Önceki", currencies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <% else %>
+              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <% end %>
+
+            <% if @has_next %>
+              <%= link_to "Sonraki", currencies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+            <% else %>
+              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
@@ -194,3 +204,5 @@
     });
   });
 </script>
+
+

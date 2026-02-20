@@ -12,7 +12,12 @@ body {
   --rt-text-primary: #111827;
   --rt-text-muted: #64748b;
   --rt-border-subtle: rgba(15, 23, 42, 0.1);
-  --rt-surface-card: rgba(248, 250, 252, 0.9);
+  --rt-surface-card: #f8fafc;
+  --rt-surface-form-card: #f8fafc;
+  --rt-surface-list-card: #ffffff;
+  --rt-field-bg: #eef2f7;
+  --rt-field-border: #c7d1de;
+  --rt-field-text: #0f172a;
 
   --rt-radius-card: 6px;
   --rt-radius-control: 6px;
@@ -29,10 +34,10 @@ body {
   --rt-page-pad-bottom: 12px;
   --rt-page-offset-top: -1rem;
 
-  --rt-focus-border: #cbd5e1;
-  --rt-focus-shadow: 0 0 14px 2px rgba(15, 23, 42, 0.35);
-  --rt-select-focus-border: #cbd5e1;
-  --rt-select-focus-shadow: 0 0 14px 2px rgba(15, 23, 42, 0.42);
+  --rt-focus-border: #94a3b8;
+  --rt-focus-shadow: 0 0 0 3px rgba(148, 163, 184, 0.35);
+  --rt-select-focus-border: #94a3b8;
+  --rt-select-focus-shadow: 0 0 0 3px rgba(148, 163, 184, 0.35);
   --rt-select-active-bg: #2b2f36;
   --rt-select-active-text: #f8fafc;
   --rt-card-gap: var(--rt-space-2);
@@ -45,6 +50,41 @@ body {
   color: #111827;
   font-weight: 400;
   overflow-x: hidden;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Theme bridge: align cards, lists and form fields without changing markup */
+.bg-slate-50\/90,
+.bg-slate-50\/90[class] {
+  background-color: var(--rt-surface-form-card) !important;
+}
+
+.rt-page-card,
+.rt-card,
+.rt-product-section {
+  background: var(--rt-surface-form-card) !important;
+  border-color: var(--rt-border-subtle) !important;
+}
+
+.rt-table-wrap,
+.rt-companies-table-wrap,
+.rt-categories-table-wrap,
+.rt-currencies-table-wrap,
+.rt-products-table-wrap,
+.alp-table-wrap {
+  background: var(--rt-surface-list-card) !important;
+}
+
+.form-input,
+.form-textarea,
+select.form-input,
+.rt-custom-select-trigger {
+  background: var(--rt-field-bg) !important;
+  border-color: var(--rt-field-border) !important;
+  color: var(--rt-field-text) !important;
 }
 
 input:focus,
@@ -177,14 +217,31 @@ select option:focus {
   transition: background-color 180ms ease, color 180ms ease;
 }
 
-.rt-custom-select-option::before {
+.rt-submenu a,
+.rt-custom-select-option,
+.rt-arrow-hover {
+  position: relative;
+}
+
+.rt-submenu a {
+  --rt-arrow-shift: 8px;
+}
+
+.rt-custom-select-option,
+.rt-arrow-hover {
+  --rt-arrow-shift: 4px;
+}
+
+.rt-submenu a::before,
+.rt-custom-select-option::before,
+.rt-arrow-hover::before {
   content: "→";
   position: absolute;
   left: 10px;
   top: 50%;
   transform: translateY(-50%) translateX(0);
   color: #94a3b8;
-  transition: color 180ms ease, transform 220ms ease;
+  transition: color 180ms ease, transform 240ms ease;
 }
 
 .rt-custom-select-option:hover,
@@ -193,10 +250,18 @@ select option:focus {
   color: #f8fafc;
 }
 
+.rt-submenu a:hover,
+.rt-arrow-hover:hover {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.rt-submenu a:hover::before,
 .rt-custom-select-option:hover::before,
-.rt-custom-select-option.is-active::before {
+.rt-custom-select-option.is-active::before,
+.rt-arrow-hover:hover::before {
   color: #e2e8f0;
-  transform: translateY(-50%) translateX(4px);
+  transform: translateY(-50%) translateX(var(--rt-arrow-shift, 6px));
 }
 
 /* When hovering menu items, only hovered option stays highlighted */
@@ -518,6 +583,10 @@ table tbody tr:last-child::after {
   right: 0;
   margin-top: 0 !important;
   z-index: 130 !important;
+}
+
+.rt-action-menu .rt-arrow-hover {
+  padding-left: 2rem !important;
 }
 
 .rt-companies-table-wrap {
@@ -1159,27 +1228,6 @@ body:has(.rt-dashboard) .app-flash-wrap {
   border-radius: 4px;
   padding: 7px 10px 7px 36px;
   margin-bottom: 4px;
-  position: relative;
-}
-
-.rt-submenu a::before {
-  content: "→";
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  transition: transform 360ms ease, color 360ms ease;
-}
-
-.rt-submenu a:hover {
-  background: #0f172a;
-  color: #f8fafc;
-}
-
-.rt-submenu a:hover::before {
-  color: #e2e8f0;
-  transform: translateY(-50%) translateX(8px);
 }
 
 .rt-content {
@@ -1595,4 +1643,180 @@ body:has(.rt-dashboard) .app-flash-wrap {
     overflow-x: auto;
     overflow-y: hidden;
   }
+}
+
+/* Lux final overrides */
+:root {
+  --rt-page-bg: #f5f5f5;
+  --rt-surface-form-card: #ffffff;
+  --rt-surface-list-card: #fcfcfc;
+  --rt-field-bg: #ffffff;
+  --rt-field-border: #d5d5d5;
+  --rt-field-text: #212529;
+  --rt-focus-border: #1a1a1a;
+  --rt-focus-shadow: 0 0 0 0.2rem rgba(26, 26, 26, 0.2);
+  --rt-select-focus-border: #1a1a1a;
+  --rt-select-focus-shadow: 0 0 0 0.2rem rgba(26, 26, 26, 0.2);
+}
+
+html,
+body,
+.app-main,
+.rt-dashboard {
+  background: var(--rt-page-bg) !important;
+  color: #212529;
+}
+
+.btn-primary,
+.btn-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #1a1a1a !important;
+  border-radius: 0.25rem !important;
+  background: #1a1a1a !important;
+  color: #fff !important;
+  padding: 0.5rem 0.9rem !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.btn-primary:hover,
+.btn-filter:hover {
+  background: #000 !important;
+  border-color: #000 !important;
+}
+
+.btn-secondary,
+.btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d5d5d5 !important;
+  border-radius: 0.25rem !important;
+  background: #fff !important;
+  color: #555 !important;
+  padding: 0.5rem 0.9rem !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.btn-secondary:hover,
+.btn-clear:hover {
+  background: #f1f1f1 !important;
+  border-color: #bfbfbf !important;
+  color: #1a1a1a !important;
+}
+
+.btn-danger {
+  border: 1px solid #d9534f !important;
+  border-radius: 0.25rem !important;
+  background: #d9534f !important;
+  color: #fff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600 !important;
+}
+
+.btn-danger:hover {
+  border-color: #c9302c !important;
+  background: #c9302c !important;
+}
+
+.form-input,
+.form-textarea,
+.rt-custom-select-trigger,
+select.form-input {
+  border-radius: 0.25rem !important;
+  border: 1px solid var(--rt-field-border) !important;
+  background: var(--rt-field-bg) !important;
+  color: var(--rt-field-text) !important;
+  box-shadow: none !important;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.rt-custom-select-trigger:focus,
+select.form-input:focus {
+  border-color: var(--rt-focus-border) !important;
+  box-shadow: var(--rt-focus-shadow) !important;
+}
+
+.bg-slate-50\/90,
+.rt-page-card,
+.rt-card,
+.rt-product-section,
+.rt-product-form-card {
+  background: var(--rt-surface-form-card) !important;
+  border: 1px solid #e3e3e3 !important;
+  box-shadow: 0 0.25rem 0.65rem rgba(0, 0, 0, 0.05) !important;
+}
+
+.rt-table-wrap,
+.rt-companies-table-wrap,
+.rt-categories-table-wrap,
+.rt-currencies-table-wrap,
+.rt-products-table-wrap,
+.alp-table-wrap {
+  background: var(--rt-surface-list-card) !important;
+  border: 1px solid #e3e3e3 !important;
+  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.04) !important;
+}
+
+.badge-info,
+.badge-approve,
+.badge-warn,
+.badge-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-info {
+  background: #1a1a1a !important;
+  color: #fff !important;
+}
+
+.badge-approve,
+.badge-success {
+  background: #4caf50 !important;
+  color: #fff !important;
+}
+
+.badge-warn {
+  background: #f0ad4e !important;
+  color: #fff !important;
+}
+
+.status-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.status-circle-success {
+  background: #5cb85c !important;
+  color: #fff !important;
+}
+
+.status-circle-warn {
+  background: #f0ad4e !important;
+  color: #fff !important;
 }

@@ -1,268 +1,172 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-0 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <% active_filters = request.query_parameters.slice("q", "tax_number", "phone", "has_offers", "active", "scope").reject { |_, v| v.blank? } %>
-
-    <!-- Card 1: Header -->
-    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Müşteriler</h1>
-          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @companies.size %></span> müşteri</p>
-        </div>
-
-        <div class="flex flex-row gap-2 sm:w-auto sm:items-center sm:justify-end">
-          <%= filter_panel_toggle_button %>
-          <%= new_record_button("Yeni Müşteri", new_company_path) %>
-          <%= home_nav_button(home_path) %>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 1.1: Collapsible Filters -->
-    <div class="hidden rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]" data-filter-panel>
-      <div class="mb-4 flex items-center gap-3">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
+<div class="col-12">
+  <div class="card shadow-sm mb-3">
+    <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+      <div>
+        <h1 class="h4 mb-1">Müşteriler</h1>
+        <p class="text-secondary mb-0">Toplam <strong><%= @companies.size %></strong> müşteri</p>
       </div>
 
-      <% if active_filters.any? %>
-        <div class="mb-4 flex flex-wrap items-center gap-2 text-xs">
-          <div class="font-semibold text-slate-500">Aktif filtreler:</div>
-          <% active_filters.each do |key, value| %>
-            <% label = case key
-                      when "q" then "Ara"
-                      when "tax_number" then "VKN"
-                      when "phone" then "Telefon"
-                      when "has_offers" then "Teklif"
-                      when "active" then "Durum"
-                      when "scope" then "Kapsam"
-                      end %>
-            <% display = case key
-                        when "has_offers" then value.to_s == "1" ? "Var" : "Yok"
-                        when "active" then value.to_s == "1" ? "Aktif" : "Pasif"
-                        when "scope" then value.to_s == "archived" ? "Arşiv" : (value.to_s == "all" ? "Tüm Kayıtlar" : "Aktif")
-                        else value
-                        end %>
-            <%= link_to companies_path(request.query_parameters.except(key)),
-                  class: "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700 hover:border-slate-300" do %>
-              <span class="font-semibold text-slate-600"><%= label %>:</span>
-              <span><%= display %></span>
-              <span class="text-slate-400">×</span>
-            <% end %>
-          <% end %>
-          <%= link_to "Tümünü temizle", companies_path, class: "ml-1 text-slate-500 hover:text-slate-700" %>
-        </div>
-      <% end %>
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <%= filter_panel_toggle_button %>
+        <%= new_record_button("Yeni Müşteri", new_company_path) %>
+        <%= home_nav_button(home_path) %>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <%= filter_form_with url: companies_path, layout: :seven_wide_first do |f| %>
-        <div>
-          <%= f.label :q, "Firma Adı / Yetkili", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.search_field :q,
-                value: params[:q],
-                placeholder: "Örn: Acme, Ahmet",
-                class: "form-input" %>
-        </div>
+<div class="col-12">
+  <div class="card shadow-sm hidden mb-3" data-filter-panel>
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <h2 class="h6 text-uppercase text-secondary mb-0">Filtreler</h2>
+      </div>
 
-        <div>
-          <%= f.label :tax_number, "Vergi No", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.text_field :tax_number,
-                value: params[:tax_number],
-                placeholder: "VKN",
-                class: "form-input" %>
-        </div>
+      <%= form_with url: companies_path, method: :get, local: true, class: "filter-form" do |f| %>
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-6 col-lg-4">
+            <%= f.label :q, "Firma Adı / Yetkili", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.search_field :q,
+                 value: params[:q],
+                 placeholder: "Örn: Acme, Ahmet",
+                 class: "form-control form-control-sm",
+                 style: "width: 100%;" %>
+          </div>
 
-        <div>
-          <%= f.label :phone, "Telefon", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.search_field :phone,
-                value: params[:phone],
-                placeholder: "0555...",
-                class: "form-input" %>
-        </div>
+          <div class="col-12 col-md-6 col-lg-2">
+            <%= f.label :tax_number, "Vergi No", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.text_field :tax_number,
+                 value: params[:tax_number],
+                 placeholder: "VKN",
+                 class: "form-control form-control-sm",
+                 style: "width: 100%;" %>
+          </div>
 
-        <div>
-          <%= f.label :has_offers, "Teklif Durumu", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :has_offers,
-                options_for_select([
-                  ["Tümü", ""],
-                  ["Teklif Var", "1"],
-                  ["Teklif Yok", "0"]
-                ], params[:has_offers]),
-                {},
-                class: "form-input" %>
-        </div>
+          <div class="col-12 col-md-6 col-lg-2">
+            <%= f.label :phone, "Telefon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.search_field :phone,
+                 value: params[:phone],
+                 placeholder: "0555...",
+                 class: "form-control form-control-sm",
+                 style: "width: 100%;" %>
+          </div>
 
-        <div>
-          <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :active,
-                options_for_select([
-                  ["Tümü", ""],
-                  ["Aktif", "1"],
-                  ["Pasif", "0"]
-                ], params[:active]),
-                {},
-                class: "form-input" %>
-        </div>
+          <div class="col-12 col-md-6 col-lg-1">
+            <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :active,
+                 options_for_select([
+                   ["Tümü", ""],
+                   ["Aktif", "1"],
+                   ["Pasif", "0"]
+                 ], params[:active]),
+                 {},
+                 class: "form-select form-select-sm",
+                 style: "width: 100%;" %>
+          </div>
 
-        <div>
-          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :scope,
-                options_for_select([
-                  ["Aktif", "active"],
-                  ["Arşiv", "archived"],
-                  ["Tüm Kayıtlar", "all"]
-                ], @scope || params[:scope] || "active"),
-                {},
-                class: "form-input" %>
-        </div>
+          <div class="col-12 col-md-6 col-lg-1">
+            <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :scope,
+                 options_for_select([
+                   ["Aktif", "active"],
+                   ["Arşiv", "archived"],
+                   ["Tüm Kayıtlar", "all"]
+                 ], params[:scope] || "active"),
+                 {},
+                 class: "form-select form-select-sm",
+                 style: "width: 100%;" %>
+          </div>
 
-        <%= filter_actions_row do %>
-          <%= filter_submit_button %>
-          <%= clear_filter_button(companies_path) %>
-        <% end %>
+          <div class="col-12 col-lg-2">
+            <div class="d-flex gap-2">
+              <%= f.submit "Filtrele", class: "btn btn-sm btn-dark flex-fill" %>
+              <%= link_to "Temizle", companies_path, class: "btn btn-sm btn-warning flex-fill" %>
+            </div>
+          </div>
+        </div>
       <% end %>
     </div>
-<!-- Card 2: List -->
-    <div class="mt-0 rounded-md bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="card shadow-sm mb-3">
+    <div class="card-body p-0">
       <% current_sort = params[:sort].to_s %>
       <% current_dir = params[:dir].to_s == "asc" ? "asc" : "desc" %>
-      <div class="md:hidden divide-y divide-slate-200">
-        <% @companies.each do |company| %>
-          <div class="bg-white px-4 py-4">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="text-sm font-semibold text-slate-900"><%= company.name %></div>
-                <div class="mt-1 text-xs text-slate-500">
-                  Yetkili: <%= company.authorized_person.presence || "-" %>
-                </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <% if company.deleted_at.present? %>
-                  <span class="status-circle bg-rose-600 text-white" title="Arşivde" aria-label="Arşivde">P</span>
-                <% elsif company.active %>
-                  <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
-                <% else %>
-                  <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
-                <% end %>
-              </div>
-            </div>
-
-            <div class="mt-3 grid grid-cols-1 gap-2 text-sm text-slate-700">
-              <div>Telefon: <%= company.phone.present? ? link_to(format_phone(company.phone), "tel:#{phone_digits(company.phone)}", class: "text-slate-700 hover:text-slate-900") : "-" %></div>
-              <div>E-posta: <%= company.email.present? ? link_to(company.email, "mailto:#{company.email}", class: "text-slate-700 hover:text-slate-900") : "-" %></div>
-              <div>VKN: <%= format_tax_number(company.tax_number) %></div>
-              <div>Vergi Dairesi: <%= company.tax_office.presence || "-" %></div>
-            </div>
-
-            <div class="mt-3 flex items-center justify-between">
-              <div class="text-xs text-slate-500">Teklif</div>
-              <span class="badge-info"><%= company.offers_count || 0 %></span>
-            </div>
-
-            <div class="mt-2 flex items-center justify-between">
-              <div class="text-xs text-slate-500">Onay</div>
-              <span class="badge-approve">0</span>
-            </div>
-
-            <div class="mt-3 flex items-center gap-2">
-              <%= link_to "Gör", company_path(company), class: "btn-secondary w-full text-center" %>
-              <%= link_to "Düzenle", edit_company_path(company), class: "btn-secondary w-full text-center" %>
-              <% if company.deleted_at.present? %>
-                <%= link_to "Geri Yükle",
-                      restore_company_path(company),
-                      data: { turbo_method: :patch, turbo_confirm: "Bu kaydı geri yüklemek istiyor musunuz?" },
-                      class: "btn-secondary w-full text-center" %>
-              <% else %>
-                <%= link_to "Arşivle",
-                      company_path(company),
-                      data: { turbo_method: :delete, turbo_confirm: "Bu müşteriyi silmek istediğinize emin misiniz?" },
-                      class: "btn-secondary w-full text-center" %>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <% if @companies.empty? %>
-          <div class="px-5 py-12 text-center">
-            <div class="mx-auto max-w-sm">
-              <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı müşteri yok</div>
-              <div class="text-sm text-slate-500">İlk müşterinizi eklemek için sağ üstteki butonu kullanın.</div>
-            </div>
-          </div>
-        <% end %>
-      </div>
-
-      <div class="hidden overflow-x-auto md:block rt-companies-table-wrap">
-        <table class="rt-table rt-pipeline-table min-w-full">
+      <div class="table-responsive rt-companies-table-wrap">
+        <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
           <thead>
             <tr>
               <th>
                 <% next_dir = current_sort == "name" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Firma Adı</span>
                   <% if current_sort == "name" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th>
                 <% next_dir = current_sort == "authorized_person" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "authorized_person", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "authorized_person", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Yetkili Kişi</span>
                   <% if current_sort == "authorized_person" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th>
                 <% next_dir = current_sort == "phone" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "phone", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "phone", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Telefon</span>
                   <% if current_sort == "phone" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th>
                 <% next_dir = current_sort == "email" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "email", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "email", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Mail</span>
                   <% if current_sort == "email" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th>
                 <% next_dir = current_sort == "tax_number" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "tax_number", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "tax_number", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Vergi No</span>
                   <% if current_sort == "tax_number" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th>
                 <% next_dir = current_sort == "tax_office" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "tax_office", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "tax_office", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Vergi Dairesi</span>
                   <% if current_sort == "tax_office" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th class="rt-col-center">
                 <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "inline-flex w-full items-center justify-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Durum</span>
                   <% if current_sort == "active" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
               <th class="rt-col-center">
                 <% next_dir = current_sort == "offers_count" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "offers_count", dir: next_dir)), class: "inline-flex w-full items-center justify-center gap-2" do %>
+                <%= link_to companies_path(request.query_parameters.merge(sort: "offers_count", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
                   <span>Teklif</span>
                   <% if current_sort == "offers_count" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                   <% end %>
                 <% end %>
               </th>
@@ -274,52 +178,37 @@
           <tbody>
             <% @companies.each do |company| %>
               <tr>
-                <td class="font-medium text-slate-900">
-                  <%= company.name %>
-                </td>
-
-                <td>
-                  <%= company.authorized_person.presence || "-" %>
-                </td>
-
+                <td class="fw-semibold"><%= company.name %></td>
+                <td><%= company.authorized_person.presence || "-" %></td>
                 <td>
                   <% if company.phone.present? %>
-                    <%= link_to format_phone(company.phone), "tel:#{phone_digits(company.phone)}", class: "text-slate-700 hover:text-slate-900" %>
+                    <%= link_to format_phone(company.phone), "tel:#{phone_digits(company.phone)}", class: "text-decoration-none text-body" %>
                   <% else %>
                     -
                   <% end %>
                 </td>
-
                 <td>
                   <% if company.email.present? %>
-                    <%= link_to company.email, "mailto:#{company.email}", class: "text-slate-700 hover:text-slate-900" %>
+                    <%= link_to company.email, "mailto:#{company.email}", class: "text-decoration-none text-body" %>
                   <% else %>
                     -
                   <% end %>
                 </td>
+                <td><%= format_tax_number(company.tax_number) %></td>
+                <td><%= company.tax_office.presence || "-" %></td>
 
-                <td>
-                  <%= format_tax_number(company.tax_number) %>
-                </td>
-
-                <td>
-                  <%= company.tax_office.presence || "-" %>
+                <td class="rt-col-center">
+                  <% if company.deleted_at.present? %>
+                    <span class="status-circle bg-danger text-white" title="Arşivde" aria-label="Arşivde">P</span>
+                  <% elsif company.active %>
+                    <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
+                  <% else %>
+                    <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
+                  <% end %>
                 </td>
 
                 <td class="rt-col-center">
-                <% if company.deleted_at.present? %>
-                  <span class="status-circle bg-rose-600 text-white" title="Arşivde" aria-label="Arşivde">P</span>
-                <% elsif company.active %>
-                  <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
-                <% else %>
-                  <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
-                <% end %>
-                </td>
-
-                <td class="rt-col-center">
-                  <span class="badge-info">
-                    <%= company.offers_count || 0 %>
-                  </span>
+                  <span class="badge-info"><%= company.offers_count || 0 %></span>
                 </td>
 
                 <td class="rt-col-center">
@@ -327,29 +216,29 @@
                 </td>
 
                 <td class="rt-col-center rt-action-cell">
-                  <details class="relative inline-block text-left rt-action-details">
-                    <summary class="list-none">
-                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-slate-300">
-                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <details class="position-relative d-inline-block text-start rt-action-details">
+                    <summary class="list-unstyled">
+                      <span class="d-inline-flex align-items-center justify-content-center rounded border bg-white text-secondary" style="width:2.25rem;height:2.25rem;">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
                           <circle cx="5" cy="12" r="1.6"/>
                           <circle cx="12" cy="12" r="1.6"/>
                           <circle cx="19" cy="12" r="1.6"/>
                         </svg>
                       </span>
                     </summary>
-                    <div class="rt-action-menu absolute right-0 z-20 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg">
-                      <%= link_to "Gör", company_path(company), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
-                      <%= link_to "Düzenle", edit_company_path(company), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
+                    <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm">
+                      <%= link_to "Gör", company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                      <%= link_to "Düzenle", edit_company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                       <% if company.deleted_at.present? %>
                         <%= link_to "Geri Yükle",
-                              restore_company_path(company),
-                              data: { turbo_method: :patch, turbo_confirm: "Bu kaydı geri yüklemek istiyor musunuz?" },
-                              class: "block rounded-lg px-3 py-2 text-emerald-700 hover:bg-emerald-50" %>
+                             restore_company_path(company),
+                             data: { turbo_method: :patch, turbo_confirm: "Bu kaydı geri yüklemek istiyor musunuz?" },
+                             class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
                       <% else %>
                         <%= link_to "Arşivle",
-                              company_path(company),
-                              data: { turbo_method: :delete, turbo_confirm: "Bu müşteriyi silmek istediğinize emin misiniz?" },
-                              class: "block rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50" %>
+                             company_path(company),
+                             data: { turbo_method: :delete, turbo_confirm: "Bu müşteriyi silmek istediğinize emin misiniz?" },
+                             class: "d-block rounded px-3 py-2 text-decoration-none text-danger rt-arrow-hover" %>
                       <% end %>
                     </div>
                   </details>
@@ -359,10 +248,10 @@
 
             <% if @companies.empty? %>
               <tr>
-                <td colspan="10" class="py-12 text-center">
-                  <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kayıtlı müşteri yok</div>
-                    <div class="text-sm text-slate-500">İlk müşterinizi eklemek için sağ üstteki butonu kullanın.</div>
+                <td colspan="10" class="text-center py-5">
+                  <div class="mx-auto" style="max-width: 420px;">
+                    <div class="fw-semibold mb-1">Henüz kayıtlı müşteri yok</div>
+                    <div class="text-secondary">İlk müşterinizi eklemek için satış üstteki butonu kullanın.</div>
                   </div>
                 </td>
               </tr>
@@ -371,35 +260,34 @@
         </table>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="rounded-md bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="flex items-center justify-between gap-3 text-sm">
-        <div class="text-slate-600">
-          Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
-          <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-1 text-xs">
-            <span class="text-slate-500">Sayfa boyutu:</span>
-            <% [25, 50, 100].each do |size| %>
-              <% active = @per_page == size %>
-              <%= link_to size.to_s, companies_path(request.query_parameters.merge(page: 1, per_page: size)),
-                    class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
-            <% end %>
-          </div>
-          <% if @has_prev %>
-            <%= link_to "Önceki", companies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
-          <% end %>
-
-          <% if @has_next %>
-            <%= link_to "Sonraki", companies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+<div class="col-12">
+  <div class="card shadow-sm">
+    <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+      <div class="text-secondary">
+        Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <div class="d-none d-sm-flex align-items-center gap-1">
+          <span class="small text-secondary">Sayfa boyutu:</span>
+          <% [25, 50, 100].each do |size| %>
+            <% active = @per_page == size %>
+            <%= link_to size.to_s, companies_path(request.query_parameters.merge(page: 1, per_page: size)),
+                 class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
           <% end %>
         </div>
+        <% if @has_prev %>
+          <%= link_to "Önceki", companies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
+        <% else %>
+          <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Önceki</span>
+        <% end %>
+        <% if @has_next %>
+          <%= link_to "Sonraki", companies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
+        <% else %>
+          <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Sonraki</span>
+        <% end %>
       </div>
     </div>
   </div>
@@ -449,11 +337,3 @@
     });
   });
 </script>
-
-
-
-
-
-
-
-

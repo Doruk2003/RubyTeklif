@@ -1,215 +1,225 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-0 pb-3 pt-0">
-  <div class="w-full space-y-2">
+<div class="container-fluid py-2">
+  <div class="row g-2">
     <% active_filters = request.query_parameters.slice("q", "active", "scope").reject { |_, v| v.blank? } %>
 
-    <div class="mt-[-2rem] rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Kategoriler</h1>
-          <p class="text-sm text-slate-500">Toplam <span class="font-semibold text-slate-800"><%= @categories.size %></span> kategori</p>
-        </div>
-
-        <div class="flex flex-row gap-2 sm:w-auto sm:items-center sm:justify-end">
-          <%= filter_panel_toggle_button %>
-          <%= new_record_button("Yeni Kategori", new_category_path) %>
-          <%= list_nav_button(products_path, label: "Ürünler") %>
-        </div>
-      </div>
-    </div>
-
-    <div class="hidden rounded-md bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]" data-filter-panel>
-      <div class="mb-4 flex items-center gap-3">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-700">Filtreler</h2>
-      </div>
-
-      <% if active_filters.any? %>
-        <div class="mb-4 flex flex-wrap items-center gap-2 text-xs">
-          <div class="font-semibold text-slate-500">Aktif filtreler:</div>
-          <% active_filters.each do |key, value| %>
-            <% label = case key
-                      when "q" then "Ara"
-                      when "active" then "Durum"
-                      when "scope" then "Kapsam"
-                      end %>
-            <% display = case key
-                        when "active" then value.to_s == "1" ? "Aktif" : "Pasif"
-                        when "scope" then value.to_s == "archived" ? "Arşiv" : (value.to_s == "all" ? "Tüm Kayıtlar" : "Aktif")
-                        else value
-                        end %>
-            <%= link_to categories_path(request.query_parameters.except(key)),
-                  class: "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700 hover:border-slate-300" do %>
-              <span class="font-semibold text-slate-600"><%= label %>:</span>
-              <span><%= display %></span>
-              <span class="text-slate-400">×</span>
-            <% end %>
-          <% end %>
-          <%= link_to "Tümünü temizle", categories_path, class: "ml-1 text-slate-500 hover:text-slate-700" %>
-        </div>
-      <% end %>
-
-      <%= filter_form_with url: categories_path, layout: :four_wide_first do |f| %>
-        <div>
-          <%= f.label :q, "Kategori Ara", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.search_field :q, value: @q, placeholder: "Ad veya kod", class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :active,
-                options_for_select([
-                  ["Tümü", ""],
-                  ["Aktif", "1"],
-                  ["Pasif", "0"]
-                ], @active),
-                {},
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :scope, "Kapsam", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :scope,
-                options_for_select([
-                  ["Aktif", "active"],
-                  ["Arşiv", "archived"],
-                  ["Tüm Kayıtlar", "all"]
-                ], @scope || "active"),
-                {},
-                class: "form-input" %>
-          <%= f.hidden_field :per_page, value: @per_page %>
-        </div>
-
-        <%= filter_actions_row do %>
-          <%= filter_submit_button %>
-          <%= clear_filter_button(categories_path(per_page: @per_page)) %>
-        <% end %>
-      <% end %>
-    </div>
-
-    <div class="rounded-md bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <% current_sort = @sort.to_s %>
-      <% current_dir = @dir.to_s == "desc" ? "desc" : "asc" %>
-      <div class="overflow-x-auto rt-categories-table-wrap">
-        <table class="rt-table rt-pipeline-table min-w-full">
-          <thead>
-            <tr>
-              <th>
-                <% next_dir = current_sort == "name" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to categories_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
-                  <span>Ad</span>
-                  <% if current_sort == "name" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th>
-                <% next_dir = current_sort == "code" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to categories_path(request.query_parameters.merge(sort: "code", dir: next_dir)), class: "inline-flex items-center gap-2" do %>
-                  <span>Kod</span>
-                  <% if current_sort == "code" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th class="rt-col-center">
-                <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to categories_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "inline-flex w-full items-center justify-center gap-2" do %>
-                  <span>Durum</span>
-                  <% if current_sort == "active" %>
-                    <span class="text-xs text-slate-400"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th class="rt-col-center">Aksiyon</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% @categories.each do |category| %>
-              <tr>
-                <td class="font-medium text-slate-900"><%= category["name"].to_s %></td>
-                <td><%= category["code"].to_s %></td>
-                <td class="rt-col-center">
-                  <% if category["deleted_at"].present? %>
-                    <span class="status-circle bg-rose-600 text-white" title="Arşivde" aria-label="Arşivde">P</span>
-                  <% elsif category["active"] %>
-                    <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
-                  <% else %>
-                    <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
-                  <% end %>
-                </td>
-                <td class="rt-col-center rt-action-cell">
-                  <details class="relative inline-block text-left rt-action-details">
-                    <summary class="list-none">
-                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-slate-300">
-                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="5" cy="12" r="1.6"/>
-                          <circle cx="12" cy="12" r="1.6"/>
-                          <circle cx="19" cy="12" r="1.6"/>
-                        </svg>
-                      </span>
-                    </summary>
-                    <div class="rt-action-menu absolute right-0 z-20 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1 text-sm shadow-lg">
-                      <%= link_to "Düzenle", edit_category_path(category["id"]), class: "block rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50" %>
-                      <% if category["deleted_at"].present? %>
-                        <%= link_to "Geri Yükle",
-                              restore_category_path(category["id"]),
-                              data: { turbo_method: :patch, turbo_confirm: "Bu kategoriyi geri yüklemek istiyor musunuz?" },
-                              class: "block rounded-lg px-3 py-2 text-emerald-700 hover:bg-emerald-50" %>
-                      <% else %>
-                        <%= link_to "Arşivle",
-                              category_path(category["id"]),
-                              data: { turbo_method: :delete, turbo_confirm: "Bu kategoriyi arşivlemek istediğinize emin misiniz?" },
-                              class: "block rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50" %>
-                      <% end %>
-                    </div>
-                  </details>
-                </td>
-              </tr>
-            <% end %>
-
-            <% if @categories.empty? %>
-              <tr>
-                <td colspan="4" class="py-12 text-center">
-                  <div class="mx-auto max-w-sm">
-                    <div class="mb-2 text-sm font-semibold text-slate-700">Henüz kategori yok</div>
-                    <div class="text-sm text-slate-500">Sağ üstten yeni kategori ekleyebilirsiniz.</div>
-                  </div>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="rounded-md bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.30)]">
-      <div class="flex items-center justify-between gap-3 text-sm">
-        <div class="text-slate-600">
-          Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
-          <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-1 text-xs">
-            <span class="text-slate-500">Sayfa boyutu:</span>
-            <% [25, 50, 100].each do |size| %>
-              <% active = @per_page == size %>
-              <%= link_to size.to_s, categories_path(request.query_parameters.merge(page: 1, per_page: size)),
-                    class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
-            <% end %>
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div>
+            <h1 class="h4 mb-1">Kategoriler</h1>
+            <p class="text-secondary mb-0">Toplam <strong><%= @categories.size %></strong> kategori</p>
           </div>
 
-          <% if @has_prev %>
-            <%= link_to "Önceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <%= filter_panel_toggle_button %>
+            <%= new_record_button("Yeni Kategori", new_category_path) %>
+            <%= list_nav_button(products_path, label: "Ürünler") %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm hidden" data-filter-panel>
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <h2 class="h6 text-uppercase text-secondary mb-0">Filtreler</h2>
+          </div>
+
+          <% if active_filters.any? %>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+              <span class="small fw-semibold text-secondary">Aktif filtreler:</span>
+              <% active_filters.each do |key, value| %>
+                <% label = case key
+                          when "q" then "Ara"
+                          when "active" then "Durum"
+                          when "scope" then "Kapsam"
+                          end %>
+                <% display = case key
+                            when "active" then value.to_s == "1" ? "Aktif" : "Pasif"
+                            when "scope" then value.to_s == "archived" ? "Arşiv" : (value.to_s == "all" ? "Tüm Kayıtlar" : "Aktif")
+                            else value
+                            end %>
+                <%= link_to categories_path(request.query_parameters.except(key)),
+                      class: "badge rounded-pill text-bg-light border" do %>
+                  <span class="fw-semibold"><%= label %>:</span>
+                  <span><%= display %></span>
+                  <span>×</span>
+                <% end %>
+              <% end %>
+              <%= link_to "Tümünü temizle", categories_path, class: "small link-secondary" %>
+            </div>
           <% end %>
 
-          <% if @has_next %>
-            <%= link_to "Sonraki", categories_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+          <%= filter_form_with url: categories_path, layout: :four_wide_first do |f| %>
+            <div>
+              <%= f.label :q, "Kategori Ara", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.search_field :q, value: @q, placeholder: "Ad veya kod", class: "form-input" %>
+            </div>
+
+            <div>
+              <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :active,
+                    options_for_select([
+                      ["Tümü", ""],
+                      ["Aktif", "1"],
+                      ["Pasif", "0"]
+                    ], @active),
+                    {},
+                    class: "form-input" %>
+            </div>
+
+            <div>
+              <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :scope,
+                    options_for_select([
+                      ["Aktif", "active"],
+                      ["Arşiv", "archived"],
+                      ["Tüm Kayıtlar", "all"]
+                    ], @scope || "active"),
+                    {},
+                    class: "form-input" %>
+              <%= f.hidden_field :per_page, value: @per_page %>
+            </div>
+
+            <%= filter_actions_row do %>
+              <%= filter_submit_button %>
+              <%= clear_filter_button(categories_path(per_page: @per_page)) %>
+            <% end %>
           <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <% current_sort = @sort.to_s %>
+          <% current_dir = @dir.to_s == "desc" ? "desc" : "asc" %>
+          <div class="table-responsive rt-categories-table-wrap">
+            <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
+              <thead>
+                <tr>
+                  <th>
+                    <% next_dir = current_sort == "name" && current_dir == "asc" ? "desc" : "asc" %>
+                    <%= link_to categories_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                      <span>Ad</span>
+                      <% if current_sort == "name" %>
+                        <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓ %></span>
+                      <% end %>
+                    <% end %>
+                  </th>
+                  <th>
+                    <% next_dir = current_sort == "code" && current_dir == "asc" ? "desc" : "asc" %>
+                    <%= link_to categories_path(request.query_parameters.merge(sort: "code", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                      <span>Kod</span>
+                      <% if current_sort == "code" %>
+                        <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓ %></span>
+                      <% end %>
+                    <% end %>
+                  </th>
+                  <th class="rt-col-center">
+                    <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
+                    <%= link_to categories_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                      <span>Durum</span>
+                      <% if current_sort == "active" %>
+                        <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓ %></span>
+                      <% end %>
+                    <% end %>
+                  </th>
+                  <th class="rt-col-center">Aksiyon</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% @categories.each do |category| %>
+                  <tr>
+                    <td class="fw-semibold"><%= category["name"].to_s %></td>
+                    <td><%= category["code"].to_s %></td>
+                    <td class="rt-col-center">
+                      <% if category["deleted_at"].present? %>
+                        <span class="status-circle bg-danger text-white" title="Arşivde" aria-label="Arşivde">P</span>
+                      <% elsif category["active"] %>
+                        <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
+                      <% else %>
+                        <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
+                      <% end %>
+                    </td>
+                    <td class="rt-col-center rt-action-cell">
+                      <details class="position-relative d-inline-block text-start rt-action-details">
+                        <summary class="list-unstyled">
+                          <span class="d-inline-flex align-items-center justify-content-center rounded border bg-white text-secondary" style="width:2.25rem;height:2.25rem;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                              <circle cx="5" cy="12" r="1.6"/>
+                              <circle cx="12" cy="12" r="1.6"/>
+                              <circle cx="19" cy="12" r="1.6"/>
+                            </svg>
+                          </span>
+                        </summary>
+                        <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm">
+                          <%= link_to "Düzenle", edit_category_path(category["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                          <% if category["deleted_at"].present? %>
+                            <%= link_to "Geri Yükle",
+                                  restore_category_path(category["id"]),
+                                  data: { turbo_method: :patch, turbo_confirm: "Bu kategoriyi geri yüklemek istiyor musunuz?" },
+                                  class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
+                          <% else %>
+                            <%= link_to "Arşivle",
+                                  category_path(category["id"]),
+                                  data: { turbo_method: :delete, turbo_confirm: "Bu kategoriyi arşivlemek istedişinize emin misiniz?" },
+                                  class: "d-block rounded px-3 py-2 text-decoration-none text-danger rt-arrow-hover" %>
+                          <% end %>
+                        </div>
+                      </details>
+                    </td>
+                  </tr>
+                <% end %>
+
+                <% if @categories.empty? %>
+                  <tr>
+                    <td colspan="4" class="text-center py-5">
+                      <div class="mx-auto" style="max-width: 420px;">
+                        <div class="fw-semibold mb-1">Henüz kategori yok</div>
+                        <div class="text-secondary">Saş üstten yeni kategori ekleyebilirsiniz.</div>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          <div class="text-secondary">
+            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="d-none d-sm-flex align-items-center gap-1">
+              <span class="small text-secondary">Sayfa boyutu:</span>
+              <% [25, 50, 100].each do |size| %>
+                <% active = @per_page == size %>
+                <%= link_to size.to_s, categories_path(request.query_parameters.merge(page: 1, per_page: size)),
+                      class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
+              <% end %>
+            </div>
+
+            <% if @has_prev %>
+              <%= link_to "Önceki", categories_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <% else %>
+              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <% end %>
+
+            <% if @has_next %>
+              <%= link_to "Sonraki", categories_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+            <% else %>
+              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
@@ -260,3 +270,5 @@
     });
   });
 </script>
+
+

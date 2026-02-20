@@ -1,166 +1,171 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Admin Panel</h1>
-          <p class="text-sm text-slate-500">Kullanıcı rolleri</p>
-        </div>
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= filter_panel_toggle_button %>
-          <%= new_record_button("Yeni Kullanıcı", new_admin_user_path) %>
-          <%= button_to "CSV Export", export_admin_users_path(request.query_parameters), method: :post, class: "btn-secondary w-full sm:w-auto" %>
-          <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-full sm:w-auto" %>
+<div class="container-fluid py-2">
+  <div class="row g-2">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div>
+            <h1 class="h4 mb-1">Admin Panel</h1>
+            <p class="text-secondary mb-0">Kullanıcı rolleri</p>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <%= filter_panel_toggle_button %>
+            <%= new_record_button("Yeni Kullanıcı", new_admin_user_path) %>
+            <%= button_to "CSV Export", export_admin_users_path(request.query_parameters), method: :post, class: "btn-secondary w-100" %>
+            <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-100" %>
+          </div>
         </div>
       </div>
     </div>
 
     <% if @export.present? %>
-      <div class="rounded-2xl bg-slate-50/90 p-4 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div class="text-sm text-slate-700">
-            <% if @export[:status].to_s == "ready" %>
-              Son kullanıcı export'u hazır.
-            <% elsif @export[:status].to_s == "failed" %>
-              Kullanıcı export'u başarısız oldu. Tekrar deneyin.
-            <% else %>
-              Kullanıcı export'u hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
-            <% end %>
-          </div>
-          <div>
-            <% if @export[:status].to_s == "ready" %>
-              <%= link_to "CSV İndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
-            <% elsif @export[:status].to_s == "pending" %>
-              <%= link_to "Yenile", admin_users_path(request.query_parameters), class: "btn-secondary" %>
-            <% end %>
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+            <div class="small text-secondary">
+              <% if @export[:status].to_s == "ready" %>
+                Son kullanıcı export'u hazır.
+              <% elsif @export[:status].to_s == "failed" %>
+                Kullanıcı export'u başarısız oldu. Tekrar deneyin.
+              <% else %>
+                Kullanıcı export'u hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
+              <% end %>
+            </div>
+            <div>
+              <% if @export[:status].to_s == "ready" %>
+                <%= link_to "CSV İndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
+              <% elsif @export[:status].to_s == "pending" %>
+                <%= link_to "Yenile", admin_users_path(request.query_parameters), class: "btn-secondary" %>
+              <% end %>
+            </div>
           </div>
         </div>
       </div>
     <% end %>
 
-    <div class="rounded-2xl bg-slate-50/90 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="p-4 hidden" data-filter-panel>
-        <%= filter_form_with url: admin_users_path, layout: :four do |f| %>
-          <div>
-            <%= f.label :q, "E-posta", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.text_field :q, value: params[:q], class: "form-input" %>
-          </div>
-          <div>
-            <%= f.label :role, "Rol", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.select :role,
-                  options_for_select([
-                    ["Tüm Roller", ""],
-                    *Roles::ASSIGNABLE_ROLE_OPTIONS
-                  ], params[:role].to_s),
-                  {},
-                  class: "form-input" %>
-          </div>
-          <div>
-            <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.select :active,
-                  options_for_select([
-                    ["Tüm", ""],
-                    ["Aktif", "true"],
-                    ["Pasif", "false"]
-                  ], params[:active].to_s),
-                  {},
-                  class: "form-input" %>
-          </div>
-          <%= filter_actions_row(class_name: "items-end") do %>
-            <%= filter_submit_button %>
-            <%= clear_filter_button(admin_users_path) %>
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body hidden" data-filter-panel>
+          <%= filter_form_with url: admin_users_path, layout: :four do |f| %>
+            <div>
+              <%= f.label :q, "E-posta", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.text_field :q, value: params[:q], class: "form-input" %>
+            </div>
+            <div>
+              <%= f.label :role, "Rol", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :role,
+                    options_for_select([
+                      ["Tüm Roller", ""],
+                      *Roles::ASSIGNABLE_ROLE_OPTIONS
+                    ], params[:role].to_s),
+                    {},
+                    class: "form-input" %>
+            </div>
+            <div>
+              <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :active,
+                    options_for_select([
+                      ["Tüm", ""],
+                      ["Aktif", "true"],
+                      ["Pasif", "false"]
+                    ], params[:active].to_s),
+                    {},
+                    class: "form-input" %>
+            </div>
+            <%= filter_actions_row(class_name: "items-end") do %>
+              <%= filter_submit_button %>
+              <%= clear_filter_button(admin_users_path) %>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
+        </div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="sticky top-0 z-10">
-            <tr>
-              <th>E-posta</th>
-              <th class="text-center">Rol</th>
-              <th class="text-center">Durum</th>
-              <th class="text-right">Aksiyon</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-200 bg-white">
-            <% @users.each do |user| %>
-              <tr class="odd:bg-slate-50 even:bg-white hover:bg-slate-100/70">
-                <td><%= user["email"].to_s %></td>
-                <td class="text-center">
-                  <% role = user["role"].to_s %>
-                  <% role_class = Roles.role_badge_class(role) %>
-                  <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold <%= role_class %>"><%= role %></span>
-                </td>
-                <td class="text-center">
-                  <% if user["active"] == false %>
-                    <span class="badge-info">Pasif</span>
-                  <% else %>
-                    <span class="badge-success">Aktif</span>
-                  <% end %>
-                </td>
-                <td class="text-right">
-                  <%= link_to "Düzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
-                  <%= link_to "Şifre Sıfırla",
-                        reset_password_admin_user_path(user["id"]),
-                        method: :post,
-                        data: { turbo_confirm: "Parola sıfırlama maili gönderilsin mi?" },
-                        class: "btn-secondary" %>
-                  <% if user["active"] == false %>
-                    <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
-                  <% else %>
-                    <%= link_to "Pasif Et", disable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>E-posta</th>
+                  <th class="text-center">Rol</th>
+                  <th class="text-center">Durum</th>
+                  <th class="text-end">Aksiyon</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @users.each do |user| %>
+                  <tr>
+                    <td><%= user["email"].to_s %></td>
+                    <td class="text-center">
+                      <% role = user["role"].to_s %>
+                      <% role_class = Roles.role_badge_class(role) %>
+                      <span class="badge rounded-pill <%= role_class %>"><%= role %></span>
+                    </td>
+                    <td class="text-center">
+                      <% if user["active"] == false %>
+                        <span class="badge-info">Pasif</span>
+                      <% else %>
+                        <span class="badge-success">Aktif</span>
+                      <% end %>
+                    </td>
+                    <td class="text-end">
+                      <div class="d-inline-flex align-items-center gap-2">
+                        <%= link_to "Düzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
+                        <%= link_to "Şifre Sıfırla",
+                              reset_password_admin_user_path(user["id"]),
+                              method: :post,
+                              data: { turbo_confirm: "Parola sıfırlama maili gönderilsin mi?" },
+                              class: "btn-secondary" %>
+                        <% if user["active"] == false %>
+                          <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
+                        <% else %>
+                          <%= link_to "Pasif Et", disable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
+                        <% end %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
 
-            <% if @users.empty? %>
-              <tr>
-                <td colspan="4" class="py-12 text-center text-slate-500">Kullanıcı yok.</td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+                <% if @users.empty? %>
+                  <tr>
+                    <td colspan="4" class="text-center py-5 text-secondary">Kullanıcı yok.</td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 px-4 py-3 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="flex items-center justify-between gap-3 text-sm">
-        <div class="text-slate-600">
-          Sayfa <span class="font-semibold text-slate-800"><%= @page %></span>
-          <span class="text-slate-400">/</span>
-          <span><%= @per_page %> kayıt</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-1 text-xs">
-            <span class="text-slate-500">Sayfa boyutu:</span>
-            <% [25, 50, 100].each do |size| %>
-              <% active = @per_page == size %>
-              <%= link_to size.to_s, admin_users_path(request.query_parameters.merge(page: 1, per_page: size)),
-                    class: "rounded-md px-2 py-1 #{active ? 'bg-slate-800 text-white' : 'bg-white text-slate-700 border border-slate-200'}" %>
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          <div class="text-secondary">
+            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="d-none d-sm-flex align-items-center gap-1">
+              <span class="small text-secondary">Sayfa boyutu:</span>
+              <% [25, 50, 100].each do |size| %>
+                <% active = @per_page == size %>
+                <%= link_to size.to_s, admin_users_path(request.query_parameters.merge(page: 1, per_page: size)),
+                      class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
+              <% end %>
+            </div>
+            <% if @has_prev %>
+              <%= link_to "Önceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+            <% else %>
+              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+            <% end %>
+
+            <% if @has_next %>
+              <%= link_to "Sonraki", admin_users_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+            <% else %>
+              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
             <% end %>
           </div>
-          <% if @has_prev %>
-            <%= link_to "Önceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
-          <% end %>
-
-          <% if @has_next %>
-            <%= link_to "Sonraki", admin_users_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
-          <% else %>
-            <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
-          <% end %>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
-
-
-
 
 

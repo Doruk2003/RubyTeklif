@@ -3,163 +3,152 @@
 <% sale_vat_included = value_for.call(:sale_price_vat_included, false) %>
 <% cost_vat_included = value_for.call(:cost_price_vat_included, false) %>
 <% active_value = value_for.call(:active, true) %>
+<%= form_with url: url, method: method, scope: :product, local: true, class: "rt-product-form" do |f| %>
 
-<%= form_with url: url, method: method, scope: :product, local: true, class: "rt-product-form-compact" do |f| %>
-  <div class="rt-product-accordion">
-    <details class="rt-product-section" open>
-      <summary class="rt-product-section-title">Temel Bilgiler</summary>
-      <div class="rt-product-section-body rt-product-section-grid">
-        <div>
-          <%= f.label :sku, "Stok Kodu", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.text_field :sku, value: value_for.call(:sku), placeholder: "Bos birakilirsa otomatik uretilir", class: "form-input", autocomplete: "off" %>
-        </div>
+<!-- 1. CARD: TEMEL BİLGİLER -->
+<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+  <div class="row g-3 align-items-end">
+    <div class="col-12 col-md-6 col-lg-4">
+      <%= f.label :sku, "Stok Kodu ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :sku, value: value_for.call(:sku), placeholder: "Boş bırakılırsa otomatik üretilir", class: "form-control form-control-sm w-100", autocomplete: "off" %>
+    </div>
 
-        <div>
-          <%= f.label :barcode, "Barkod / GTIN", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.text_field :barcode, value: value_for.call(:barcode), placeholder: "Opsiyonel", class: "form-input", autocomplete: "off" %>
-        </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <%= f.label :name, "Ürün Adı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :name, value: value_for.call(:name), placeholder: "Örn: Çelik Kapı", class: "form-control form-control-sm w-100" %>
+    </div>
 
-        <div class="rt-col-span-full">
-          <%= f.label :name, "Urun Adi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.text_field :name, value: value_for.call(:name), placeholder: "Orn: Celik Kapi", class: "form-input" %>
-        </div>
+    <div class="col-12 col-md-6 col-lg-2">
+      <%= f.label :barcode, "Barkod / GTIN ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_field :barcode, value: value_for.call(:barcode), placeholder: "Opsiyonel", class: "form-control form-control-sm w-100", autocomplete: "off" %>
+    </div>
 
-        <div class="rt-col-span-full">
-          <%= f.label :description, "Aciklama", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.text_area :description, value: value_for.call(:description), rows: 2, placeholder: "Urun teknik/aciklayici bilgi", class: "form-input" %>
-        </div>
+    <div class="col-12 col-md-6 col-lg-2">
+      <%= f.label :is_stock_item, "Stok Ürünü ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :is_stock_item,
+            options_for_select([[ "Evet", "1" ], [ "Hayır", "0" ]], stock_value.to_s.in?(%w[true 1]) ? "1" : "0"),
+            {},
+            class: "form-select form-select-sm w-100" %>
+    </div>
 
-        <div>
-          <%= f.label :item_type, "Tip", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :item_type,
-                options_for_select(Products::UpsertForm::ITEM_TYPE_OPTIONS, value_for.call(:item_type)),
-                { prompt: "Tip Secin" },
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :unit, "Birim", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :unit,
-                options_for_select(Products::UpsertForm::UNIT_OPTIONS, value_for.call(:unit, "adet")),
-                {},
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :active, "Durum", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :active,
-                options_for_select([["Aktif", "1"], ["Pasif", "0"]], active_value.to_s.in?(%w[true 1]) ? "1" : "0"),
-                {},
-                class: "form-input" %>
-        </div>
-      </div>
-    </details>
-
-    <details class="rt-product-section">
-      <summary class="rt-product-section-title">Kategori ve Fiyat</summary>
-      <div class="rt-product-section-body rt-product-section-grid">
-        <div>
-          <div class="flex items-center justify-between gap-2">
-            <%= f.label :category_id, "Kategori", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= link_to "Yeni Kategori", new_category_path(return_to: request.fullpath), class: "text-xs font-medium text-sky-700 hover:text-sky-800" %>
-          </div>
-          <%= f.select :category_id,
-                options_for_select(@category_options, value_for.call(:category_id)),
-                { prompt: "Kategori secin" },
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between gap-2">
-            <%= f.label :brand_id, "Marka", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= link_to "Yeni Marka", new_brand_path(return_to: request.fullpath), class: "text-xs font-medium text-sky-700 hover:text-sky-800" %>
-          </div>
-          <%= f.select :brand_id,
-                options_for_select(@brand_options, value_for.call(:brand_id)),
-                { prompt: "Marka secmeden devam et" },
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :currency_id, "Para Birimi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :currency_id,
-                options_for_select([["Varsayilan (TRY)", ""]] + @currency_options, value_for.call(:currency_id)),
-                {},
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :vat_rate, "KDV Orani (%)", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.number_field :vat_rate, value: value_for.call(:vat_rate, 0), step: "0.01", class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :price, "Satis Fiyati", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <div class="mt-2 rt-price-inline-row">
-            <%= f.number_field :price, value: value_for.call(:price), step: "0.01", class: "form-input mt-0" %>
-            <%= f.select :sale_price_vat_included,
-                  options_for_select([["KDV Haric", "0"], ["KDV Dahil", "1"]], sale_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
-                  {},
-                  class: "form-input mt-0" %>
-          </div>
-        </div>
-
-        <div>
-          <%= f.label :cost_price, "Maliyet Fiyati", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <div class="mt-2 rt-price-inline-row">
-            <%= f.number_field :cost_price, value: value_for.call(:cost_price, 0), step: "0.01", class: "form-input mt-0" %>
-            <%= f.select :cost_price_vat_included,
-                  options_for_select([["KDV Haric", "0"], ["KDV Dahil", "1"]], cost_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
-                  {},
-                  class: "form-input mt-0" %>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <details class="rt-product-section">
-      <summary class="rt-product-section-title">Stok</summary>
-      <div class="rt-product-section-body rt-product-section-grid">
-        <div>
-          <%= f.label :is_stock_item, "Stok Urunu", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.select :is_stock_item,
-                options_for_select([["Evet", "1"], ["Hayir", "0"]], stock_value.to_s.in?(%w[true 1]) ? "1" : "0"),
-                {},
-                class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :stock_quantity, "Mevcut Stok", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.number_field :stock_quantity, value: value_for.call(:stock_quantity, 0), step: "0.01", class: "form-input" %>
-        </div>
-
-        <div>
-          <%= f.label :min_stock_level, "Minimum Stok", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.number_field :min_stock_level, value: value_for.call(:min_stock_level, 0), step: "0.01", class: "form-input" %>
-        </div>
-      </div>
-    </details>
-
-    <details class="rt-product-section">
-      <summary class="rt-product-section-title">Fotograf ve Kaydet</summary>
-      <div class="rt-product-section-body">
-        <div>
-          <%= f.label :photos, "Urun Fotografi", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-          <%= f.file_field :photos, multiple: true, accept: "image/*", class: "form-input", disabled: remaining_photo_count.to_i.zero? && !remaining_photo_count.nil? %>
-          <% if remaining_photo_count.nil? %>
-            <p class="mt-1 text-xs text-slate-500">Maksimum 6 adet fotograf yukleyebilirsiniz.</p>
-          <% else %>
-            <p class="mt-1 text-xs text-slate-500">
-              En fazla 6 adet fotograf yuklenebilir.
-              Mevcut: <%= existing_photo_count %>, kalan: <%= remaining_photo_count %>.
-            </p>
-          <% end %>
-        </div>
-
-        <div class="mt-3">
-          <%= f.submit submit_label, class: "btn-primary w-full", data: { turbo_confirm: submit_confirm } %>
-        </div>
-      </div>
-    </details>
+    <div class="col-12">
+      <%= f.label :description, "Açıklama ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.text_area :description, value: value_for.call(:description), rows: 2, placeholder: "Ürün teknik/açıklayıcı bilgi", class: "form-control form-control-sm w-100" %>
+    </div>
   </div>
+</div>
+
+<!-- 2. CARD: KATEGORİ VE FİYAT -->
+<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+  <div class="row g-3 align-items-end">
+    <!-- Kategori - Tip - Marka - Birim (Aynı Satır) -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+        <%= f.label :category_id, "Kategori ", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
+        <%= link_to "Yeni Kategori ", new_category_path(return_to: request.fullpath), class: "small link-secondary text-decoration-none" %>
+      </div>
+      <%= f.select :category_id,
+            options_for_select(@category_options, value_for.call(:category_id)),
+            { prompt: "Kategori seçin" },
+            class: "form-select form-select-sm w-100" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :item_type, "Tip ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :item_type,
+            options_for_select(Products::UpsertForm::ITEM_TYPE_OPTIONS, value_for.call(:item_type)),
+            { prompt: "Tip Seçin" },
+            class: "form-select form-select-sm w-100" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+        <%= f.label :brand_id, "Marka ", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
+        <%= link_to "Yeni Marka ", new_brand_path(return_to: request.fullpath), class: "small link-secondary text-decoration-none" %>
+      </div>
+      <%= f.select :brand_id,
+            options_for_select(@brand_options, value_for.call(:brand_id)),
+            { prompt: "Marka seçmeden devam et" },
+            class: "form-select form-select-sm w-100" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :unit, "Birim ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :unit,
+            options_for_select(Products::UpsertForm::UNIT_OPTIONS, value_for.call(:unit, "adet")),
+            {},
+            class: "form-select form-select-sm w-100" %>
+    </div>
+
+    <!-- Satış Fiyatı + KDV Hariç/Dahil -->
+    <div class="col-12 col-md-6 col-lg-6">
+      <%= f.label :price, "Satış Fiyatı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <div class="d-flex gap-2">
+        <%= f.number_field :price, value: value_for.call(:price), step: "0.01", class: "form-control form-control-sm flex-fill" %>
+        <%= f.select :sale_price_vat_included,
+              options_for_select([[ "KDV Hariç", "0" ], [ "KDV Dahil", "1" ]], sale_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
+              {},
+              class: "form-select form-select-sm" %>
+      </div>
+    </div>
+
+    <!-- Maliyet Fiyatı + KDV Hariç/Dahil + KDV Oranı -->
+    <div class="col-12 col-md-6 col-lg-6">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+        <%= f.label :cost_price, "Maliyet Fiyatı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
+        <%= f.label :vat_rate, "KDV Oranı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
+      </div>
+      <div class="d-flex gap-2">
+        <%= f.number_field :cost_price, value: value_for.call(:cost_price, 0), step: "0.01", class: "form-control form-control-sm flex-fill" %>
+        <%= f.select :cost_price_vat_included,
+              options_for_select([[ "KDV Hariç", "0" ], [ "KDV Dahil", "1" ]], cost_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
+              {},
+              class: "form-select form-select-sm" %>
+        <%= f.select :vat_rate,
+              options_for_select([[ "0%", "0" ], [ "8%", "8" ], [ "10%", "10" ], [ "18%", "18" ], [ "20%", "20" ]], value_for.call(:vat_rate, "0")),
+              {},
+              class: "form-select form-select-sm" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. CARD: STOK BİLGİLERİ -->
+<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+  <div class="row g-3 align-items-end">
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :stock_quantity, "Mevcut Stok ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.number_field :stock_quantity, value: value_for.call(:stock_quantity, 0), step: "0.01", class: "form-control form-control-sm w-100" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :min_stock_level, "Minimum Stok ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.number_field :min_stock_level, value: value_for.call(:min_stock_level, 0), step: "0.01", class: "form-control form-control-sm w-100" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :active, "Durum ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :active,
+            options_for_select([[ "Aktif", "1" ], [ "Pasif", "0" ]], active_value.to_s.in?(%w[true 1]) ? "1" : "0"),
+            {},
+            class: "form-select form-select-sm w-100" %>
+    </div>
+  </div>
+</div>
+
+<!-- 4. CARD: FOTOĞRAF -->
+<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+  <h6 class="text-uppercase fw-semibold text-secondary mb-2">Fotoğraf</h6>
+  <p class="small text-muted mb-2">Maksimum 6 adet fotoğraf yükleyebilirsiniz.</p>
+  <div class="d-flex gap-2 flex-wrap">
+    <%= f.file_field :photos, multiple: true, class: "d-none", id: "photo_upload" %>
+    <label for="photo_upload" class="btn btn-outline-secondary btn-sm">Dosyaları Seç</label>
+    <span class="text-muted">Dosya seçilmemiş</span>
+  </div>
+  <p class="small text-muted mt-1">Maksimum 6 adet fotoğraf yüklenebilirsiniz.</p>
+</div>
+
+<div class="d-grid">
+  <button type="submit" class="btn btn-dark py-2">KAYDET</button>
+</div>
 <% end %>

@@ -1,42 +1,44 @@
-﻿<div class="min-h-screen bg-[#f6f3ee] px-4 pb-3 pt-0">
-  <div class="w-full space-y-2">
-    <div class="mt-[-2rem] rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Admin Panel</h1>
-          <p class="text-sm text-slate-500">Yeni kullanıcı</p>
-        </div>
-        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <%= link_to "Listeye Dön", admin_users_path, class: "btn-secondary w-full sm:w-auto" %>
+<div class="container-fluid py-2">
+  <div class="row g-2">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div>
+            <h1 class="h4 mb-1">Admin Panel</h1>
+            <p class="text-secondary mb-0">Yeni kullanıcı</p>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <%= link_to "Listeye Dön", admin_users_path, class: "btn-secondary w-100" %>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="rounded-2xl bg-slate-50/90 p-5 shadow-[0_18px_40px_-16px_rgba(15,23,42,0.25)]">
-      <div class="rounded-2xl bg-white p-6 shadow-sm">
-        <%= form_with url: admin_users_path, method: :post, local: true, scope: :user, class: "space-y-4" do |f| %>
-          <div>
-            <%= f.label :email, "E-posta", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.email_field :email, value: @user&.[]("email"), class: "form-input", required: true, autocomplete: "email" %>
-          </div>
-          <div>
-            <%= f.label :password, "Şifre", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.password_field :password, class: "form-input", required: true, autocomplete: "new-password" %>
-          </div>
-          <div>
-            <%= f.label :role, "Rol", class: "block text-xs font-semibold uppercase tracking-wide text-slate-800/70" %>
-            <%= f.select :role,
-                  options_for_select(Roles::ASSIGNABLE_ROLE_OPTIONS, @user&.[]("role").to_s),
-                  {},
-                  class: "form-input" %>
-          </div>
-          <%= f.submit "Oluştur", class: "btn-primary w-full", data: { turbo_confirm: "Yeni kullanıcı oluşturulsun mu?" } %>
-        <% end %>
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <%= form_with url: admin_users_path, method: :post, local: true, scope: :user, class: "d-grid gap-3" do |f| %>
+            <div>
+              <%= f.label :email, "E-posta", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.email_field :email, value: @user&.[]("email"), class: "form-input", required: true, autocomplete: "email" %>
+            </div>
+            <div>
+              <%= f.label :password, "Şifre", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.password_field :password, class: "form-input", required: true, autocomplete: "new-password" %>
+            </div>
+            <div>
+              <%= f.label :role, "Rol", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :role,
+                    options_for_select(Roles::ASSIGNABLE_ROLE_OPTIONS, @user&.[]("role").to_s),
+                    {},
+                    class: "form-input" %>
+            </div>
+            <%= f.submit "Oluştur", class: "btn-primary w-100", data: { turbo_confirm: "Yeni kullanıcı oluşturulsun mu?" } %>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-
 
 

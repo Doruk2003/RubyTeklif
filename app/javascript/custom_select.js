@@ -42,7 +42,7 @@ function buildCustomSelect(select) {
   Array.from(select.options).forEach((option) => {
     const item = document.createElement("button")
     item.type = "button"
-    item.className = "rt-custom-select-option"
+    item.className = "rt-custom-select-option rt-arrow-hover"
     item.dataset.value = option.value
     item.textContent = option.text
     item.setAttribute("role", "option")
