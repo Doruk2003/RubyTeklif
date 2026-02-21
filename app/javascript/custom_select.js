@@ -19,7 +19,6 @@ function syncState(root, select, trigger, menu) {
 }
 
 function buildCustomSelect(select) {
-  if (!select.classList.contains("form-input")) return
   if (select.multiple) return
   if (select.closest(`[${ROOT_ATTR}]`)) return
   if (select.dataset.nativeSelect === "true") return
@@ -30,7 +29,11 @@ function buildCustomSelect(select) {
 
   const trigger = document.createElement("button")
   trigger.type = "button"
-  trigger.className = "rt-custom-select-trigger"
+
+  // Orijinal select'in boyut class'larını butona kopyala (margin kırmamak için)
+  const classesToKeep = Array.from(select.classList).filter(c => c.startsWith("form-select") || c === "w-100" || c === "form-input")
+  trigger.className = `rt-custom-select-trigger ${classesToKeep.join(" ")}`
+
   trigger.setAttribute("aria-haspopup", "listbox")
   trigger.setAttribute("aria-expanded", "false")
   trigger.innerHTML = '<span class="rt-custom-select-label"></span><span class="rt-custom-select-arrow">▾</span>'
@@ -91,7 +94,7 @@ function buildCustomSelect(select) {
 }
 
 export function initCustomSelects() {
-  document.querySelectorAll("select.form-input").forEach((select) => {
+  document.querySelectorAll("select").forEach((select) => {
     buildCustomSelect(select)
   })
 }

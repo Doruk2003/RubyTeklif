@@ -1,13 +1,12 @@
 <div class="container-fluid py-2">
-  <div class="row g-2">
+  <div class="row g-3">
     <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
           <div>
-            <h1 class="h4 mb-1">Ürünler</h1>
+            <h1 class="h4 mb-1">ÜRÜN LİSTESİ</h1>
             <p class="text-secondary mb-0">Toplam <strong><%= @products.size %></strong> ürün</p>
           </div>
-
           <div class="d-flex flex-wrap align-items-center gap-2">
             <%= filter_panel_toggle_button %>
             <%= new_record_button("Yeni Ürün", new_product_path) %>
@@ -16,45 +15,51 @@
         </div>
       </div>
     </div>
-
-    <div class="col-12">
-      <div class="card shadow-sm hidden" data-filter-panel>
+    <div class="col-12 hidden" data-filter-panel>
+      <div class="card shadow-sm">
         <div class="card-body">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <h2 class="h6 text-uppercase text-secondary mb-0">Filtreler</h2>
-          </div>
-
-          <%= filter_form_with url: products_path, layout: :three_wide_first do |f| %>
-            <div>
-              <%= f.label :category, "Kategori", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :category,
-                    options_for_select([["Tüm Kategoriler", ""]] + @category_options, @category),
-                    {},
-                    class: "form-input" %>
+          <%= form_with url: products_path, method: :get, local: true, class: "filter-form" do |f| %>
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :sku, "SKU", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.search_field :sku, value: params[:sku], placeholder: "Stok Kodu", class: "form-control form-control-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :barcode, "Barkod", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.search_field :barcode, value: params[:barcode], placeholder: "Barkod No", class: "form-control form-control-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :name, "Ürün", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.search_field :name, value: params[:name], placeholder: "Ürün Adı", class: "form-control form-control-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :category, "Kategori", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :category, options_for_select([["Tümü", ""]] + @category_options, @category || params[:category]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :item_type, "Tip", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :item_type, options_for_select([["Tümü", ""]] + Products::UpsertForm::ITEM_TYPE_OPTIONS, params[:item_type]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :brand, "Marka", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :brand, options_for_select([["Tümü", ""]] + @brand_options, params[:brand]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :scope, options_for_select([["Aktif", "active"], ["Arşiv", "archived"], ["Tüm Kayıtlar", "all"]], @scope || params[:scope] || "active"), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="d-flex gap-2 w-100">
+                  <%= f.submit "FİLTRELE", class: "btn btn-sm btn-dark flex-fill" %>
+                  <%= link_to "TEMİZLE", products_path(per_page: @per_page), class: "btn btn-sm btn-warning flex-fill" %>
+                  <%= f.hidden_field :per_page, value: @per_page %>
+                </div>
+              </div>
             </div>
-
-            <div>
-              <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :scope,
-                    options_for_select([
-                      ["Aktif", "active"],
-                      ["Arşiv", "archived"],
-                      ["Tüm Kayıtlar", "all"]
-                    ], @scope || params[:scope] || "active"),
-                    {},
-                    class: "form-input" %>
-              <%= f.hidden_field :per_page, value: @per_page %>
-            </div>
-
-            <%= filter_actions_row do %>
-              <%= filter_submit_button %>
-              <%= clear_filter_button(products_path(per_page: @per_page)) %>
-            <% end %>
           <% end %>
         </div>
       </div>
     </div>
-
     <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-body p-0">
@@ -77,7 +82,6 @@
                   <th class="rt-col-center">Aksiyon</th>
                 </tr>
               </thead>
-
               <tbody>
                 <% @products.each do |product| %>
                   <tr>
@@ -131,7 +135,6 @@
                     </td>
                   </tr>
                 <% end %>
-
                 <% if @products.empty? %>
                   <tr>
                     <td colspan="13" class="text-center py-5">
@@ -148,7 +151,6 @@
         </div>
       </div>
     </div>
-
     <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -164,17 +166,15 @@
                       class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
               <% end %>
             </div>
-
             <% if @has_prev %>
-              <%= link_to "Önceki", products_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+              <%= link_to "Önceki", products_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+              <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Önceki</span>
             <% end %>
-
             <% if @has_next %>
-              <%= link_to "Sonraki", products_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+              <%= link_to "Sonraki", products_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+              <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Sonraki</span>
             <% end %>
           </div>
         </div>
@@ -182,7 +182,6 @@
     </div>
   </div>
 </div>
-
 <script>
   document.addEventListener("turbo:load", function () {
     var tableWrap = document.querySelector(".rt-products-table-wrap");
@@ -227,5 +226,3 @@
     });
   });
 </script>
-
-

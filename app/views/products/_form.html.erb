@@ -6,24 +6,24 @@
 <%= form_with url: url, method: method, scope: :product, local: true, class: "rt-product-form" do |f| %>
 
 <!-- 1. CARD: TEMEL BİLGİLER -->
-<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
   <div class="row g-3 align-items-end">
-    <div class="col-12 col-md-6 col-lg-4">
+    <div class="col-12 col-md-6 col-lg-3">
       <%= f.label :sku, "Stok Kodu ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
       <%= f.text_field :sku, value: value_for.call(:sku), placeholder: "Boş bırakılırsa otomatik üretilir", class: "form-control form-control-sm w-100", autocomplete: "off" %>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-4">
+    <div class="col-12 col-md-6 col-lg-3">
       <%= f.label :name, "Ürün Adı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
       <%= f.text_field :name, value: value_for.call(:name), placeholder: "Örn: Çelik Kapı", class: "form-control form-control-sm w-100" %>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-2">
+    <div class="col-12 col-md-6 col-lg-3">
       <%= f.label :barcode, "Barkod / GTIN ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
       <%= f.text_field :barcode, value: value_for.call(:barcode), placeholder: "Opsiyonel", class: "form-control form-control-sm w-100", autocomplete: "off" %>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-2">
+    <div class="col-12 col-md-6 col-lg-3">
       <%= f.label :is_stock_item, "Stok Ürünü ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
       <%= f.select :is_stock_item,
             options_for_select([[ "Evet", "1" ], [ "Hayır", "0" ]], stock_value.to_s.in?(%w[true 1]) ? "1" : "0"),
@@ -39,7 +39,7 @@
 </div>
 
 <!-- 2. CARD: KATEGORİ VE FİYAT -->
-<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
   <div class="row g-3 align-items-end">
     <!-- Kategori - Tip - Marka - Birim (Aynı Satır) -->
     <div class="col-12 col-md-6 col-lg-3">
@@ -80,42 +80,47 @@
             class: "form-select form-select-sm w-100" %>
     </div>
 
-    <!-- Satış Fiyatı + KDV Hariç/Dahil -->
-    <div class="col-12 col-md-6 col-lg-6">
+    <!-- Satış Fiyatı -->
+    <div class="col-12 col-md-6 col-lg-3">
       <%= f.label :price, "Satış Fiyatı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <div class="d-flex gap-2">
-        <%= f.number_field :price, value: value_for.call(:price), step: "0.01", class: "form-control form-control-sm flex-fill" %>
-        <%= f.select :sale_price_vat_included,
-              options_for_select([[ "KDV Hariç", "0" ], [ "KDV Dahil", "1" ]], sale_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
-              {},
-              class: "form-select form-select-sm" %>
-      </div>
+      <%= f.number_field :price, value: value_for.call(:price), step: "0.01", class: "form-control form-control-sm w-100" %>
     </div>
 
-    <!-- Maliyet Fiyatı + KDV Hariç/Dahil + KDV Oranı -->
-    <div class="col-12 col-md-6 col-lg-6">
-      <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
-        <%= f.label :cost_price, "Maliyet Fiyatı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
-        <%= f.label :vat_rate, "KDV Oranı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-0" %>
-      </div>
-      <div class="d-flex gap-2">
-        <%= f.number_field :cost_price, value: value_for.call(:cost_price, 0), step: "0.01", class: "form-control form-control-sm flex-fill" %>
-        <%= f.select :cost_price_vat_included,
-              options_for_select([[ "KDV Hariç", "0" ], [ "KDV Dahil", "1" ]], cost_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
-              {},
-              class: "form-select form-select-sm" %>
-        <%= f.select :vat_rate,
-              options_for_select([[ "0%", "0" ], [ "8%", "8" ], [ "10%", "10" ], [ "18%", "18" ], [ "20%", "20" ]], value_for.call(:vat_rate, "0")),
-              {},
-              class: "form-select form-select-sm" %>
-      </div>
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :sale_price_vat_included, "Satış KDV Durumu ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :sale_price_vat_included,
+            options_for_select([[ "KDV Hariç", "0" ], [ "KDV Dahil", "1" ]], sale_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
+            {},
+            class: "form-select form-select-sm w-100" %>
+    </div>
+
+    <!-- Maliyet Fiyatı -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :cost_price, "Maliyet Fiyatı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.number_field :cost_price, value: value_for.call(:cost_price, 0), step: "0.01", class: "form-control form-control-sm w-100" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :cost_price_vat_included, "Maliyet KDV Durumu ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :cost_price_vat_included,
+            options_for_select([[ "KDV Hariç", "0" ], [ "KDV Dahil", "1" ]], cost_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
+            {},
+            class: "form-select form-select-sm w-100" %>
     </div>
   </div>
 </div>
 
 <!-- 3. CARD: STOK BİLGİLERİ -->
-<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
   <div class="row g-3 align-items-end">
+    <div class="col-12 col-md-6 col-lg-3">
+      <%= f.label :vat_rate, "KDV Oranı ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+      <%= f.select :vat_rate,
+            options_for_select([[ "0%", "0" ], [ "8%", "8" ], [ "10%", "10" ], [ "18%", "18" ], [ "20%", "20" ]], value_for.call(:vat_rate, "0")),
+            {},
+            class: "form-select form-select-sm w-100" %>
+    </div>
+
     <div class="col-12 col-md-6 col-lg-3">
       <%= f.label :stock_quantity, "Mevcut Stok ", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
       <%= f.number_field :stock_quantity, value: value_for.call(:stock_quantity, 0), step: "0.01", class: "form-control form-control-sm w-100" %>
@@ -137,18 +142,107 @@
 </div>
 
 <!-- 4. CARD: FOTOĞRAF -->
-<div class="card mb-4 bg-white border border-1 border-light p-4 rounded">
+<style>
+  .preview-image-wrapper {
+    width: 3.5rem;
+    height: 3.5rem;
+    position: relative;
+    transition: transform 0.2s ease-in-out, z-index 0.2s step-end;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    z-index: 1;
+    border: 1px solid #dee2e6;
+  }
+  .preview-image-wrapper:hover {
+    transform: scale(3);
+    z-index: 10;
+    transition: transform 0.2s ease-in-out, z-index 0s step-start;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+  }
+  .preview-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
   <h6 class="text-uppercase fw-semibold text-secondary mb-2">Fotoğraf</h6>
-  <p class="small text-muted mb-2">Maksimum 6 adet fotoğraf yükleyebilirsiniz.</p>
-  <div class="d-flex gap-2 flex-wrap">
-    <%= f.file_field :photos, multiple: true, class: "d-none", id: "photo_upload" %>
-    <label for="photo_upload" class="btn btn-outline-secondary btn-sm">Dosyaları Seç</label>
-    <span class="text-muted">Dosya seçilmemiş</span>
+  
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <!-- SOL: YÜKLEME BUTONLARI -->
+    <div>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <%= f.file_field :photos, multiple: true, accept: "image/png, image/jpeg, image/jpg, image/webp", class: "d-none", id: "photo_upload" %>
+        <label for="photo_upload" class="btn btn-warning btn-sm mb-0">Dosyaları Seç</label>
+        <span class="text-muted small" id="photo_file_names">Dosya seçilmemiş</span>
+      </div>  
+      <p class="small text-muted mb-0 mt-2">Maksimum 6 adet fotoğraf (PNG, JPG, WEBP) yükleyebilirsiniz.</p>
+    </div>
+
+    <!-- SAĞ: PREVIEW CONTAINER -->
+    <div id="image_previews_container" class="d-flex gap-2 flex-wrap justify-content-end d-none"></div>
   </div>
-  <p class="small text-muted mt-1">Maksimum 6 adet fotoğraf yüklenebilirsiniz.</p>
 </div>
 
-<div class="d-grid">
+<div class="d-grid mt-4">
   <button type="submit" class="btn btn-dark py-2">KAYDET</button>
 </div>
 <% end %>
+
+<script>
+  document.addEventListener('turbo:load', setupPhotoUpload);
+  document.addEventListener('DOMContentLoaded', setupPhotoUpload);
+
+  function setupPhotoUpload() {
+    const photoUpload = document.getElementById('photo_upload');
+    const photoFileNames = document.getElementById('photo_file_names');
+    const imagePreviewsContainer = document.getElementById('image_previews_container');
+
+    if (photoUpload && photoFileNames && imagePreviewsContainer) {
+      photoUpload.addEventListener('change', (e) => {
+        const files = e.target.files;
+        imagePreviewsContainer.innerHTML = '';
+        
+        if (files.length > 6) {
+          alert('En fazla 6 adet fotoğraf yükleyebilirsiniz.');
+          photoUpload.value = '';
+          photoFileNames.textContent = 'Dosya seçilmemiş';
+          imagePreviewsContainer.classList.add('d-none');
+          return;
+        }
+
+        if (files.length === 0) {
+          photoFileNames.textContent = 'Dosya seçilmemiş';
+          imagePreviewsContainer.classList.add('d-none');
+        } else {
+          if (files.length === 1) {
+            photoFileNames.textContent = files[0].name;
+          } else {
+            photoFileNames.textContent = files.length + ' dosya seçildi';
+          }
+          
+          imagePreviewsContainer.classList.remove('d-none');
+          
+          Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const wrapper = document.createElement('div');
+              wrapper.className = 'preview-image-wrapper bg-light';
+              
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              
+              wrapper.appendChild(img);
+              imagePreviewsContainer.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+      });
+    }
+  }
+</script>

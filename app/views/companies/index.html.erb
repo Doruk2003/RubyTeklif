@@ -1,59 +1,51 @@
-<div class="col-12">
-  <div class="card shadow-sm mb-3">
-    <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-      <div>
-        <h1 class="h4 mb-1">Müşteriler</h1>
-        <p class="text-secondary mb-0">Toplam <strong><%= @companies.size %></strong> müşteri</p>
-      </div>
-
-      <div class="d-flex flex-wrap align-items-center gap-2">
-        <%= filter_panel_toggle_button %>
-        <%= new_record_button("Yeni Müşteri", new_company_path) %>
-        <%= home_nav_button(home_path) %>
+<div class="row g-3">
+  <div class="col-12" style="z-index: 10; position: relative;">
+    <div class="card shadow-sm">
+      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+          <h1 class="h4 mb-1">MÜŞTERİ LİSTESİ</h1>
+          <p class="text-secondary mb-0">Toplam <strong><%= @companies.size %></strong> müşteri</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <%= filter_panel_toggle_button %>
+          <%= new_record_button("Yeni Müşteri", new_company_path) %>
+          <%= home_nav_button(home_path) %>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<div class="col-12">
-  <div class="card shadow-sm hidden mb-3" data-filter-panel>
-    <div class="card-body">
-      <div class="d-flex align-items-center gap-2 mb-3">
-        <h2 class="h6 text-uppercase text-secondary mb-0">Filtreler</h2>
-      </div>
-
-      <%= form_with url: companies_path, method: :get, local: true, class: "filter-form" do |f| %>
-        <div class="row g-3 align-items-end">
-          <div class="col-12 col-md-6 col-lg-4">
-            <%= f.label :q, "Firma Adı / Yetkili", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-            <%= f.search_field :q,
+  <div class="col-12 hidden" data-filter-panel>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <%= form_with url: companies_path, method: :get, local: true, class: "filter-form" do |f| %>
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-6 col-lg-4">
+              <%= f.label :q, "Firma Adı / Yetkili", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.search_field :q,
                  value: params[:q],
                  placeholder: "Örn: Acme, Ahmet",
                  class: "form-control form-control-sm",
                  style: "width: 100%;" %>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-2">
-            <%= f.label :tax_number, "Vergi No", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-            <%= f.text_field :tax_number,
+            </div>
+            <div class="col-12 col-md-6 col-lg-2">
+              <%= f.label :tax_number, "Vergi No", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.text_field :tax_number,
                  value: params[:tax_number],
                  placeholder: "VKN",
                  class: "form-control form-control-sm",
                  style: "width: 100%;" %>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-2">
-            <%= f.label :phone, "Telefon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-            <%= f.search_field :phone,
+            </div>
+            <div class="col-12 col-md-6 col-lg-2">
+              <%= f.label :phone, "Telefon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.search_field :phone,
                  value: params[:phone],
                  placeholder: "0555...",
                  class: "form-control form-control-sm",
                  style: "width: 100%;" %>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-1">
-            <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-            <%= f.select :active,
+            </div>
+            <div class="col-12 col-md-6 col-lg-1">
+              <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :active,
                  options_for_select([
                    ["Tümü", ""],
                    ["Aktif", "1"],
@@ -62,11 +54,10 @@
                  {},
                  class: "form-select form-select-sm",
                  style: "width: 100%;" %>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-1">
-            <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-            <%= f.select :scope,
+            </div>
+            <div class="col-12 col-md-6 col-lg-1">
+              <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :scope,
                  options_for_select([
                    ["Aktif", "active"],
                    ["Arşiv", "archived"],
@@ -75,224 +66,215 @@
                  {},
                  class: "form-select form-select-sm",
                  style: "width: 100%;" %>
-          </div>
-
-          <div class="col-12 col-lg-2">
-            <div class="d-flex gap-2">
-              <%= f.submit "Filtrele", class: "btn btn-sm btn-dark flex-fill" %>
-              <%= link_to "Temizle", companies_path, class: "btn btn-sm btn-warning flex-fill" %>
+            </div>
+            <div class="col-12 col-lg-2">
+              <div class="d-flex gap-2">
+                <%= f.submit "FİLTRELE", class: "btn btn-sm btn-dark flex-fill" %>
+                <%= link_to "TEMİZLE", companies_path, class: "btn btn-sm btn-warning flex-fill" %>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
-
-<div class="col-12">
-  <div class="card shadow-sm mb-3">
-    <div class="card-body p-0">
-      <% current_sort = params[:sort].to_s %>
-      <% current_dir = params[:dir].to_s == "asc" ? "asc" : "desc" %>
-      <div class="table-responsive rt-companies-table-wrap">
-        <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
-          <thead>
-            <tr>
-              <th>
-                <% next_dir = current_sort == "name" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Firma Adı</span>
-                  <% if current_sort == "name" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th>
-                <% next_dir = current_sort == "authorized_person" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "authorized_person", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Yetkili Kişi</span>
-                  <% if current_sort == "authorized_person" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th>
-                <% next_dir = current_sort == "phone" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "phone", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Telefon</span>
-                  <% if current_sort == "phone" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th>
-                <% next_dir = current_sort == "email" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "email", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Mail</span>
-                  <% if current_sort == "email" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th>
-                <% next_dir = current_sort == "tax_number" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "tax_number", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Vergi No</span>
-                  <% if current_sort == "tax_number" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th>
-                <% next_dir = current_sort == "tax_office" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "tax_office", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Vergi Dairesi</span>
-                  <% if current_sort == "tax_office" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th class="rt-col-center">
-                <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Durum</span>
-                  <% if current_sort == "active" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th class="rt-col-center">
-                <% next_dir = current_sort == "offers_count" && current_dir == "asc" ? "desc" : "asc" %>
-                <%= link_to companies_path(request.query_parameters.merge(sort: "offers_count", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                  <span>Teklif</span>
-                  <% if current_sort == "offers_count" %>
-                    <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
-                  <% end %>
-                <% end %>
-              </th>
-              <th class="rt-col-center">Onay</th>
-              <th class="rt-col-center">Aksiyon</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% @companies.each do |company| %>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <% current_sort = params[:sort].to_s %>
+        <% current_dir = params[:dir].to_s == "asc" ? "asc" : "desc" %>
+        <div class="table-responsive rt-companies-table-wrap">
+          <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
+            <thead>
               <tr>
-                <td class="fw-semibold"><%= company.name %></td>
-                <td><%= company.authorized_person.presence || "-" %></td>
-                <td>
-                  <% if company.phone.present? %>
-                    <%= link_to format_phone(company.phone), "tel:#{phone_digits(company.phone)}", class: "text-decoration-none text-body" %>
-                  <% else %>
-                    -
+                <th>
+                  <% next_dir = current_sort == "name" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "name", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Firma Adı</span>
+                    <% if current_sort == "name" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
                   <% end %>
-                </td>
-                <td>
-                  <% if company.email.present? %>
-                    <%= link_to company.email, "mailto:#{company.email}", class: "text-decoration-none text-body" %>
-                  <% else %>
-                    -
+                </th>
+                <th>
+                  <% next_dir = current_sort == "authorized_person" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "authorized_person", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Yetkili Kişi</span>
+                    <% if current_sort == "authorized_person" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
                   <% end %>
-                </td>
-                <td><%= format_tax_number(company.tax_number) %></td>
-                <td><%= company.tax_office.presence || "-" %></td>
-
-                <td class="rt-col-center">
-                  <% if company.deleted_at.present? %>
-                    <span class="status-circle bg-danger text-white" title="Arşivde" aria-label="Arşivde">P</span>
-                  <% elsif company.active %>
-                    <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
-                  <% else %>
-                    <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
+                </th>
+                <th>
+                  <% next_dir = current_sort == "phone" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "phone", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Telefon</span>
+                    <% if current_sort == "phone" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
                   <% end %>
-                </td>
-
-                <td class="rt-col-center">
-                  <span class="badge-info"><%= company.offers_count || 0 %></span>
-                </td>
-
-                <td class="rt-col-center">
-                  <span class="badge-approve">0</span>
-                </td>
-
-                <td class="rt-col-center rt-action-cell">
-                  <details class="position-relative d-inline-block text-start rt-action-details">
-                    <summary class="list-unstyled">
-                      <span class="d-inline-flex align-items-center justify-content-center rounded border bg-white text-secondary" style="width:2.25rem;height:2.25rem;">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="5" cy="12" r="1.6"/>
-                          <circle cx="12" cy="12" r="1.6"/>
-                          <circle cx="19" cy="12" r="1.6"/>
-                        </svg>
-                      </span>
-                    </summary>
-                    <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm">
-                      <%= link_to "Gör", company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
-                      <%= link_to "Düzenle", edit_company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
-                      <% if company.deleted_at.present? %>
-                        <%= link_to "Geri Yükle",
+                </th>
+                <th>
+                  <% next_dir = current_sort == "email" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "email", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Mail</span>
+                    <% if current_sort == "email" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
+                  <% end %>
+                </th>
+                <th>
+                  <% next_dir = current_sort == "tax_number" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "tax_number", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Vergi No</span>
+                    <% if current_sort == "tax_number" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
+                  <% end %>
+                </th>
+                <th>
+                  <% next_dir = current_sort == "tax_office" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "tax_office", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Vergi Dairesi</span>
+                    <% if current_sort == "tax_office" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
+                  <% end %>
+                </th>
+                <th class="rt-col-center">
+                  <% next_dir = current_sort == "active" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "active", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Durum</span>
+                    <% if current_sort == "active" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
+                  <% end %>
+                </th>
+                <th class="rt-col-center">
+                  <% next_dir = current_sort == "offers_count" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "offers_count", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Teklif</span>
+                    <% if current_sort == "offers_count" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
+                  <% end %>
+                </th>
+                <th class="rt-col-center">Onay</th>
+                <th class="rt-col-center">Aksiyon</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @companies.each do |company| %>
+                <tr>
+                  <td class="fw-semibold"><%= company.name %></td>
+                  <td><%= company.authorized_person.presence || "-" %></td>
+                  <td>
+                    <% if company.phone.present? %>
+                      <%= link_to format_phone(company.phone), "tel:#{phone_digits(company.phone)}", class: "text-decoration-none text-body" %>
+                    <% else %>
+                      -
+                    <% end %>
+                  </td>
+                  <td>
+                    <% if company.email.present? %>
+                      <%= link_to company.email, "mailto:#{company.email}", class: "text-decoration-none text-body" %>
+                    <% else %>
+                      -
+                    <% end %>
+                  </td>
+                  <td><%= format_tax_number(company.tax_number) %></td>
+                  <td><%= company.tax_office.presence || "-" %></td>
+                  <td class="rt-col-center">
+                    <% if company.deleted_at.present? %>
+                      <span class="status-circle bg-danger text-white" title="Arşivde" aria-label="Arşivde">P</span>
+                    <% elsif company.active %>
+                      <span class="status-circle status-circle-success" title="Aktif" aria-label="Aktif">A</span>
+                    <% else %>
+                      <span class="status-circle status-circle-warn" title="Pasif" aria-label="Pasif">P</span>
+                    <% end %>
+                  </td>
+                  <td class="rt-col-center">
+                    <span class="badge-info"><%= company.offers_count || 0 %></span>
+                  </td>
+                  <td class="rt-col-center">
+                    <span class="badge-approve">0</span>
+                  </td>
+                  <td class="rt-col-center rt-action-cell">
+                    <details class="position-relative d-inline-block text-start rt-action-details">
+                      <summary class="list-unstyled">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded border bg-white text-secondary" style="width:2.25rem;height:2.25rem;">
+                          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="5" cy="12" r="1.6"/>
+                            <circle cx="12" cy="12" r="1.6"/>
+                            <circle cx="19" cy="12" r="1.6"/>
+                          </svg>
+                        </span>
+                      </summary>
+                      <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm">
+                        <%= link_to "Gör", company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                        <%= link_to "Düzenle", edit_company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                        <% if company.deleted_at.present? %>
+                          <%= link_to "Geri Yükle",
                              restore_company_path(company),
                              data: { turbo_method: :patch, turbo_confirm: "Bu kaydı geri yüklemek istiyor musunuz?" },
                              class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
-                      <% else %>
-                        <%= link_to "Arşivle",
+                        <% else %>
+                          <%= link_to "Arşivle",
                              company_path(company),
                              data: { turbo_method: :delete, turbo_confirm: "Bu müşteriyi silmek istediğinize emin misiniz?" },
                              class: "d-block rounded px-3 py-2 text-decoration-none text-danger rt-arrow-hover" %>
-                      <% end %>
+                        <% end %>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              <% end %>
+              <% if @companies.empty? %>
+                <tr>
+                  <td colspan="10" class="text-center py-5">
+                    <div class="mx-auto" style="max-width: 420px;">
+                      <div class="fw-semibold mb-1">Henüz kayıtlı müşteri yok</div>
+                      <div class="text-secondary">İlk müşterinizi eklemek için satış üstteki butonu kullanın.</div>
                     </div>
-                  </details>
-                </td>
-              </tr>
-            <% end %>
-
-            <% if @companies.empty? %>
-              <tr>
-                <td colspan="10" class="text-center py-5">
-                  <div class="mx-auto" style="max-width: 420px;">
-                    <div class="fw-semibold mb-1">Henüz kayıtlı müşteri yok</div>
-                    <div class="text-secondary">İlk müşterinizi eklemek için satış üstteki butonu kullanın.</div>
-                  </div>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<div class="col-12">
-  <div class="card shadow-sm">
-    <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-      <div class="text-secondary">
-        Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <div class="d-none d-sm-flex align-items-center gap-1">
-          <span class="small text-secondary">Sayfa boyutu:</span>
-          <% [25, 50, 100].each do |size| %>
-            <% active = @per_page == size %>
-            <%= link_to size.to_s, companies_path(request.query_parameters.merge(page: 1, per_page: size)),
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="text-secondary">
+          Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="d-none d-sm-flex align-items-center gap-1">
+            <span class="small text-secondary">Sayfa boyutu:</span>
+            <% [25, 50, 100].each do |size| %>
+              <% active = @per_page == size %>
+              <%= link_to size.to_s, companies_path(request.query_parameters.merge(page: 1, per_page: size)),
                  class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
+            <% end %>
+          </div>
+          <% if @has_prev %>
+            <%= link_to "Önceki", companies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
+          <% else %>
+            <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Önceki</span>
+          <% end %>
+          <% if @has_next %>
+            <%= link_to "Sonraki", companies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
+          <% else %>
+            <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Sonraki</span>
           <% end %>
         </div>
-        <% if @has_prev %>
-          <%= link_to "Önceki", companies_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
-        <% else %>
-          <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Önceki</span>
-        <% end %>
-        <% if @has_next %>
-          <%= link_to "Sonraki", companies_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
-        <% else %>
-          <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Sonraki</span>
-        <% end %>
       </div>
     </div>
   </div>
 </div>
-
 <script>
   document.addEventListener("turbo:load", function () {
     var tableWrap = document.querySelector(".rt-companies-table-wrap");

@@ -24,14 +24,7 @@
   end
 
   def icon_link_button(path, label:, icon:, variant: :nav, class_name: nil, **options)
-    variant_class = case variant.to_sym
-                    when :new then "btn-new-record"
-                    when :filter then "btn-filter-icon"
-                    when :clear then "btn-clear-icon"
-                    else "btn-home-nav"
-                    end
-
-    classes = [variant_class, class_name].compact.join(" ")
+    classes = ["btn", "btn-outline-secondary", "rt-icon-btn-layout", class_name].compact.join(" ")
     data_options = (options[:data] || {}).merge(tip: label)
     aria_options = (options[:aria] || {}).merge(label: label)
 
@@ -41,8 +34,7 @@
   end
 
   def icon_submit_button(label:, icon:, variant: :filter, class_name: nil, **options)
-    variant_class = variant.to_sym == :clear ? "btn-clear-icon" : "btn-filter-icon"
-    classes = [variant_class, class_name].compact.join(" ")
+    classes = ["btn", "btn-outline-secondary", "rt-icon-btn-layout", class_name].compact.join(" ")
     data_options = (options[:data] || {}).merge(tip: label)
     aria_options = (options[:aria] || {}).merge(label: label)
 
@@ -76,7 +68,7 @@
   end
 
   def filter_panel_toggle_button(label_open: "Filtreleri Aç", class_name: nil, target: nil)
-    classes = ["btn-home-nav", class_name].compact.join(" ")
+    classes = ["btn", "btn-outline-secondary", "rt-icon-btn-layout", class_name].compact.join(" ")
     data_options = { tip: label_open, filter_panel_toggle: true }
     data_options[:filter_panel_target] = target if target.present?
 
