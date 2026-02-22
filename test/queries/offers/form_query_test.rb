@@ -48,5 +48,23 @@ module Offers
       assert_includes path, "companies?deleted_at=is.null"
       assert_includes path, "order=name.asc"
     end
+
+    test "raises system error for non-array companies response" do
+      client = FakeClient.new(response: { "error" => "bad" })
+      query = Offers::FormQuery.new(client: client)
+
+      assert_raises(ServiceErrors::System) do
+        query.companies(user_id: "usr-1")
+      end
+    end
+
+    test "raises system error for non-array products response" do
+      client = FakeClient.new(response: { "error" => "bad" })
+      query = Offers::FormQuery.new(client: client)
+
+      assert_raises(ServiceErrors::System) do
+        query.products(category_id: "cat-1", user_id: "usr-1")
+      end
+    end
   end
 end

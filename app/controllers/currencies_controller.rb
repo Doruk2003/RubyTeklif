@@ -16,6 +16,15 @@
     @per_page = 50
     @has_prev = false
     @has_next = false
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "currencies#index", severity: :error)
+    @currencies = []
+    @scope = "active"
+    @page = 1
+    @per_page = 50
+    @has_prev = false
+    @has_next = false
+    flash.now[:alert] = e.user_message
   end
 
   def new
@@ -85,7 +94,6 @@
   end
 
   def clear_currencies_cache!
-    Rails.cache.delete_matched("queries/currencies/v1/user:#{current_user.id}/*")
+    QueryCacheInvalidator.new.invalidate_currencies!(user_id: current_user.id)
   end
 end
-

@@ -24,6 +24,19 @@
     @per_page = 50
     @has_prev = false
     @has_next = false
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "categories#index", severity: :error)
+    @categories = []
+    @scope = "active"
+    @active = ""
+    @q = ""
+    @sort = "name"
+    @dir = "asc"
+    @page = 1
+    @per_page = 50
+    @has_prev = false
+    @has_next = false
+    flash.now[:alert] = e.user_message
   end
 
   def new
@@ -39,6 +52,7 @@
   def create
     payload = category_params
     Catalog::UseCases::Categories::Create.new(client: client).call(form_payload: payload, actor_id: current_user.id)
+    clear_categories_cache!
     redirect_to safe_return_to || categories_path, notice: "Kategori oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#create")
@@ -50,6 +64,7 @@
   def update
     payload = category_params
     Catalog::UseCases::Categories::Update.new(client: client).call(id: params[:id], form_payload: payload, actor_id: current_user.id)
+    clear_categories_cache!
     redirect_to categories_path, notice: "Kategori güncellendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#update")
@@ -60,6 +75,7 @@
 
   def destroy
     Catalog::UseCases::Categories::Archive.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_categories_cache!
     redirect_to categories_path, notice: "Kategori arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#destroy")
@@ -68,6 +84,7 @@
 
   def restore
     Catalog::UseCases::Categories::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
+    clear_categories_cache!
     redirect_to categories_path(scope: "archived"), notice: "Kategori geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "categories#restore")
@@ -95,5 +112,8 @@
   def authorize_categories!
     authorize_with_policy!(CategoriesPolicy)
   end
-end
 
+  def clear_categories_cache!
+    QueryCacheInvalidator.new.invalidate_categories!(user_id: current_user.id)
+  end
+end

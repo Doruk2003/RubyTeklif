@@ -12,7 +12,7 @@ module Companies
     def call(params:, user_id: nil)
       return build_result(params) unless user_id.present?
 
-      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 90.seconds) do
+      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 30.seconds) do
         build_result(params)
       end
     end
@@ -25,15 +25,7 @@ module Companies
       rows = fetch_companies(params)
       has_next = rows.size > per_page
       rows = rows.first(per_page)
-      company_ids = rows.map { |row| row["id"].to_s }.reject(&:blank?)
-      offer_counts = needs_offer_counts?(params) ? load_offer_counts(company_ids) : Hash.new(0)
-
-      companies = rows.map do |row|
-        build_company(row, offers_count: offer_counts[row["id"]].to_i)
-      end
-
-      companies = apply_has_offers_filter(companies, params) if params[:has_offers].present?
-      companies = apply_offers_count_sort(companies, params)
+      companies = rows.map { |row| build_company(row) }
 
       {
         items: companies,
@@ -59,21 +51,23 @@ module Companies
         dir: params[:dir].to_s
       }
 
-      "queries/companies/v1/user:#{user_id}/#{Digest::SHA256.hexdigest(filtered.to_json)}"
+      "queries/companies/v2/user:#{user_id}/#{Digest::SHA256.hexdigest(filtered.to_json)}"
     end
 
     def fetch_companies(params)
-      @client.get(build_companies_query(params)).tap do |data|
-        return data if data.is_a?(Array)
-      end
-      []
-    rescue StandardError
-      []
+      data = @client.get(build_companies_query(params))
+      return data if data.is_a?(Array)
+
+      raise ServiceErrors::System.new(user_message: "Musteri listesi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+    rescue StandardError => e
+      raise if e.is_a?(ServiceErrors::Base)
+
+      raise ServiceErrors::System.new(user_message: "Musteri listesi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
     end
 
     def build_companies_query(params)
       query_parts = []
-      query_parts << "select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active,deleted_at"
+      query_parts << "select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active,deleted_at,offers_count"
       query_parts << sort_clause(params)
       query_parts << "limit=#{per_page(params) + 1}"
       query_parts << "offset=#{offset(params)}"
@@ -95,9 +89,14 @@ module Companies
         query_parts << "active=eq.#{active}"
       end
 
+      if params[:has_offers].present?
+        has_offers = params[:has_offers].to_s == "1"
+        query_parts << (has_offers ? "offers_count=gt.0" : "offers_count=eq.0")
+      end
+
       query_parts << deleted_scope_filter(params)
 
-      "companies?#{query_parts.compact.join('&')}"
+      "company_with_offer_counts?#{query_parts.compact.join('&')}"
     end
 
     def sort_clause(params)
@@ -111,7 +110,8 @@ module Companies
         "email" => "email",
         "tax_number" => "tax_number",
         "tax_office" => "tax_office",
-        "active" => "active"
+        "active" => "active",
+        "offers_count" => "offers_count"
       }
 
       column = allowed[sort] || "created_at"
@@ -157,59 +157,7 @@ module Companies
       value.to_s.gsub("%", "\\%").gsub("_", "\\_")
     end
 
-    def needs_offer_counts?(params)
-      params[:has_offers].present? || params[:sort].to_s == "offers_count"
-    end
-
-    def load_offer_counts(company_ids)
-      return Hash.new(0) if company_ids.empty?
-
-      encoded_ids = company_ids.map { |id| Supabase::FilterValue.eq(id) }.join(",")
-      data = @client.get("company_offer_stats?select=company_id,offers_count&company_id=in.(#{encoded_ids})")
-      rows = data.is_a?(Array) ? data : []
-
-      rows.each_with_object(Hash.new(0)) do |row, counts|
-        company_id = row["company_id"].to_s
-        next if company_id.blank?
-
-        count = row["offers_count"].to_i
-        counts[company_id] = count
-      end
-    rescue StandardError
-      load_offer_counts_fallback(company_ids)
-    end
-
-    def load_offer_counts_fallback(company_ids)
-      return Hash.new(0) if company_ids.empty?
-
-      encoded_ids = company_ids.map { |id| Supabase::FilterValue.eq(id) }.join(",")
-      data = @client.get("offers?select=company_id&deleted_at=is.null&company_id=in.(#{encoded_ids})")
-      rows = data.is_a?(Array) ? data : []
-
-      rows.each_with_object(Hash.new(0)) do |row, counts|
-        company_id = row["company_id"].to_s
-        counts[company_id] += 1 if company_id.present?
-      end
-    rescue StandardError
-      Hash.new(0)
-    end
-
-    def apply_has_offers_filter(companies, params)
-      has_offers = params[:has_offers].to_s == "1"
-      companies.select do |company|
-        has_offers ? company.offers_count.to_i.positive? : company.offers_count.to_i.zero?
-      end
-    end
-
-    def apply_offers_count_sort(companies, params)
-      return companies unless params[:sort].to_s == "offers_count"
-
-      dir = params[:dir].to_s == "asc" ? "asc" : "desc"
-      sorted = companies.sort_by { |company| company.offers_count.to_i }
-      dir == "asc" ? sorted : sorted.reverse
-    end
-
-    def build_company(row, offers_count: 0)
+    def build_company(row)
       Company.new(
         id: row["id"],
         name: row["name"],
@@ -221,9 +169,8 @@ module Companies
         address: row["address"],
         active: row.key?("active") ? row["active"] : true,
         deleted_at: row["deleted_at"],
-        offers_count: offers_count
+        offers_count: row["offers_count"].to_i
       )
     end
   end
 end
-

@@ -10,6 +10,7 @@ module Admin
       def call(form_payload:, actor_id:)
         form = Admin::Users::CreateForm.new(form_payload)
         validate_form!(form)
+        ensure_email_available!(form.email)
 
         created = @auth.create_user(email: form.email, password: form.password, role: form.role)
         user_id = created.is_a?(Hash) ? (created["id"].presence || created.dig("user", "id").to_s) : nil
@@ -45,6 +46,16 @@ module Admin
       end
 
       private
+
+      def ensure_email_available!(email)
+        normalized = email.to_s.strip
+        return if normalized.blank?
+
+        rows = @client.get("users?select=id&email=ilike.#{Supabase::FilterValue.ilike(normalized)}&limit=1")
+        return unless rows.is_a?(Array) && rows.any?
+
+        raise ServiceErrors::Validation.new(user_message: "Bu e-posta zaten kayitli.")
+      end
 
       def validate_form!(form)
         return if form.valid?

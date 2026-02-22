@@ -13,10 +13,12 @@ module Categories
       path = "#{path}&#{filters.join('&')}" if filters.any?
 
       cache_key = "categories/options/v1/user:#{user_id}/active:#{active_only ? 1 : 0}"
-      data = Rails.cache.fetch(cache_key, expires_in: 2.minutes) do
+      data = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
         @client.get(path)
       end
-      data.is_a?(Array) ? data : []
+      return data if data.is_a?(Array)
+
+      raise ServiceErrors::System.new(user_message: "Kategori secenekleri gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
     end
   end
 end

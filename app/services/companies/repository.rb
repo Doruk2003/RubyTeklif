@@ -60,5 +60,22 @@ module Companies
         }
       )
     end
+
+    def tax_number_taken?(tax_number:, exclude_company_id: nil)
+      return false if tax_number.to_s.strip.blank?
+
+      filters = [
+        "tax_number=eq.#{Supabase::FilterValue.eq(tax_number.to_s.strip)}"
+      ]
+      if exclude_company_id.present?
+        filters << "id=neq.#{Supabase::FilterValue.eq(exclude_company_id)}"
+      end
+
+      path = "companies?select=id&#{filters.join('&')}&limit=1"
+      rows = @client.get(path)
+      return false unless rows.is_a?(Array)
+
+      rows.any?
+    end
   end
 end

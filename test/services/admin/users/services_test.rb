@@ -62,7 +62,7 @@ module Admin
       end
 
       test "create user inserts role row and logs action" do
-        client = FakeClient.new(post_response: [])
+        client = FakeClient.new(post_response: [], get_response: [])
         auth = FakeAuth.new(create_user_response: { "id" => "usr-2" })
         audit = FakeAuditLog.new
 
@@ -73,6 +73,21 @@ module Admin
 
         assert_equal "usr-2", user_id
         assert_equal "users.create", audit.payload[:action]
+      end
+
+      test "create user blocks duplicate email before auth call" do
+        client = FakeClient.new(post_response: [], get_response: [{ "id" => "usr-existing" }])
+        auth = FakeAuth.new(create_user_response: { "id" => "usr-2" })
+        service = Admin::Users::Create.new(client: client, auth: auth, audit_log: FakeAuditLog.new)
+
+        assert_raises(ServiceErrors::Validation) do
+          service.call(
+            form_payload: { email: "test@example.com", password: "Password12", role: Roles::OPERATOR },
+            actor_id: "usr-1"
+          )
+        end
+
+        assert_nil client.last_post_path
       end
 
       test "create user rejects legacy roles" do

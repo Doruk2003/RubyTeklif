@@ -9,11 +9,15 @@ module Admin
       # :reek:FeatureEnvy
       def call(id:)
         data = @client.get("users?id=eq.#{Supabase::FilterValue.eq(id)}&select=id,email,role&limit=1")
-        return nil unless data.is_a?(Array)
+        unless data.is_a?(Array)
+          raise ServiceErrors::System.new(user_message: "Kullanici bilgisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+        end
 
         data.first
-      rescue StandardError
-        nil
+      rescue StandardError => e
+        raise if e.is_a?(ServiceErrors::Base)
+
+        raise ServiceErrors::System.new(user_message: "Kullanici bilgisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
       end
     end
   end

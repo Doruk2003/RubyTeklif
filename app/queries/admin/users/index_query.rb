@@ -12,7 +12,9 @@ module Admin
         page = positive_int(params[:page], default: 1)
         per_page = positive_int(params[:per_page], default: DEFAULT_PER_PAGE, max: MAX_PER_PAGE)
         rows = @client.get(build_query(params, page: page, per_page: per_page))
-        rows = rows.is_a?(Array) ? rows : []
+        unless rows.is_a?(Array)
+          raise ServiceErrors::System.new(user_message: "Kullanici listesi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+        end
 
         {
           items: rows.first(per_page),
@@ -28,9 +30,13 @@ module Admin
         base = "users?select=id,email,role,active&order=email.asc&limit=#{limit}&offset=0"
         query = append_filters(base, params)
         rows = @client.get(query)
-        rows.is_a?(Array) ? rows : []
-      rescue StandardError
-        []
+        return rows if rows.is_a?(Array)
+
+        raise ServiceErrors::System.new(user_message: "Kullanici export verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      rescue StandardError => e
+        raise if e.is_a?(ServiceErrors::Base)
+
+        raise ServiceErrors::System.new(user_message: "Kullanici export verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
       end
 
       private

@@ -125,10 +125,10 @@ class ApplicationController < ActionController::Base
     Auth::Messages::SESSION_ENDED
   end
 
-  def report_handled_error(error, source:)
+  def report_handled_error(error, source:, severity: :warn)
     Observability::ErrorReporter.report(
       error,
-      severity: :warn,
+      severity: severity,
       context: error_context.merge(source: source)
     )
   end

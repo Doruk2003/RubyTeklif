@@ -40,6 +40,6 @@ class BrandsController < ApplicationController
   end
 
   def clear_brands_cache!
-    Rails.cache.delete_matched("brands/options/v1/user:#{current_user.id}/*")
+    QueryCacheInvalidator.new.invalidate_brands!(user_id: current_user.id)
   end
 end

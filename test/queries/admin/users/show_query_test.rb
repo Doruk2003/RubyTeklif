@@ -27,12 +27,12 @@ module Admin
         assert_includes client.paths.first, "users?id=eq.usr-1"
       end
 
-      test "returns nil for non-array responses" do
+      test "raises system error for non-array responses" do
         client = FakeClient.new(response: { "error" => "bad" })
 
-        result = Admin::Users::ShowQuery.new(client: client).call(id: "usr-1")
-
-        assert_nil result
+        assert_raises(ServiceErrors::System) do
+          Admin::Users::ShowQuery.new(client: client).call(id: "usr-1")
+        end
       end
     end
   end

@@ -9,6 +9,7 @@ module Companies
       validate_form!(form)
 
       payload = form.normalized_attributes
+      validate_tax_number_uniqueness!(tax_number: payload[:tax_number])
       created = @repository.create_with_audit_atomic(payload: payload, actor_id: actor_id)
       raise_from_response!(created, fallback: "Musteri olusturulamadi.")
 
@@ -40,7 +41,7 @@ module Companies
     def raise_from_response!(response, fallback:)
       return unless response.is_a?(Hash) && (response["message"].present? || response["error"].present?)
 
-      if duplicate_tax_number_error?(response)
+      if response["code"].to_s == "23505"
         raise ServiceErrors::Validation.new(user_message: "Bu vergi numarasi zaten kayitli.")
       end
 
@@ -52,11 +53,10 @@ module Companies
       raise ServiceErrors::System.new(user_message: parts.presence&.join(" | ") || fallback)
     end
 
-    def duplicate_tax_number_error?(response)
-      return false unless response.is_a?(Hash) && response["code"].to_s == "23505"
+    def validate_tax_number_uniqueness!(tax_number:)
+      return unless @repository.tax_number_taken?(tax_number: tax_number)
 
-      message = response["message"].to_s.downcase
-      message.include?("companies_tax_number_idx") || message.include?("companies_user_tax_number_idx")
+      raise ServiceErrors::Validation.new(user_message: "Bu vergi numarasi zaten kayitli.")
     end
   end
 end

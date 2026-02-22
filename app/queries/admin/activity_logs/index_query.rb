@@ -12,7 +12,9 @@ module Admin
         page = positive_int(params[:page], default: 1)
         per_page = positive_int(params[:per_page], default: DEFAULT_PER_PAGE, max: MAX_PER_PAGE)
         rows = @client.get(build_query(params, page: page, per_page: per_page))
-        rows = rows.is_a?(Array) ? rows : []
+        unless rows.is_a?(Array)
+          raise ServiceErrors::System.new(user_message: "Aktivite kayitlari gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+        end
 
         {
           items: rows.first(per_page),
@@ -36,9 +38,13 @@ module Admin
         base = "activity_logs?select=id,action,actor_id,target_id,target_type,metadata,created_at&order=created_at.desc&limit=#{limit}&offset=0"
         query = append_filters(base, params)
         rows = @client.get(query)
-        rows.is_a?(Array) ? rows : []
-      rescue StandardError
-        []
+        return rows if rows.is_a?(Array)
+
+        raise ServiceErrors::System.new(user_message: "Aktivite export verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      rescue StandardError => e
+        raise if e.is_a?(ServiceErrors::Base)
+
+        raise ServiceErrors::System.new(user_message: "Aktivite export verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
       end
 
       private
@@ -78,13 +84,17 @@ module Admin
         return @filter_options if defined?(@filter_options)
 
         rows = @client.get("activity_logs?select=action,target_type&order=created_at.desc&limit=500")
-        rows = rows.is_a?(Array) ? rows : []
+        unless rows.is_a?(Array)
+          raise ServiceErrors::System.new(user_message: "Aktivite filtre verileri gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+        end
         @filter_options = {
           actions: rows.map { |row| row["action"].to_s }.reject(&:blank?).uniq,
           target_types: rows.map { |row| row["target_type"].to_s }.reject(&:blank?).uniq
         }
-      rescue StandardError
-        @filter_options = { actions: [], target_types: [] }
+      rescue StandardError => e
+        raise if e.is_a?(ServiceErrors::Base)
+
+        raise ServiceErrors::System.new(user_message: "Aktivite filtre verileri gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
       end
     end
   end

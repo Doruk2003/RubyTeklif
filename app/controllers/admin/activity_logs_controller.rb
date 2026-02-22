@@ -25,6 +25,18 @@
       @has_next = false
       @has_prev = false
       @export = nil
+    rescue ServiceErrors::System => e
+      report_handled_error(e, source: "admin/activity_logs#index", severity: :error)
+      @logs = []
+      @users_index = {}
+      @action_options = []
+      @target_type_options = []
+      @page = 1
+      @per_page = 100
+      @has_next = false
+      @has_prev = false
+      @export = nil
+      flash.now[:alert] = e.user_message
     end
 
     def export

@@ -5,8 +5,9 @@ module Offers
     class FakeRepository
       attr_reader :offer_payload, :items_payload
 
-      def initialize(create_offer_with_items_response:)
+      def initialize(create_offer_with_items_response:, offer_number_taken: false)
         @create_offer_with_items_response = create_offer_with_items_response
+        @offer_number_taken = offer_number_taken
       end
 
       def client
@@ -23,6 +24,10 @@ module Offers
         @offer_payload = offer_body
         @items_payload = { items: items, user_id: user_id }
         @create_offer_with_items_response
+      end
+
+      def offer_number_taken?(offer_number:)
+        @offer_number_taken
       end
     end
 
@@ -123,6 +128,29 @@ module Offers
           user_id: "usr-1"
         )
       end
+    end
+
+    test "prevents duplicate offer number before repository write" do
+      repository = FakeRepository.new(
+        create_offer_with_items_response: [{ "offer_id" => "off-1" }],
+        offer_number_taken: true
+      )
+      service = Offers::Create.new(repository: repository)
+
+      assert_raises(ServiceErrors::Validation) do
+        service.call(
+          payload: {
+            company_id: "cmp-1",
+            offer_number: "TK-100",
+            offer_date: "2026-02-13",
+            status: "taslak",
+            items: [{ product_id: "prd-1", description: "", quantity: "2", unit_price: "10", discount_rate: "0" }]
+          },
+          user_id: "usr-1"
+        )
+      end
+
+      assert_nil repository.offer_payload
     end
   end
 end

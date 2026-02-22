@@ -11,7 +11,10 @@ module Offers
       page = page(params)
       per_page = per_page(params)
       data = @client.get(build_query(params, page: page, per_page: per_page))
-      rows = data.is_a?(Array) ? data : []
+      unless data.is_a?(Array)
+        raise ServiceErrors::System.new(user_message: "Teklif listesi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      end
+      rows = data
 
       {
         items: rows.first(per_page),

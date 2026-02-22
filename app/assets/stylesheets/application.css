@@ -1,4 +1,4 @@
-﻿/* Global */
+/* Global */
 html,
 body {
   margin: 0 !important;
@@ -238,16 +238,22 @@ select option:focus {
   --rt-arrow-shift: 4px;
 }
 
+.dropdown-item.rt-arrow-hover {
+  padding-left: 2.25rem;
+  border-radius: 4px;
+}
+
 .rt-submenu a::before,
 .rt-custom-select-option::before,
 .rt-arrow-hover::before {
-  content: "→";
+  content: "›";
   position: absolute;
   left: 10px;
   top: 50%;
   transform: translateY(-50%) translateX(0);
   color: #94a3b8;
   transition: color 180ms ease, transform 240ms ease;
+  pointer-events: none;
 }
 
 .rt-custom-select-option:hover,
@@ -758,7 +764,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
 .rt-dashboard {
   background: #f6f3ee;
   min-height: 100vh;
-  padding-top: 80px;
+  padding-top: 132px;
 }
 
 .rt-shell {
@@ -786,6 +792,8 @@ body:has(.rt-dashboard) .app-flash-wrap {
   background: linear-gradient(90deg, #0f172a, #1e293b);
   padding-left: 30px;
   padding-right: 30px;
+  position: relative;
+  z-index: 220;
 }
 
 .rt-topbar-utility .rt-shell,
@@ -802,7 +810,12 @@ body:has(.rt-dashboard) .app-flash-wrap {
 }
 
 .rt-topbar-utility .rt-shell {
-  padding: 10px 0;
+  padding: 14px 0;
+  min-height: 48px;
+}
+
+.rt-topbar-menu .rt-shell {
+  min-height: 42px;
 }
 
 .rt-brand {
@@ -1150,12 +1163,15 @@ body:has(.rt-dashboard) .app-flash-wrap {
 .rt-menu {
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   gap: 2px;
   overflow: visible;
-  padding: 6px 0;
+  padding: 0;
   font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  position: relative;
+  z-index: 120;
+  min-height: 42px;
 }
 
 .rt-menu > a,
@@ -1168,52 +1184,65 @@ body:has(.rt-dashboard) .app-flash-wrap {
   font-weight: 300;
   letter-spacing: 0;
   text-transform: uppercase;
-  padding: 6px 12px;
+  padding: 0 12px;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   transition: color 180ms ease;
+  display: inline-flex;
+  align-items: center;
+  min-height: 100%;
+  line-height: 1.2;
 }
 
 .rt-menu > a:hover,
 .rt-menu > a.is-active,
 .rt-menu-item > button:hover,
-.rt-menu-item:focus-within > button {
+.rt-menu-item > button:focus-visible,
+.rt-menu-item:hover > button,
+.rt-menu-item.is-open > button {
   background: transparent;
   color: #f8fafc;
 }
 
 .rt-menu-item {
   position: relative;
+  display: flex;
+  align-items: stretch;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 .rt-menu-item::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 6px;
+  display: none;
 }
 
 .rt-submenu {
   display: none;
   position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: calc(100% + 12px);
+  left: 0;
+  transform: none;
   min-width: 220px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 6px;
-  padding: 8px;
+  padding: 4px;
   box-shadow: 0 20px 35px -18px rgba(2, 6, 23, 0.6);
-  z-index: 60;
+  z-index: 1000;
+  pointer-events: auto;
 }
 
 .rt-menu-item:hover .rt-submenu,
-.rt-menu-item:focus-within .rt-submenu {
+.rt-menu-item:focus-within .rt-submenu,
+.rt-menu-item.is-open .rt-submenu {
   display: block;
+}
+
+.rt-menu-item:hover,
+.rt-menu-item:focus-within,
+.rt-menu-item.is-open {
+  z-index: 400;
 }
 
 .rt-submenu h4 {
@@ -1226,14 +1255,24 @@ body:has(.rt-dashboard) .app-flash-wrap {
 }
 
 .rt-submenu a {
-  display: block;
+  display: flex;
+  align-items: center;
   text-decoration: none;
   color: #334155;
   font-size: 14px;
   font-weight: 400;
   border-radius: 4px;
-  padding: 7px 10px 7px 36px;
-  margin-bottom: 4px;
+  padding: 10px 10px 10px 36px;
+  margin: 0;
+  position: relative;
+  z-index: 201;
+  min-height: 38px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.rt-submenu a + a {
+  margin-top: 4px;
 }
 
 .rt-content {
@@ -1635,7 +1674,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
     grid-column: span 2;
     padding-top: 0;
     align-self: start;
-    transform: translateY(-140px);
+    transform: none;
   }
 
   .rt-flow-grid {
@@ -1872,3 +1911,5 @@ select.form-input:focus {
 .rt-icon-btn-layout:focus-visible::after {
   opacity: 1;
 }
+
+

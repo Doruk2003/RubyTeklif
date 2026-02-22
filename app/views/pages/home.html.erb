@@ -1,252 +1,317 @@
-﻿<div class="rt-dashboard">
-  <header class="rt-topbar">
-    <div class="rt-topbar-utility">
-      <div class="rt-shell">
-        <div class="rt-brand">
-          <span class="rt-brand-badge">A</span>
-          <div>
-            <div class="rt-brand-title">COTIL TENTE</div>
-            <div class="rt-brand-subtitle">Dashboard</div>
-          </div>
-        </div>
+<div class="container-fluid pt-0 pb-3 px-0">
+  <style>
+    :root {
+      --home-top-height: 84px;
+    }
 
-        <div class="rt-search-wrap">
-          <input type="search" placeholder="Search..." aria-label="Search" />
-        </div>
+    .home-header-card .card-body {
+      height: var(--home-top-height);
+    }
 
-        <div class="rt-icon-group">
-          <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 1" data-tip="Gecici Arac 1">
-            <span class="material-symbols-outlined" aria-hidden="true">apps</span>
-          </button>
-          <button type="button" class="rt-icon-btn" aria-label="Zoom" data-tip="Zoom">
-            <span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>
-          </button>
-          <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 3" data-tip="Gecici Arac 3">
-            <span class="material-symbols-outlined" aria-hidden="true">sort</span>
-          </button>
-          <button type="button" class="rt-icon-btn" aria-label="Gecici Arac 4" data-tip="Gecici Arac 4">
-            <span class="material-symbols-outlined" aria-hidden="true">settings</span>
-          </button>
-          <%= link_to logout_path,
-                      data: { turbo_method: :delete, turbo_confirm: "Oturumu kapatmak istiyor musunuz?" },
-                      class: "rt-icon-btn",
-                      "data-tip": "Kapatma",
-                      aria: { label: "Kapatma" } do %>
-            <span class="material-symbols-outlined" aria-hidden="true">power_settings_new</span>
-          <% end %>
-        </div>
+    .home-nav {
+      position: relative;
+      z-index: 200;
+      overflow: visible !important;
+      height: var(--home-top-height);
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .home-nav .navbar-collapse {
+      overflow: visible !important;
+    }
+
+    .home-nav .container-fluid {
+      height: 100%;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .home-nav .home-search {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .home-nav .home-search .form-control,
+    .home-nav .home-search .btn {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      align-self: center;
+    }
+
+    .home-nav .nav-link.dropdown-toggle {
+      background: transparent;
+      border: 0;
+      text-decoration: none;
+    }
+
+    .home-nav .home-menu-item:hover > .nav-link.dropdown-toggle,
+    .home-nav .home-menu-item:focus-within > .nav-link.dropdown-toggle {
+      color: var(--bs-navbar-active-color);
+      opacity: 1;
+    }
+
+    .home-nav .home-menu-item {
+      position: relative;
+    }
+
+    .home-nav .home-menu-item::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: 8px;
+    }
+
+    .home-nav .home-submenu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 220px;
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 6px;
+      padding: 6px;
+      box-shadow: 0 14px 30px -18px rgba(2, 6, 23, 0.55);
+      z-index: 1200;
+    }
+
+    .home-nav .home-menu-item:hover > .home-submenu {
+      display: block;
+    }
+
+    .home-nav .home-submenu:hover {
+      display: block;
+    }
+
+    .home-nav .home-submenu .rt-arrow-hover {
+      display: block;
+      color: #334155;
+      text-decoration: none;
+      border-radius: 4px;
+      padding: 9px 10px 9px 36px;
+      margin: 0;
+      text-transform: capitalize !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      letter-spacing: normal !important;
+      line-height: 1.3 !important;
+    }
+
+    .home-nav .home-submenu .rt-arrow-hover:hover {
+      color: #f8fafc;
+    }
+
+    .home-nav .home-submenu .rt-arrow-hover + .rt-arrow-hover {
+      margin-top: 4px;
+    }
+
+    @media (min-width: 992px) {
+      .home-nav .home-menu-item:focus-within > .home-submenu {
+        display: none;
+      }
+
+      .home-nav #navbarColor03 {
+        position: relative;
+      }
+
+      .home-nav #navbarColor03 .navbar-nav {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .home-nav #navbarColor03 .home-search {
+        margin-left: auto;
+      }
+    }
+
+    @media (max-width: 991.98px) {
+      .home-nav .home-menu-item:focus-within > .home-submenu {
+        display: block;
+      }
+    }
+  </style>
+  <div class="card shadow-sm mb-3 w-100 rounded-0">
+    <div class="card-body d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+      <div>
+        <h1 class="h4 mb-1">COTIL TENTE</h1>
+        <p class="text-secondary mb-0">Genel durum ve hizli erisim</p>
+      </div>
+      <div class="d-flex gap-2">
+        <%= link_to "Ana Sayfa", home_path, class: "btn btn-secondary btn-sm" %>
+        <%= link_to "Oturumu Kapat", logout_path,
+                    data: { turbo_method: :delete, turbo_confirm: "Oturumu kapatmak istiyor musunuz?" },
+                    class: "btn btn-danger btn-sm" %>
       </div>
     </div>
-
-    <div class="rt-topbar-menu">
-      <div class="rt-shell">
-        <nav class="rt-menu" aria-label="Primary">
-          <%= link_to "Dashboard", root_path, class: "is-active" %>
-
+  </div>
+  <nav class="navbar navbar-expand-lg bg-light home-nav mb-3 w-100 rounded-0" data-bs-theme="light">
+    <div class="container-fluid px-3">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarColor03">
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item">
+            <%= link_to root_path, class: "nav-link active" do %>
+              Home
+              <span class="visually-hidden">(current)</span>
+            <% end %>
+          </li>
           <% if current_user && Roles.catalog_manage?(current_user.role) %>
-            <div class="rt-menu-item">
-              <button type="button">Müşteriler</button>
-              <div class="rt-submenu">
-                
-                <%= link_to "Musteri tanimla", new_company_path, class: "rt-arrow-hover" %>
-                <%= link_to "Musteri listesi", companies_path, class: "rt-arrow-hover" %>
+            <li class="nav-item home-menu-item">
+              <button class="nav-link dropdown-toggle" type="button">MÜŞTERİLER</button>
+              <div class="home-submenu">
+                <%= link_to "Müşteri Tanımlama", new_company_path, class: "rt-arrow-hover" %>
+                <%= link_to "Müşteri Listesi", companies_path, class: "rt-arrow-hover" %>
               </div>
-            </div>
-
-            <div class="rt-menu-item">
-              <button type="button">Teklifler</button>
-              <div class="rt-submenu">
-                
-                <%= link_to "Yeni teklif", new_offer_path, class: "rt-arrow-hover" %>
-                <%= link_to "Teklif listesi", offers_path, class: "rt-arrow-hover" %>
+            </li>
+            <li class="nav-item home-menu-item">
+              <button class="nav-link dropdown-toggle" type="button">TEKLİFLER</button>
+              <div class="home-submenu">
+                <%= link_to "Yeni Teklif", new_offer_path, class: "rt-arrow-hover" %>
+                <%= link_to "Teklif Listesi", offers_path, class: "rt-arrow-hover" %>
               </div>
-            </div>
-
-            <div class="rt-menu-item">
-              <button type="button">Urunler</button>
-              <div class="rt-submenu">
-                
-                <%= link_to "Urun tanimla", new_product_path, class: "rt-arrow-hover" %>
-                <%= link_to "Urun listesi", products_path, class: "rt-arrow-hover" %>
+            </li>
+            <li class="nav-item home-menu-item">
+              <button class="nav-link dropdown-toggle" type="button">ÜRÜNLER</button>
+              <div class="home-submenu">
+                <%= link_to "Ürün Tanımla", new_product_path, class: "rt-arrow-hover" %>
+                <%= link_to "Ürün Listesi", products_path, class: "rt-arrow-hover" %>
               </div>
-            </div>
+            </li>
           <% end %>
-
           <% if current_user && Roles.finance_manage?(current_user.role) %>
-            <div class="rt-menu-item">
-              <button type="button">Kurlar</button>
-              <div class="rt-submenu">
-               
-                <%= link_to "Kur ekle", new_currency_path, class: "rt-arrow-hover" %>
-                <%= link_to "Kur listesi", currencies_path, class: "rt-arrow-hover" %>
+            <li class="nav-item home-menu-item">
+              <button class="nav-link dropdown-toggle" type="button">KURLAR</button>
+              <div class="home-submenu">
+                <%= link_to "Kur Ekle", new_currency_path, class: "rt-arrow-hover" %>
+                <%= link_to "Kur Listesi", currencies_path, class: "rt-arrow-hover" %>
               </div>
-            </div>
+            </li>
           <% end %>
-
           <% if current_user && Roles.admin?(current_user.role) %>
-            <div class="rt-menu-item">
-              <button type="button">Ayarlar</button>
-              <div class="rt-submenu">
-               
+            <li class="nav-item home-menu-item">
+              <button class="nav-link dropdown-toggle" type="button">AYARLAR</button>
+              <div class="home-submenu">
                 <%= link_to "Admin Panel", admin_users_path, class: "rt-arrow-hover" %>
                 <%= link_to "Activity Logs", admin_activity_logs_path, class: "rt-arrow-hover" %>
               </div>
-            </div>
+            </li>
           <% end %>
-        </nav>
+        </ul>
+        <form class="d-flex home-search" role="search" action="<%= home_path %>" method="get">
+          <input class="form-control me-sm-2" type="search" name="q" placeholder="Search" aria-label="Search">
+          <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+        </form>
       </div>
     </div>
-  </header>
-
-  <div class="rt-shell rt-content">
-    <section class="rt-kpi-grid">
-      <% @kpis.first(3).each_with_index do |kpi, index| %>
-        <% icon_name = case index
-                      when 0 then "account_balance"
-                      when 1 then "assignment"
-                      else "shopping_basket"
-                      end %>
-        <% icon_color_class = case index
-                             when 0 then "col-amber"
-                             when 1 then "col-blue"
-                             else "col-slate"
-                             end %>
-        <article class="rt-kpi-card rt-kpi-card-classic text-center">
-          <div class="rt-kpi-body">
-            <p class="rt-kpi-icon-wrap">
-              <span class="material-symbols-outlined rt-kpi-icon <%= icon_color_class %>"><%= icon_name %></span>
-            </p>
-            <span class="rt-kpi-classic-label"><%= kpi[:label] %></span>
-            <h3 class="rt-kpi-classic-value"><%= kpi[:value] %></h3>
-            <small class="rt-kpi-classic-note"><%= kpi[:delta] %></small>
+  </nav>
+  <div class="row g-3 mb-3">
+    <% @kpis.first(3).each do |kpi| %>
+      <div class="col-12 col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="text-secondary small text-uppercase mb-1"><%= kpi[:label] %></div>
+            <div class="h4 mb-1"><%= kpi[:value] %></div>
+            <div class="small text-secondary"><%= kpi[:delta] %></div>
           </div>
-        </article>
-      <% end %>
-    </section>
-
-    <section class="rt-main-grid">
-      <div class="rt-stack">
-        <section class="rt-card">
-          <header class="rt-card-header">
-            <div>
-              <h3>Haftalik Akis Ozeti</h3>
-            </div>
-            <span class="rt-chip">7 gun</span>
-          </header>
-
-          <div class="rt-flow-grid">
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="row g-3">
+    <div class="col-12 col-xl-8">
+      <div class="card shadow-sm mb-3 home-header-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Haftalik akis ozeti</span>
+          <span class="badge bg-warning text-dark">7 gun</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
             <% @flow_stats.each do |item| %>
-              <% amount = item[:value].to_i %>
-              <% bar_height = [[(amount * 6), 24].max, 120].min %>
-              <div class="rt-flow-item">
-                <div class="rt-flow-bar-wrap">
-                  <div class="rt-flow-bar" style="height: <%= bar_height %>px;"></div>
+              <div class="col-12 col-md-4">
+                <div class="border rounded p-2 h-100 bg-light-subtle">
+                  <div class="h5 mb-1"><%= item[:value] %></div>
+                  <div class="small fw-semibold"><%= item[:label] %></div>
+                  <div class="small text-secondary"><%= item[:note] %></div>
                 </div>
-                <p class="rt-flow-value"><%= item[:value] %></p>
-                <p class="rt-flow-label"><%= item[:label] %></p>
-                <p class="rt-flow-note"><%= item[:note] %></p>
               </div>
             <% end %>
           </div>
-        </section>
-
-        <section class="rt-card">
-          <header class="rt-card-header">
-            <div>
-              <h3>Son Teklifler</h3>
-            </div>
-            <%= link_to "Tum Teklifler", offers_path, class: "rt-link" %>
-          </header>
-
-          <div class="rt-table-wrap">
-            <table class="rt-table rt-pipeline-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Musteri</th>
-                  <th>Tutar</th>
-                  <th>Durum</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% if @recent_offers.blank? %>
-                  <tr>
-                    <td colspan="4" class="rt-empty">Kayit bulunamadi.</td>
-                  </tr>
-                <% else %>
-                  <% @recent_offers.each do |offer| %>
-                    <% status_text = offer[:status].to_s %>
-                    <% normalized_status = I18n.transliterate(status_text).downcase %>
-                    <% status_kind =
-                        if normalized_status.include?("onay")
-                          :approved
-                        elsif normalized_status.include?("kapan") || normalized_status.include?("closed")
-                          :closed
-                        else
-                          :waiting
-                        end %>
-                    <% status_icon = { waiting: "hourglass_empty", approved: "check_circle", closed: "cancel" }[status_kind] %>
-                    <tr>
-                      <td><%= offer[:number].presence || "-" %></td>
-                      <td>
-                        <span class="rt-list-name"><%= offer[:company].presence || "-" %></span>
-                        <span class="rt-list-sub">Teklif No: <%= offer[:number].presence || "-" %></span>
-                      </td>
-                      <td><%= offer[:amount] %></td>
-                      <td>
-                        <span class="rt-status rt-status-<%= status_kind %>">
-                          <span class="material-symbols-outlined rt-status-icon" aria-hidden="true"><%= status_icon %></span>
-                          <span><%= status_text.presence || "-" %></span>
-                        </span>
-                      </td>
-                    </tr>
-                  <% end %>
-                <% end %>
-              </tbody>
-            </table>
-          </div>
-        </section>
+        </div>
       </div>
-
-      <aside class="rt-stack">
-        <section class="rt-card">
-          <header class="rt-card-header">
-            <div>
-              <h3>Hizli Islemler</h3>
-            </div>
-          </header>
-          <div class="rt-actions">
-            <% if current_user && Roles.catalog_manage?(current_user.role) %>
-              <%= link_to "Yeni Musteri", new_company_path %>
-              <%= link_to "Yeni Teklif", new_offer_path %>
-              <%= link_to "Yeni Urun", new_product_path %>
-            <% end %>
-            <% if current_user && Roles.finance_manage?(current_user.role) %>
-              <%= link_to "Kur Yonetimi", currencies_path %>
-            <% end %>
-            <% if current_user && Roles.admin?(current_user.role) %>
-              <%= link_to "Kullanici Yonetimi", admin_users_path %>
-            <% end %>
-          </div>
-        </section>
-
-        <section class="rt-card">
-          <header class="rt-card-header">
-            <div>
-              <h3>Hatirlatmalar</h3>
-            </div>
-          </header>
-          <ul class="rt-reminders">
-            <% if @reminders.blank? %>
-              <li>Bugun icin not bulunmuyor.</li>
-            <% else %>
-              <% @reminders.each do |note| %>
-                <li><%= note %></li>
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Son teklifler</span>
+          <%= link_to "Tum teklifler", offers_path, class: "btn btn-sm btn-secondary" %>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Musteri</th>
+                <th>Tutar</th>
+                <th>Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @recent_offers.blank? %>
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-secondary">Kayit bulunamadi.</td>
+                </tr>
+              <% else %>
+                <% @recent_offers.each do |offer| %>
+                  <tr>
+                    <td><%= offer[:number].presence || "-" %></td>
+                    <td><%= offer[:company].presence || "-" %></td>
+                    <td><%= offer[:amount] %></td>
+                    <td><%= offer[:status].presence || "-" %></td>
+                  </tr>
+                <% end %>
               <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-xl-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header">Hizli islemler</div>
+        <div class="list-group list-group-flush">
+          <% if current_user && Roles.catalog_manage?(current_user.role) %>
+            <%= link_to "Yeni musteri", new_company_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Yeni teklif", new_offer_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Yeni urun", new_product_path, class: "list-group-item list-group-item-action" %>
+          <% end %>
+          <% if current_user && Roles.finance_manage?(current_user.role) %>
+            <%= link_to "Kur yonetimi", currencies_path, class: "list-group-item list-group-item-action" %>
+          <% end %>
+          <% if current_user && Roles.admin?(current_user.role) %>
+            <%= link_to "Kullanici yonetimi", admin_users_path, class: "list-group-item list-group-item-action" %>
+          <% end %>
+        </div>
+      </div>
+      <div class="card shadow-sm">
+        <div class="card-header">Hatirlatmalar</div>
+        <ul class="list-group list-group-flush">
+          <% if @reminders.blank? %>
+            <li class="list-group-item text-secondary">Bugun icin not bulunmuyor.</li>
+          <% else %>
+            <% @reminders.each do |note| %>
+              <li class="list-group-item"><%= note %></li>
             <% end %>
-          </ul>
-        </section>
-      </aside>
-    </section>
+          <% end %>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>

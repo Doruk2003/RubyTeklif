@@ -81,10 +81,12 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Run architecture boundary tests
+      - name: Run architecture and data-access guard tests
         env:
           RAILS_ENV: test
-        run: bin/rails db:test:prepare test/architecture
+        run: |
+          bin/rails db:test:prepare
+          bin/rails quality:guard
 
   test:
     runs-on: ubuntu-latest

@@ -9,6 +9,7 @@ module Categories
       validate_form!(form)
 
       payload = form.normalized_attributes
+      validate_uniqueness!(category_id: id, payload: payload)
       updated = @repository.update_with_audit_atomic(category_id: id, payload: payload, actor_id: actor_id)
       raise_from_response!(updated, fallback: "Kategori guncellenemedi.")
 
@@ -27,6 +28,10 @@ module Categories
     def raise_from_response!(response, fallback:)
       return unless response.is_a?(Hash) && (response["message"].present? || response["error"].present?)
 
+      if response["code"].to_s == "23505"
+        raise ServiceErrors::Validation.new(user_message: "Kategori kodu veya adi zaten kayitli.")
+      end
+
       if response["code"].to_s == "42501"
         raise ServiceErrors::Policy.new(user_message: "Bu islem icin yetkiniz yok.")
       end
@@ -42,6 +47,14 @@ module Categories
       return response["id"].to_s if response.is_a?(Hash)
 
       nil
+    end
+
+    def validate_uniqueness!(category_id:, payload:)
+      code_taken = @repository.code_taken?(code: payload[:code], exclude_category_id: category_id)
+      name_taken = @repository.name_taken?(name: payload[:name], exclude_category_id: category_id)
+      return unless code_taken || name_taken
+
+      raise ServiceErrors::Validation.new(user_message: "Kategori kodu veya adi zaten kayitli.")
     end
   end
 end

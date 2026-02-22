@@ -17,5 +17,24 @@ module Brands
         }
       )
     end
+
+    def code_taken?(code:)
+      taken_for?(:code, code)
+    end
+
+    def name_taken?(name:)
+      taken_for?(:name, name)
+    end
+
+    private
+
+    def taken_for?(field, value)
+      normalized = value.to_s.strip
+      return false if normalized.blank?
+
+      path = "brands?select=id&deleted_at=is.null&#{field}=eq.#{Supabase::FilterValue.eq(normalized)}&limit=1"
+      rows = @client.get(path)
+      rows.is_a?(Array) && rows.any?
+    end
   end
 end

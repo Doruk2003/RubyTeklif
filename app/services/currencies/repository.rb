@@ -54,5 +54,22 @@ module Currencies
         }
       )
     end
+
+    def code_taken?(code:, exclude_currency_id: nil)
+      normalized = code.to_s.strip.upcase
+      return false if normalized.blank?
+
+      filters = [
+        "deleted_at=is.null",
+        "code=eq.#{Supabase::FilterValue.eq(normalized)}"
+      ]
+      if exclude_currency_id.present?
+        filters << "id=neq.#{Supabase::FilterValue.eq(exclude_currency_id)}"
+      end
+
+      path = "currencies?select=id&#{filters.join('&')}&limit=1"
+      rows = @client.get(path)
+      rows.is_a?(Array) && rows.any?
+    end
   end
 end

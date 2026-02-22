@@ -38,6 +38,7 @@ Rails + Supabase tabanli teklif/CRM uygulamasi.
 
 - Tum testler: `bin/rails test`
 - Mimari sinir testleri: `bin/rails test test/architecture`
+- Standart koruma kapisi: `bin/rails quality:guard`
 - Koku analizi: `bin/reek app`
 - Stil: `bin/rubocop`
 - Guvenlik: `bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error`

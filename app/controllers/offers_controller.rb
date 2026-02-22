@@ -16,6 +16,15 @@
     @per_page = 50
     @has_prev = false
     @has_next = false
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "offers#index", severity: :error)
+    @offers = []
+    @scope = "active"
+    @page = 1
+    @per_page = 50
+    @has_prev = false
+    @has_next = false
+    flash.now[:alert] = e.user_message
   end
 
   def show
@@ -26,6 +35,7 @@
 
   def destroy
     Sales::UseCases::Offers::Archive.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
+    clear_offer_caches!
     redirect_to offers_path, notice: "Teklif arşivlendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#destroy")
@@ -34,6 +44,7 @@
 
   def restore
     Sales::UseCases::Offers::Restore.new(client: supabase_user_client).call(id: params[:id], actor_id: current_user.id)
+    clear_offer_caches!
     redirect_to offers_path(scope: "archived"), notice: "Teklif geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#restore")
@@ -63,6 +74,7 @@
     payload = Offers::CreateForm.new(permitted).normalized_attributes
 
     offer_id = Sales::UseCases::Offers::Create.new(client: supabase_user_client).call(payload: payload, user_id: current_user.id)
+    clear_offer_caches!
     redirect_to offer_path(offer_id), notice: "Teklif oluşturuldu."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "offers#create")
@@ -102,6 +114,13 @@
     category_rows = Categories::OptionsQuery.new(client: supabase_user_client).call(active_only: true, user_id: current_user.id)
     @category_options = category_rows.map { |row| [row["name"].to_s, row["id"].to_s] }
     @category_labels = category_rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "offers#load_form_data", severity: :error)
+    flash.now[:alert] ||= e.user_message
+    @companies = []
+    @products = []
+    @category_options = []
+    @category_labels = {}
   rescue StandardError
     @companies = []
     @products = []
@@ -116,5 +135,8 @@
   def authorize_offers!
     authorize_with_policy!(OffersPolicy)
   end
-end
 
+  def clear_offer_caches!
+    QueryCacheInvalidator.new.invalidate_offers!(user_id: current_user.id)
+  end
+end

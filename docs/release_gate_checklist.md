@@ -6,6 +6,7 @@ Bu liste merge/deploy oncesi "go/no-go" kararini standartlastirir.
 
 - [ ] `bin/rails test` basarili.
 - [ ] `bin/rails test test/architecture` basarili.
+- [ ] `bin/rails quality:guard` basarili.
 - [ ] `bin/reek app` basarili.
 - [ ] `bin/rubocop` basarili.
 - [ ] Controller katmaninda dogrudan Supabase CRUD cagrisi yok.

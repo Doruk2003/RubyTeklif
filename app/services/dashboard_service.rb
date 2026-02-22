@@ -23,7 +23,9 @@ class DashboardService
   def recent_offers
     cached("recent_offers") do
       data = @client.get("offers?select=offer_number,offer_date,gross_total,status,companies(name)&deleted_at=is.null&order=offer_date.desc&limit=5")
-      return [] unless data.is_a?(Array)
+      unless data.is_a?(Array)
+        raise ServiceErrors::System.new(user_message: "Panel teklif verileri gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      end
 
       data.map { |row| serialize_recent_offer_row(row) }
     end
@@ -112,7 +114,9 @@ class DashboardService
   def sum_gross_total_this_month
     start = Date.today.beginning_of_month.iso8601
     data = @client.get("offers?select=sum(gross_total)&deleted_at=is.null&offer_date=gte.#{start}")
-    return 0 unless data.is_a?(Array)
+    unless data.is_a?(Array)
+      raise ServiceErrors::System.new(user_message: "Panel ciro verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+    end
 
     data.first&.fetch("sum", 0) || 0
   end
@@ -120,19 +124,31 @@ class DashboardService
   def companies_created_since(days:)
     since = (Date.today - days).iso8601
     data = @client.get("companies?select=id&deleted_at=is.null&created_at=gte.#{since}")
-    data.is_a?(Array) ? data.size : 0
+    unless data.is_a?(Array)
+      raise ServiceErrors::System.new(user_message: "Panel musteri akis verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+    end
+
+    data.size
   end
 
   def offers_created_since(days:)
     since = (Date.today - days).iso8601
     data = @client.get("offers?select=id&deleted_at=is.null&created_at=gte.#{since}")
-    data.is_a?(Array) ? data.size : 0
+    unless data.is_a?(Array)
+      raise ServiceErrors::System.new(user_message: "Panel teklif akis verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+    end
+
+    data.size
   end
 
   def offers_closed_since(days:)
     since = (Date.today - days).iso8601
     data = @client.get("offers?select=id&deleted_at=is.null&created_at=gte.#{since}&status=eq.onaylandi")
-    data.is_a?(Array) ? data.size : 0
+    unless data.is_a?(Array)
+      raise ServiceErrors::System.new(user_message: "Panel kapanan teklif verisi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+    end
+
+    data.size
   end
 
   def count_from_response(body, response)
@@ -144,7 +160,7 @@ class DashboardService
 
     return body.size if body.is_a?(Array)
 
-    0
+    raise ServiceErrors::System.new(user_message: "Panel sayim verileri gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
   end
 
   def format_currency(value)

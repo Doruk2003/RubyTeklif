@@ -146,9 +146,98 @@ function initFilterPanelToggles(root = document) {
   })
 }
 
+function initStableHoverMenus(root = document) {
+  const bind = (menuSelector, itemSelector, submenuSelector, options = {}) => {
+    const closeOnLeave = options.closeOnLeave !== false
+    const menus = root.querySelectorAll(menuSelector)
+    menus.forEach((menu) => {
+      if (menu.dataset.stableHoverInit === "1") return
+      menu.dataset.stableHoverInit = "1"
+
+      const items = Array.from(menu.querySelectorAll(itemSelector)).filter((item) => item.querySelector(submenuSelector))
+      let closeTimer = null
+
+      const clearCloseTimer = () => {
+        if (!closeTimer) return
+        clearTimeout(closeTimer)
+        closeTimer = null
+      }
+
+      const closeAll = () => {
+        clearCloseTimer()
+        items.forEach((item) => item.classList.remove("is-open"))
+      }
+
+      const openItem = (item) => {
+        clearCloseTimer()
+        items.forEach((candidate) => {
+          candidate.classList.toggle("is-open", candidate === item)
+        })
+      }
+
+      const delayedCloseAll = () => {
+        clearCloseTimer()
+        closeTimer = setTimeout(() => {
+          closeAll()
+        }, 160)
+      }
+
+      items.forEach((item) => {
+        const submenu = item.querySelector(submenuSelector)
+        const trigger = item.querySelector("button, .alp-menu-trigger")
+
+        item.addEventListener("pointerenter", () => openItem(item))
+        item.addEventListener("focusin", () => openItem(item))
+
+        if (submenu) {
+          submenu.addEventListener("pointerenter", () => openItem(item))
+        }
+
+        if (trigger) {
+          trigger.addEventListener("click", (event) => {
+            event.preventDefault()
+            const isOpen = item.classList.contains("is-open")
+            if (isOpen) {
+              closeAll()
+            } else {
+              openItem(item)
+            }
+          })
+        }
+      })
+
+      menu.addEventListener("pointerover", (event) => {
+        const hoveredItem = event.target.closest(itemSelector)
+        if (!hoveredItem || !menu.contains(hoveredItem)) return
+        if (!hoveredItem.querySelector(submenuSelector)) return
+        openItem(hoveredItem)
+      })
+
+      if (closeOnLeave) {
+        menu.addEventListener("pointerleave", delayedCloseAll)
+        menu.addEventListener("pointerenter", clearCloseTimer)
+      }
+      menu.addEventListener("focusout", (event) => {
+        if (!event.relatedTarget || !menu.contains(event.relatedTarget)) closeAll()
+      })
+
+      document.addEventListener("pointerdown", (event) => {
+        if (menu.contains(event.target)) return
+        closeAll()
+      })
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeAll()
+      })
+    })
+  }
+
+  bind(".alp-menu", ".alp-menu-item", ".alp-mega-menu")
+}
+
 document.addEventListener("turbo:load", () => {
   initCustomSelects()
   applyAutoConfirmDefaults()
   initFilterPanelToggles()
+  initStableHoverMenus()
 })
-

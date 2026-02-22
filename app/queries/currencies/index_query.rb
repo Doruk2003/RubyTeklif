@@ -12,7 +12,7 @@ module Currencies
     def call(params:, user_id: nil)
       return build_result(params) unless user_id.present?
 
-      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 90.seconds) do
+      Rails.cache.fetch(cache_key(params, user_id: user_id), expires_in: 30.seconds) do
         build_result(params)
       end
     end
@@ -23,7 +23,10 @@ module Currencies
       page = page(params)
       per_page = per_page(params)
       data = @client.get(build_query(params, page: page, per_page: per_page))
-      rows = data.is_a?(Array) ? data : []
+      unless data.is_a?(Array)
+        raise ServiceErrors::System.new(user_message: "Kur listesi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      end
+      rows = data
 
       {
         items: rows.first(per_page),

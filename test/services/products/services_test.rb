@@ -5,10 +5,17 @@ module Products
     class FakeClient
       attr_reader :last_post_path, :last_post_body, :last_patch_path, :last_patch_body
 
-      def initialize(post_response: nil, patch_response: nil, delete_response: nil)
+      def initialize(post_response: nil, patch_response: nil, delete_response: nil, get_response: [])
         @post_response = post_response
         @patch_response = patch_response
         @delete_response = delete_response
+        @get_response = get_response
+      end
+
+      def get(path)
+        return @get_response.call(path) if @get_response.respond_to?(:call)
+
+        @get_response
       end
 
       def post(path, body:, headers:)
@@ -43,7 +50,7 @@ module Products
     end
 
     test "create returns id via rpc" do
-      client = FakeClient.new(post_response: [{ "product_id" => "prd-1" }])
+      client = FakeClient.new(post_response: [{ "product_id" => "prd-1" }], get_response: [])
       service = Products::Create.new(client: client)
 
       id = service.call(form_payload: valid_payload, actor_id: "usr-1")
@@ -54,7 +61,7 @@ module Products
     end
 
     test "create raises validation for invalid payload" do
-      service = Products::Create.new(client: FakeClient.new(post_response: [{ "product_id" => "prd-1" }]))
+      service = Products::Create.new(client: FakeClient.new(post_response: [{ "product_id" => "prd-1" }], get_response: []))
 
       assert_raises(ServiceErrors::Validation) do
         service.call(form_payload: valid_payload.merge(name: "", price: "-1"), actor_id: "usr-1")
@@ -62,7 +69,7 @@ module Products
     end
 
     test "create raises validation when category is missing" do
-      service = Products::Create.new(client: FakeClient.new(post_response: [{ "product_id" => "prd-1" }]))
+      service = Products::Create.new(client: FakeClient.new(post_response: [{ "product_id" => "prd-1" }], get_response: []))
 
       assert_raises(ServiceErrors::Validation) do
         service.call(form_payload: valid_payload.merge(category_id: ""), actor_id: "usr-1")
@@ -70,7 +77,7 @@ module Products
     end
 
     test "update raises policy error for forbidden response" do
-      client = FakeClient.new(post_response: { "code" => "42501", "message" => "forbidden" })
+      client = FakeClient.new(post_response: { "code" => "42501", "message" => "forbidden" }, get_response: [])
       service = Products::Update.new(client: client)
 
       assert_raises(ServiceErrors::Policy) do
@@ -88,7 +95,7 @@ module Products
     end
 
     test "restore calls atomic rpc endpoint" do
-      client = FakeClient.new(post_response: [{ "product_id" => "prd-1" }])
+      client = FakeClient.new(post_response: [{ "product_id" => "prd-1" }], get_response: [])
       service = Products::Restore.new(client: client)
 
       service.call(id: "prd-1", actor_id: "usr-1")
@@ -96,6 +103,46 @@ module Products
       assert_equal "rpc/restore_product_with_audit_atomic", client.last_post_path
       assert_equal "prd-1", client.last_post_body[:p_product_id]
       assert_equal "usr-1", client.last_post_body[:p_actor_id]
+    end
+
+    test "create prevents duplicate sku or barcode before rpc" do
+      client = FakeClient.new(
+        post_response: [{ "product_id" => "prd-1" }],
+        get_response: lambda { |path|
+          if path.include?("sku=eq.PRD-00001")
+            [{ "id" => "prd-existing" }]
+          else
+            []
+          end
+        }
+      )
+      service = Products::Create.new(client: client)
+
+      assert_raises(ServiceErrors::Validation) do
+        service.call(form_payload: valid_payload, actor_id: "usr-1")
+      end
+
+      assert_nil client.last_post_path
+    end
+
+    test "update prevents duplicate sku or barcode before rpc" do
+      client = FakeClient.new(
+        post_response: [{ "product_id" => "prd-1" }],
+        get_response: lambda { |path|
+          if path.include?("id=neq.prd-1") && path.include?("barcode=eq.8691234567890")
+            [{ "id" => "prd-other" }]
+          else
+            []
+          end
+        }
+      )
+      service = Products::Update.new(client: client)
+
+      assert_raises(ServiceErrors::Validation) do
+        service.call(id: "prd-1", form_payload: valid_payload, actor_id: "usr-1")
+      end
+
+      assert_nil client.last_post_path
     end
   end
 end

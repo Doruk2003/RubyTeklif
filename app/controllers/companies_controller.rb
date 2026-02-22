@@ -17,6 +17,15 @@
     @has_prev = false
     @has_next = false
     flash.now[:alert] = "Supabase ayarlari eksik oldugu icin musteriler yuklenemedi."
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "companies#index", severity: :error)
+    @companies = []
+    @scope = "active"
+    @page = 1
+    @per_page = 50
+    @has_prev = false
+    @has_next = false
+    flash.now[:alert] = e.user_message
   end
 
   def show
@@ -100,7 +109,6 @@
   end
 
   def clear_companies_cache!
-    Rails.cache.delete_matched("queries/companies/v1/user:#{current_user.id}/*")
+    QueryCacheInvalidator.new.invalidate_companies!(user_id: current_user.id)
   end
 end
-

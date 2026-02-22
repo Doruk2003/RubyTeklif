@@ -51,6 +51,15 @@ module Offers
       call_atomic_rpc!("rpc/create_offer_with_items_atomic", body: payload)
     end
 
+    def offer_number_taken?(offer_number:)
+      normalized = offer_number.to_s.strip
+      return false if normalized.blank?
+
+      path = "offers?select=id&deleted_at=is.null&offer_number=eq.#{Supabase::FilterValue.eq(normalized)}&limit=1"
+      rows = @client.get(path)
+      rows.is_a?(Array) && rows.any?
+    end
+
     def archive_with_audit_atomic(offer_id:, actor_id:)
       call_atomic_rpc!(
         "rpc/archive_offer_with_items_and_audit_atomic",

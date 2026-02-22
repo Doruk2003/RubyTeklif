@@ -80,5 +80,38 @@ module Products
         }
       )
     end
+
+    def sku_taken?(sku:, exclude_product_id: nil)
+      return false if sku.to_s.strip.blank?
+
+      filters = [
+        "deleted_at=is.null",
+        "sku=eq.#{Supabase::FilterValue.eq(sku.to_s.strip.upcase)}"
+      ]
+      if exclude_product_id.present?
+        filters << "id=neq.#{Supabase::FilterValue.eq(exclude_product_id)}"
+      end
+
+      path = "products?select=id&#{filters.join('&')}&limit=1"
+      rows = @client.get(path)
+      rows.is_a?(Array) && rows.any?
+    end
+
+    def barcode_taken?(barcode:, exclude_product_id: nil)
+      normalized = barcode.to_s.strip.upcase
+      return false if normalized.blank?
+
+      filters = [
+        "deleted_at=is.null",
+        "barcode=eq.#{Supabase::FilterValue.eq(normalized)}"
+      ]
+      if exclude_product_id.present?
+        filters << "id=neq.#{Supabase::FilterValue.eq(exclude_product_id)}"
+      end
+
+      path = "products?select=id&#{filters.join('&')}&limit=1"
+      rows = @client.get(path)
+      rows.is_a?(Array) && rows.any?
+    end
   end
 end

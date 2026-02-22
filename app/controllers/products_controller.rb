@@ -22,6 +22,16 @@ class ProductsController < ApplicationController
     @per_page = 50
     @has_prev = false
     @has_next = false
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "products#index", severity: :error)
+    @products = []
+    @scope = "active"
+    @category = nil
+    @page = 1
+    @per_page = 50
+    @has_prev = false
+    @has_next = false
+    flash.now[:alert] = e.user_message
   end
 
   def show
@@ -164,6 +174,11 @@ class ProductsController < ApplicationController
     rows = Categories::OptionsQuery.new(client: client).call(active_only: false, user_id: current_user.id)
     @category_options = rows.map { |row| [row["name"].to_s, row["id"].to_s] }
     @category_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "products#load_category_options", severity: :error)
+    flash.now[:alert] ||= e.user_message
+    @category_options = []
+    @category_labels = {}
   rescue StandardError
     @category_options = []
     @category_labels = {}
@@ -173,6 +188,11 @@ class ProductsController < ApplicationController
     rows = Brands::OptionsQuery.new(client: client).call(active_only: false, user_id: current_user.id)
     @brand_options = rows.map { |row| [row["name"].to_s, row["id"].to_s] }
     @brand_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "products#load_brand_options", severity: :error)
+    flash.now[:alert] ||= e.user_message
+    @brand_options = []
+    @brand_labels = {}
   rescue StandardError
     @brand_options = []
     @brand_labels = {}
@@ -182,6 +202,11 @@ class ProductsController < ApplicationController
     rows = Currencies::OptionsQuery.new(client: client).call(active_only: false, user_id: current_user.id)
     @currency_options = rows.map { |row| ["#{row["code"]} - #{row["name"]}", row["id"].to_s] }
     @currency_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["code"].to_s }
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "products#load_currency_options", severity: :error)
+    flash.now[:alert] ||= e.user_message
+    @currency_options = []
+    @currency_labels = {}
   rescue StandardError
     @currency_options = []
     @currency_labels = {}
@@ -213,8 +238,7 @@ class ProductsController < ApplicationController
   end
 
   def clear_products_cache!
-    Rails.cache.delete_matched("queries/products/v1/user:#{current_user.id}/*")
-    Rails.cache.delete_matched("offers/form/products/v1/user:#{current_user.id}/*")
+    QueryCacheInvalidator.new.invalidate_products!(user_id: current_user.id)
   end
 
   def purge_archived_product_images_warning(product_id:)

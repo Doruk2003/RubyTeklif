@@ -9,6 +9,7 @@ module Currencies
       validate_form!(form)
 
       payload = form.normalized_attributes
+      validate_code_uniqueness!(code: payload[:code])
       created = @repository.create_with_audit_atomic(payload: payload, actor_id: actor_id)
       raise_from_response!(created, fallback: "Kur kaydi olusturulamadi.")
 
@@ -29,6 +30,10 @@ module Currencies
     def raise_from_response!(response, fallback:)
       return unless response.is_a?(Hash) && (response["message"].present? || response["error"].present?)
 
+      if response["code"].to_s == "23505"
+        raise ServiceErrors::Validation.new(user_message: "Bu kur kodu zaten kayitli.")
+      end
+
       if response["code"].to_s == "42501"
         raise ServiceErrors::Policy.new(user_message: "Bu islem icin yetkiniz yok.")
       end
@@ -44,6 +49,12 @@ module Currencies
       return response["id"].to_s if response.is_a?(Hash)
 
       nil
+    end
+
+    def validate_code_uniqueness!(code:)
+      return unless @repository.code_taken?(code: code)
+
+      raise ServiceErrors::Validation.new(user_message: "Bu kur kodu zaten kayitli.")
     end
   end
 end

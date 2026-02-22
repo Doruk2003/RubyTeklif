@@ -31,12 +31,12 @@ module Admin
         )
       end
 
-      test "returns empty hash on non-array response" do
+      test "raises system error on non-array response" do
         client = FakeClient.new(response: { "error" => "bad" })
 
-        result = Admin::Users::EmailIndexQuery.new(client: client).call
-
-        assert_equal({}, result)
+        assert_raises(ServiceErrors::System) do
+          Admin::Users::EmailIndexQuery.new(client: client).call
+        end
       end
     end
   end

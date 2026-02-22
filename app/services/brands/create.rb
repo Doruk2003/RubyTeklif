@@ -9,6 +9,7 @@ module Brands
       validate_form!(form)
 
       payload = form.normalized_attributes
+      validate_uniqueness!(payload: payload)
       created = @repository.create_with_audit_atomic(payload: payload, actor_id: actor_id)
       raise_from_response!(created, fallback: "Marka olusturulamadi.")
 
@@ -29,6 +30,10 @@ module Brands
     def raise_from_response!(response, fallback:)
       return unless response.is_a?(Hash) && (response["message"].present? || response["error"].present?)
 
+      if response["code"].to_s == "23505"
+        raise ServiceErrors::Validation.new(user_message: "Marka kodu veya adi zaten kayitli.")
+      end
+
       if response["code"].to_s == "42501"
         raise ServiceErrors::Policy.new(user_message: "Bu islem icin yetkiniz yok.")
       end
@@ -44,6 +49,12 @@ module Brands
       return response["id"].to_s if response.is_a?(Hash)
 
       nil
+    end
+
+    def validate_uniqueness!(payload:)
+      if @repository.code_taken?(code: payload[:code]) || @repository.name_taken?(name: payload[:name])
+        raise ServiceErrors::Validation.new(user_message: "Marka kodu veya adi zaten kayitli.")
+      end
     end
   end
 end

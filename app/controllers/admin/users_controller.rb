@@ -18,6 +18,15 @@
       @has_next = false
       @has_prev = false
       @export = nil
+    rescue ServiceErrors::System => e
+      report_handled_error(e, source: "admin/users#index", severity: :error)
+      @users = []
+      @page = 1
+      @per_page = 100
+      @has_next = false
+      @has_prev = false
+      @export = nil
+      flash.now[:alert] = e.user_message
     end
 
     def new
@@ -40,6 +49,9 @@
       redirect_to admin_users_path, alert: "Kullanici bulunamadi." if @user.nil?
     rescue Supabase::Client::ConfigurationError
       redirect_to admin_users_path, alert: "Kullanici yuklenemedi."
+    rescue ServiceErrors::System => e
+      report_handled_error(e, source: "admin/users#edit", severity: :error)
+      redirect_to admin_users_path, alert: e.user_message
     end
 
     def update

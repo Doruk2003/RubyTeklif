@@ -9,6 +9,7 @@ module Offers
       form = Offers::CreateForm.new(payload)
       validate_form!(form)
       normalized = form.normalized_attributes
+      validate_offer_number_uniqueness!(offer_number: normalized[:offer_number])
 
       items = normalized.delete(:items)
       product_map = @repository.fetch_products(items.map { |i| i[:product_id] })
@@ -48,6 +49,10 @@ module Offers
     def raise_from_response!(response, fallback:)
       return unless response.is_a?(Hash) && (response["message"].present? || response["error"].present?)
 
+      if response["code"].to_s == "23505"
+        raise ServiceErrors::Validation.new(user_message: "Bu teklif numarasi zaten kayitli.")
+      end
+
       if response["code"].to_s == "42501"
         raise ServiceErrors::Policy.new(user_message: "Bu islem icin yetkiniz yok.")
       end
@@ -67,6 +72,12 @@ module Offers
       return response.to_s if response.is_a?(String)
 
       nil
+    end
+
+    def validate_offer_number_uniqueness!(offer_number:)
+      return unless @repository.offer_number_taken?(offer_number: offer_number)
+
+      raise ServiceErrors::Validation.new(user_message: "Bu teklif numarasi zaten kayitli.")
     end
   end
 end

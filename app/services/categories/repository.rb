@@ -50,5 +50,32 @@ module Categories
         }
       )
     end
+
+    def code_taken?(code:, exclude_category_id: nil)
+      taken_for?(:code, code, exclude_category_id: exclude_category_id)
+    end
+
+    def name_taken?(name:, exclude_category_id: nil)
+      taken_for?(:name, name, exclude_category_id: exclude_category_id)
+    end
+
+    private
+
+    def taken_for?(field, value, exclude_category_id: nil)
+      normalized = value.to_s.strip
+      return false if normalized.blank?
+
+      filters = [
+        "deleted_at=is.null",
+        "#{field}=eq.#{Supabase::FilterValue.eq(normalized)}"
+      ]
+      if exclude_category_id.present?
+        filters << "id=neq.#{Supabase::FilterValue.eq(exclude_category_id)}"
+      end
+
+      path = "categories?select=id&#{filters.join('&')}&limit=1"
+      rows = @client.get(path)
+      rows.is_a?(Array) && rows.any?
+    end
   end
 end

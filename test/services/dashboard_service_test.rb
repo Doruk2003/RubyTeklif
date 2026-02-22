@@ -24,6 +24,14 @@ class DashboardServiceTest < ActiveSupport::TestCase
     end
   end
 
+  class MalformedRecentOffersClient < FakeClient
+    def get(path)
+      return { "error" => "bad" } if path.start_with?("offers?select=offer_number")
+
+      super(path)
+    end
+  end
+
   test "kpis are cached per actor" do
     client = FakeClient.new
     cache = ActiveSupport::Cache::MemoryStore.new
@@ -47,5 +55,17 @@ class DashboardServiceTest < ActiveSupport::TestCase
 
     assert_equal first, second
     assert_equal 1, client.get_calls.count { |p| p.start_with?("offers?select=offer_number") }
+  end
+
+  test "raises system error when recent offers response is malformed" do
+    service = DashboardService.new(
+      client: MalformedRecentOffersClient.new,
+      actor_id: "usr-1",
+      cache_store: ActiveSupport::Cache::MemoryStore.new
+    )
+
+    assert_raises(ServiceErrors::System) do
+      service.recent_offers
+    end
   end
 end

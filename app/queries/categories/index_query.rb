@@ -31,7 +31,10 @@ module Categories
       path += "&order=#{sort}.#{dir}"
       path += "&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
       data = @client.get(path)
-      rows = data.is_a?(Array) ? data : []
+      unless data.is_a?(Array)
+        raise ServiceErrors::System.new(user_message: "Kategori listesi gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      end
+      rows = data
 
       {
         items: rows.first(per_page),

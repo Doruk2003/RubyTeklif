@@ -11,6 +11,10 @@ module Products
     def raise_from_response!(response, fallback:)
       return unless response.is_a?(Hash) && (response["message"].present? || response["error"].present?)
 
+      if response["code"].to_s == "23505"
+        raise ServiceErrors::Validation.new(user_message: "SKU veya barkod zaten kayitli.")
+      end
+
       if response["code"].to_s == "42501"
         raise ServiceErrors::Policy.new(user_message: "Bu islem icin yetkiniz yok.")
       end
