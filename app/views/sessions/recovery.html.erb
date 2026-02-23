@@ -6,18 +6,15 @@
           <div class="text-center mb-4">
             <p class="small fw-semibold text-uppercase text-secondary mb-1">Hesap Kurtarma</p>
             <h1 class="h3 mb-2">Şifremi unuttum</h1>
-            <p class="text-secondary mb-0">E-posta adresinizi girin, şifre sıfırlama başlantısını gönderelim.</p>
+            <p class="text-secondary mb-0">E-posta adresinizi girin, şifre sıfırlama bağlantısını gönderelim.</p>
           </div>
-
           <%= form_with url: password_recovery_path, method: :post, local: true, class: "d-grid gap-3" do |f| %>
             <div>
               <%= f.label :email, "E-posta", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
               <%= f.email_field :email, class: "form-input", required: true, autocomplete: "email", placeholder: "ornek@firma.com" %>
             </div>
-
             <%= f.submit "Sıfırlama Başlantısı Gönder", class: "btn-primary w-100" %>
           <% end %>
-
           <div class="text-center mt-3">
             <%= link_to "Giriş ekranına dön", login_path, class: "small link-secondary text-decoration-none" %>
           </div>
@@ -26,5 +23,3 @@
     </div>
   </div>
 </div>
-
-
