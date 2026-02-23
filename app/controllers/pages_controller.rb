@@ -18,4 +18,18 @@
     @flow_stats = []
     @reminders = []
   end
+
+  def ajanda
+    service = AgendaService.new(client: supabase_user_client, actor_id: current_user.id)
+    @calendar_events = service.calendar_events
+    @agenda_items = service.side_items
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: "pages#ajanda", severity: :error)
+    flash.now[:alert] = e.user_message
+    @calendar_events = []
+    @agenda_items = []
+  rescue StandardError
+    @calendar_events = []
+    @agenda_items = []
+  end
 end

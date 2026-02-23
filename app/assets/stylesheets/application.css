@@ -52,6 +52,28 @@ body {
   overflow-x: hidden;
 }
 
+/* Home page: remove global page paddings/margins completely */
+body.home-page {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.home-page .app-main {
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  top: -24px;
+}
+
+body.home-page .home-page-root {
+  margin: 0 !important;
+  padding-top: 0 !important;
+}
+
+body.home-page .home-nav {
+  margin-top: 0 !important;
+}
+
 .hidden {
   display: none !important;
 }
@@ -1911,5 +1933,3 @@ select.form-input:focus {
 .rt-icon-btn-layout:focus-visible::after {
   opacity: 1;
 }
-
-

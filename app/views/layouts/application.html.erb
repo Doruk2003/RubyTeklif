@@ -24,7 +24,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= 'auth-page' if controller_name == 'sessions' %>">
+  <body class="<%= [("auth-page" if controller_name == "sessions"), ("home-page" if controller_name == "pages" && action_name == "home")].compact.join(" ") %>">
     <main class="app-main">
       <% notice_message = notice.to_s.strip.presence %>
       <% alert_message = alert.to_s.strip.presence %>

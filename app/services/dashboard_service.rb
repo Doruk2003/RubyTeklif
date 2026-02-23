@@ -3,11 +3,13 @@ require "uri"
 
 class DashboardService
   CACHE_TTL = 2.minutes
+  REMINDER_LIMIT = 5
 
   def initialize(client:, actor_id: nil, cache_store: Rails.cache)
     @client = client
     @actor_id = actor_id.to_s.presence || "anonymous"
     @cache_store = cache_store
+    @calendar_events_repository = CalendarEvents::Repository.new(client: client)
   end
 
   def kpis
@@ -54,11 +56,28 @@ class DashboardService
   end
 
   def reminders
-    [
-      "Son 48 saatte güncellenmeyen teklifleri kontrol edin.",
-      "Onay bekleyen teklifler için müşteri geri dönüşü alın.",
-      "Fiyat listesi güncellemesini paylaşmayı unutmayın."
-    ]
+    cached("reminders") do
+      rows = @calendar_events_repository.list_active(user_id: @actor_id, limit: 300)
+      unless rows.is_a?(Array)
+        raise ServiceErrors::System.new(user_message: "Hatirlatma verileri gecici olarak yuklenemedi. Lutfen tekrar deneyin.")
+      end
+
+      items = rows.filter_map do |row|
+        next unless row.is_a?(Hash)
+
+        start_at = parse_time(row["start_at"]) || parse_date(row["event_date"])&.in_time_zone
+        title = row["title"].to_s.strip
+        next if start_at.nil? || title.blank?
+
+        { date: start_at.to_date, time: start_at.strftime("%H:%M"), title: title }
+      end
+
+      upcoming = items.select { |item| item[:date] >= Date.current }.sort_by { |item| item[:date] }
+      picked = upcoming.first(REMINDER_LIMIT)
+      picked = items.sort_by { |item| item[:date] }.reverse.first(REMINDER_LIMIT) if picked.blank?
+
+      picked.map { |item| "#{I18n.l(item[:date])} #{item[:time]} - #{item[:title]}" }
+    end
   end
 
   private
@@ -191,6 +210,24 @@ class DashboardService
 
   def cached(section, &block)
     @cache_store.fetch("dashboard/#{@actor_id}/#{section}", expires_in: CACHE_TTL, &block)
+  end
+
+  def parse_date(value)
+    return value if value.is_a?(Date)
+    return nil if value.blank?
+
+    Date.iso8601(value.to_s)
+  rescue ArgumentError
+    nil
+  end
+
+  def parse_time(value)
+    return value.in_time_zone if value.respond_to?(:in_time_zone)
+    return nil if value.blank?
+
+    Time.zone.parse(value.to_s)
+  rescue ArgumentError
+    nil
   end
 
   # :reek:FeatureEnvy

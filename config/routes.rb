@@ -27,6 +27,8 @@ Rails.application.routes.draw do
 
   root "pages#home"
   get "home", to: "pages#home"
+  get "ajanda", to: "pages#ajanda"
+  resources :calendar_events, only: [:index, :create, :update, :destroy]
 
   resources :companies do
     member do

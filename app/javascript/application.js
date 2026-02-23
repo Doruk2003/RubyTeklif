@@ -3,6 +3,85 @@ import { Turbo } from "@hotwired/turbo-rails"
 import "controllers"
 import { initCustomSelects } from "custom_select"
 
+let globalAgendaAlarmTimer = null
+
+function requestGlobalNotificationPermission() {
+  if (!("Notification" in window)) return
+  if (Notification.permission === "default") Notification.requestPermission()
+}
+
+function alarmStorageKey(eventItem) {
+  const idPart = eventItem.id || eventItem.title || "event"
+  const startPart = eventItem.start || ""
+  const remindPart = eventItem.remindMinutesBefore || 0
+  return `agenda_alarm_fired_${idPart}_${startPart}_${remindPart}`
+}
+
+function showGlobalAgendaAlarm(eventItem) {
+  const title = eventItem.title || "Ajanda Hatirlatmasi"
+  const startTime = new Date(eventItem.start)
+  const body = `Etkinlik saati: ${startTime.toLocaleString("tr-TR")}`
+
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification(title, { body })
+    return
+  }
+
+  window.alert(`${title}\n${body}`)
+}
+
+function startGlobalAgendaAlarmPolling(events) {
+  if (globalAgendaAlarmTimer) {
+    clearInterval(globalAgendaAlarmTimer)
+    globalAgendaAlarmTimer = null
+  }
+
+  const tick = () => {
+    const now = Date.now()
+
+    events.forEach((eventItem) => {
+      const startAtMs = Date.parse(eventItem.start)
+      if (Number.isNaN(startAtMs)) return
+
+      const remindMinutes = Number(eventItem.remindMinutesBefore || 0)
+      if (remindMinutes < 0) return
+
+      const remindAtMs = startAtMs - remindMinutes * 60 * 1000
+      const maxTriggerMs = startAtMs + 2 * 60 * 1000
+      if (now < remindAtMs || now > maxTriggerMs) return
+
+      const key = alarmStorageKey(eventItem)
+      if (localStorage.getItem(key) === "1") return
+
+      showGlobalAgendaAlarm(eventItem)
+      localStorage.setItem(key, "1")
+    })
+  }
+
+  tick()
+  globalAgendaAlarmTimer = setInterval(tick, 30 * 1000)
+}
+
+async function initGlobalAgendaAlarms() {
+  if (document.body.classList.contains("auth-page")) return
+
+  try {
+    const response = await fetch("/calendar_events.json", {
+      headers: { Accept: "application/json" },
+      credentials: "same-origin"
+    })
+    if (!response.ok) return
+
+    const events = await response.json()
+    if (!Array.isArray(events)) return
+
+    requestGlobalNotificationPermission()
+    startGlobalAgendaAlarmPolling(events)
+  } catch (_error) {
+    // noop: keep UI usable even if alarm feed fails
+  }
+}
+
 function showAppConfirm(message, opts = {}) {
   const title = opts.title || "Onay"
   const okText = opts.okText || "Evet"
@@ -240,4 +319,5 @@ document.addEventListener("turbo:load", () => {
   applyAutoConfirmDefaults()
   initFilterPanelToggles()
   initStableHoverMenus()
+  initGlobalAgendaAlarms()
 })

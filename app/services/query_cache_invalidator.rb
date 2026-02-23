@@ -53,6 +53,14 @@ class QueryCacheInvalidator
     delete("queries/companies/v2/user:#{uid}/*")
   end
 
+  def invalidate_agenda!(user_id:)
+    uid = user_id.to_s
+    return if uid.blank?
+
+    delete("agenda/#{uid}/*")
+    delete("dashboard/#{uid}/reminders")
+  end
+
   private
 
   def delete(pattern)
