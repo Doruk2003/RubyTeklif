@@ -656,6 +656,203 @@ body.auth-page .app-main {
   padding: 0 !important;
 }
 
+body.auth-page .app-main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 2vw, 32px) !important;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(15, 23, 42, 0.07), transparent 40%),
+    radial-gradient(circle at 80% 75%, rgba(2, 132, 199, 0.08), transparent 38%),
+    linear-gradient(160deg, #f8f6f2 0%, #eceff3 100%) !important;
+}
+
+body.auth-page .app-main > * {
+  width: 100%;
+}
+
+.erp-login-shell {
+  width: 100%;
+  max-width: 919px;
+  margin: 0 auto;
+}
+
+.erp-login-card {
+  border: 1px solid #d8dde4;
+  border-radius: 6px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 30px 55px -36px rgba(15, 23, 42, 0.45);
+}
+
+.erp-login-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.erp-login-aside {
+  padding: clamp(19px, 2.4vw, 32px);
+  background: linear-gradient(150deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  min-height: 100%;
+}
+
+.erp-login-brand {
+  display: block;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.erp-login-heading {
+  margin: 6px 0 4px;
+  font-size: clamp(18px, 1.8vw, 22px);
+  font-weight: 600;
+  line-height: 1.2;
+  color: #d1d5db;
+}
+
+.erp-login-copy {
+  margin: 0 0 8px;
+  color: rgba(248, 250, 252, 0.85);
+  line-height: 1.55;
+}
+
+.erp-login-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.erp-login-points li {
+  position: relative;
+  padding-left: 18px;
+  color: rgba(248, 250, 252, 0.9);
+  font-size: 14px;
+}
+
+.erp-login-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #38bdf8;
+}
+
+.erp-login-main {
+  padding: clamp(19px, 2.4vw, 32px);
+  display: grid;
+  gap: 19px;
+}
+
+.erp-login-main form {
+  margin-top: 12px;
+  gap: 6px !important;
+}
+
+.erp-login-main form > .form-floating:first-child {
+  margin-top: 8px;
+}
+
+.erp-login-main form > div {
+  width: 100%;
+}
+
+.erp-login-main .form-input {
+  width: 100% !important;
+  display: block;
+  margin-top: 0 !important;
+  min-height: 46px;
+}
+
+.erp-login-main .form-floating > .form-input {
+  min-height: 40px;
+  padding-top: 1.25rem !important;
+  padding-bottom: 0.375rem !important;
+}
+
+.erp-login-main #login-password.form-input {
+  padding-right: 44px !important;
+}
+
+.erp-login-main-head h2 {
+  margin: 5px 0 6px;
+  font-size: clamp(18px, 1.8vw, 22px);
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.erp-login-main-head p {
+  margin: 0;
+  color: #475569;
+}
+
+.erp-login-kicker {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0369a1;
+  font-weight: 700;
+}
+
+.erp-login-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 26px;
+  margin-top: 0;
+}
+
+.erp-login-actions {
+  margin-top: 24px;
+  display: grid;
+  gap: 6px;
+}
+
+.erp-login-security {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.erp-login-link {
+  font-weight: 600;
+}
+
+.erp-login-submit {
+  margin-top: 0;
+  min-height: 38px;
+  font-weight: 600 !important;
+}
+
+@media (min-width: 992px) {
+  .erp-login-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .erp-login-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .app-flash-wrap {
   position: fixed;
   top: 16px;
