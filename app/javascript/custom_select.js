@@ -9,7 +9,10 @@ function closeAllCustomSelects(except = null) {
 
 function syncState(root, select, trigger, menu) {
   const selectedOption = select.options[select.selectedIndex]
-  trigger.querySelector(".rt-custom-select-label").textContent = selectedOption ? selectedOption.text : ""
+  const hasValue = !!(selectedOption && selectedOption.value !== "")
+  trigger.querySelector(".rt-custom-select-label").textContent = hasValue ? selectedOption.text : ""
+  root.classList.toggle("has-value", hasValue)
+  root.classList.toggle("is-empty", !hasValue)
 
   menu.querySelectorAll(".rt-custom-select-option").forEach((optionButton) => {
     const active = optionButton.dataset.value === select.value
@@ -41,6 +44,11 @@ function buildCustomSelect(select) {
   const menu = document.createElement("div")
   menu.className = "rt-custom-select-menu"
   menu.setAttribute("role", "listbox")
+
+  // Floating label icin istenirse ilk yuklemede secimi bos birak.
+  if (select.dataset.floatEmpty === "true" && !select.value) {
+    select.selectedIndex = -1
+  }
 
   Array.from(select.options).forEach((option) => {
     const item = document.createElement("button")

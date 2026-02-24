@@ -1,17 +1,24 @@
-<div class="container-fluid py-2">
-  <div class="row g-2">
-    <div class="col-12">
-      <div class="card shadow-sm">
+<div class="container-fluid py-2 admin-users-page">
+  <div class="row g-3">
+    <div class="col-12" style="z-index: 10; position: relative;">
+      <div class="card shadow-sm app-header-card">
         <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
           <div>
             <h1 class="h4 mb-1">Admin Panel</h1>
-            <p class="text-secondary mb-0">Kullanıcı rolleri</p>
+            <p class="text-secondary mb-0">Kullanıcı Rolleri</p>
           </div>
-          <div class="d-flex flex-wrap align-items-center gap-2">
-            <%= filter_panel_toggle_button %>
-            <%= new_record_button("Yeni Kullanıcı", new_admin_user_path) %>
-            <%= button_to "CSV Export", export_admin_users_path(request.query_parameters), method: :post, class: "btn-secondary w-100" %>
-            <%= link_to "Ana Sayfa", home_path, class: "btn-secondary w-100" %>
+          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+            <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
+            <%= new_record_button("Yeni Kullanici", new_admin_user_path, class_name: "app-header-icon-btn") %>
+            <%= button_to export_admin_users_path(request.query_parameters),
+                  method: :post,
+                  class: "btn btn-outline-secondary rt-icon-btn-layout app-header-icon-btn",
+                  form_class: "d-inline-block m-0",
+                  data: { tip: "CSV Export" },
+                  aria: { label: "CSV Export" } do %>
+              <span class="material-symbols-outlined" aria-hidden="true">download</span>
+            <% end %>
+            <%= home_nav_button(home_path, label: "Ana Sayfa", icon: "home", class_name: "app-header-icon-btn") %>
           </div>
         </div>
       </div>
@@ -23,16 +30,16 @@
           <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
             <div class="small text-secondary">
               <% if @export[:status].to_s == "ready" %>
-                Son kullanıcı export'u hazır.
+                Son kullanici export'u hazir.
               <% elsif @export[:status].to_s == "failed" %>
-                Kullanıcı export'u başarısız oldu. Tekrar deneyin.
+                Kullanici export'u basarisiz oldu. Tekrar deneyin.
               <% else %>
-                Kullanıcı export'u hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
+                Kullanici export'u hazirlaniyor. Birkac saniye sonra sayfayi yenileyin.
               <% end %>
             </div>
             <div>
               <% if @export[:status].to_s == "ready" %>
-                <%= link_to "CSV İndir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
+                <%= link_to "CSV Indir", download_export_admin_users_path(token: @export[:token]), class: "btn-secondary" %>
               <% elsif @export[:status].to_s == "pending" %>
                 <%= link_to "Yenile", admin_users_path(request.query_parameters), class: "btn-secondary" %>
               <% end %>
@@ -42,44 +49,66 @@
       </div>
     <% end %>
 
-    <div class="col-12">
+    <div class="col-12 hidden" data-filter-panel>
       <div class="card shadow-sm">
-        <div class="card-body hidden" data-filter-panel>
-          <%= filter_form_with url: admin_users_path, layout: :four do |f| %>
-            <div>
-              <%= f.label :q, "E-posta", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.text_field :q, value: params[:q], class: "form-input" %>
+        <div class="card-body">
+          <%= form_with url: admin_users_path, method: :get, local: true, class: app_form_class("filter-form") do |f| %>
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-6 col-lg-4">
+                <div class="form-floating">
+                  <%= f.search_field :q,
+                      value: params[:q],
+                      placeholder: "E-posta",
+                      class: "form-control",
+                      style: "width: 100%;" %>
+                  <%= f.label :q, "E-posta" %>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="form-floating">
+                  <%= f.select :role,
+                      options_for_select([
+                        ["Tum Roller", ""],
+                        *Roles::ASSIGNABLE_ROLE_OPTIONS
+                      ], params[:role].to_s),
+                      {},
+                      class: "form-select",
+                      data: { float_empty: true },
+                      style: "width: 100%;" %>
+                  <%= f.label :role, "Rol" %>
+                </div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <div class="form-floating">
+                  <%= f.select :active,
+                      options_for_select([
+                        ["Tumu", ""],
+                        ["Aktif", "true"],
+                        ["Pasif", "false"]
+                      ], params[:active].to_s),
+                      {},
+                      class: "form-select",
+                      data: { float_empty: true },
+                      style: "width: 100%;" %>
+                  <%= f.label :active, "Durum" %>
+                </div>
+              </div>
+              <div class="col-12 col-lg-2">
+                <div class="d-flex gap-2">
+                  <%= f.submit "FILTRELE", class: "btn btn-sm btn-dark flex-fill" %>
+                  <%= link_to "TEMIZLE", admin_users_path, class: "btn btn-sm btn-warning flex-fill" %>
+                </div>
+              </div>
             </div>
-            <div>
-              <%= f.label :role, "Rol", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :role,
-                    options_for_select([
-                      ["Tüm Roller", ""],
-                      *Roles::ASSIGNABLE_ROLE_OPTIONS
-                    ], params[:role].to_s),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <div>
-              <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :active,
-                    options_for_select([
-                      ["Tüm", ""],
-                      ["Aktif", "true"],
-                      ["Pasif", "false"]
-                    ], params[:active].to_s),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <%= filter_actions_row(class_name: "items-end") do %>
-              <%= filter_submit_button %>
-              <%= clear_filter_button(admin_users_path) %>
-            <% end %>
           <% end %>
         </div>
+      </div>
+    </div>
 
+    <div class="col-12">
+      <div class="card shadow-sm">
         <div class="card-body p-0">
-          <div class="table-responsive">
+          <%= app_table_wrapper do %>
             <table class="table table-hover align-middle mb-0">
               <thead>
                 <tr>
@@ -96,27 +125,27 @@
                     <td class="text-center">
                       <% role = user["role"].to_s %>
                       <% role_class = Roles.role_badge_class(role) %>
-                      <span class="badge rounded-pill <%= role_class %>"><%= role %></span>
+                      <span><%= role.upcase %></span>
                     </td>
                     <td class="text-center">
                       <% if user["active"] == false %>
-                        <span class="badge-info">Pasif</span>
+                        <span>Pasif</span>
                       <% else %>
-                        <span class="badge-success">Aktif</span>
+                        <span>Aktif</span>
                       <% end %>
                     </td>
                     <td class="text-end">
                       <div class="d-inline-flex align-items-center gap-2">
-                        <%= link_to "Düzenle", edit_admin_user_path(user["id"]), class: "btn-secondary" %>
-                        <%= link_to "Şifre Sıfırla",
+                        <%= link_to "Duzenle", edit_admin_user_path(user["id"]), class: "btn btn-sm btn-warning" %>
+                        <%= link_to "Sifre Sifirla",
                               reset_password_admin_user_path(user["id"]),
                               method: :post,
-                              data: { turbo_confirm: "Parola sıfırlama maili gönderilsin mi?" },
-                              class: "btn-secondary" %>
+                              data: { turbo_confirm: "Parola sifirlama maili gonderilsin mi?" },
+                              class: "btn btn-sm btn-secondary" %>
                         <% if user["active"] == false %>
-                          <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
+                          <%= link_to "Aktif Et", enable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn btn-sm btn-primary" %>
                         <% else %>
-                          <%= link_to "Pasif Et", disable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn-secondary" %>
+                          <%= link_to "Pasif Et", disable_admin_user_path(user["id"]), data: { turbo_method: :patch }, class: "btn btn-sm btn-danger" %>
                         <% end %>
                       </div>
                     </td>
@@ -125,12 +154,12 @@
 
                 <% if @users.empty? %>
                   <tr>
-                    <td colspan="4" class="text-center py-5 text-secondary">Kullanıcı yok.</td>
+                    <td colspan="4" class="text-center py-5 text-secondary">Kullanici yok.</td>
                   </tr>
                 <% end %>
               </tbody>
             </table>
-          </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -139,7 +168,7 @@
       <div class="card shadow-sm">
         <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
           <div class="text-secondary">
-            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayit</span>
           </div>
           <div class="d-flex align-items-center gap-2">
             <div class="d-none d-sm-flex align-items-center gap-1">
@@ -151,15 +180,15 @@
               <% end %>
             </div>
             <% if @has_prev %>
-              <%= link_to "Önceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+              <%= link_to "Onceki", admin_users_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+              <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Onceki</span>
             <% end %>
 
             <% if @has_next %>
-              <%= link_to "Sonraki", admin_users_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+              <%= link_to "Sonraki", admin_users_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+              <span class="btn btn-outline-secondary opacity-50" style="pointer-events:none">Sonraki</span>
             <% end %>
           </div>
         </div>
@@ -167,5 +196,3 @@
     </div>
   </div>
 </div>
-
-

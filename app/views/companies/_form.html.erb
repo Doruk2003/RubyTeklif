@@ -1,4 +1,4 @@
-<%= form_with model: company, class: "d-grid gap-3" do |f| %>
+<%= form_with model: company, class: app_form_class("d-grid gap-3") do |f| %>
   <% if company.errors.any? %>
     <div class="alert alert-danger mb-0" role="alert">
       <div class="fw-semibold mb-2">Formda hata var:</div>
@@ -12,50 +12,66 @@
 
   <div class="row g-3">
     <div class="col-md-6">
-      <%= f.label :name, "Firma Adı", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.text_field :name, class: "form-control form-control-sm", required: true %>
+      <div class="form-floating">
+        <%= f.text_field :name, class: "form-control", required: true, placeholder: "Firma Adi" %>
+        <%= f.label :name, "Firma Adi" %>
+      </div>
     </div>
 
     <div class="col-md-6">
-      <%= f.label :tax_number, "Vergi No", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.text_field :tax_number, class: "form-control form-control-sm", required: true %>
+      <div class="form-floating">
+        <%= f.text_field :tax_number, class: "form-control", required: true, placeholder: "Vergi No" %>
+        <%= f.label :tax_number, "Vergi No" %>
+      </div>
     </div>
 
     <div class="col-md-6">
-      <%= f.label :tax_office, "Vergi Dairesi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.text_field :tax_office, class: "form-control form-control-sm" %>
+      <div class="form-floating">
+        <%= f.text_field :tax_office, class: "form-control", placeholder: "Vergi Dairesi" %>
+        <%= f.label :tax_office, "Vergi Dairesi" %>
+      </div>
     </div>
 
     <div class="col-md-6">
-      <%= f.label :authorized_person, "Yetkili Kişi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.text_field :authorized_person, class: "form-control form-control-sm" %>
+      <div class="form-floating">
+        <%= f.text_field :authorized_person, class: "form-control", placeholder: "Yetkili Kisi" %>
+        <%= f.label :authorized_person, "Yetkili Kisi" %>
+      </div>
     </div>
 
     <div class="col-md-6">
-      <%= f.label :phone, "Telefon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.telephone_field :phone, class: "form-control form-control-sm" %>
+      <div class="form-floating">
+        <%= f.telephone_field :phone, class: "form-control", placeholder: "Telefon" %>
+        <%= f.label :phone, "Telefon" %>
+      </div>
     </div>
 
     <div class="col-md-6">
-      <%= f.label :email, "Mail Adresi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.email_field :email, class: "form-control form-control-sm", autocomplete: "email" %>
+      <div class="form-floating">
+        <%= f.email_field :email, class: "form-control", autocomplete: "email", placeholder: "Mail Adresi" %>
+        <%= f.label :email, "Mail Adresi" %>
+      </div>
     </div>
 
     <div class="col-12">
-      <%= f.label :address, "Adres", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.text_area :address, rows: 3, class: "form-control form-control-sm" %>
+      <div class="form-floating">
+        <%= f.text_area :address, class: "form-control", placeholder: "Adres", style: "height: 110px" %>
+        <%= f.label :address, "Adres" %>
+      </div>
     </div>
 
     <div class="col-12">
-      <%= f.label :active, "Durumu", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-      <%= f.select :active,
-            options_for_select([["Aktif", "true"], ["Pasif", "false"]], company.active == false ? "false" : "true"),
-            {},
-            class: "form-control form-control-sm" %>
+      <div class="form-floating">
+        <%= f.select :active,
+              options_for_select([["Aktif", "true"], ["Pasif", "false"]], company.active == false ? "false" : "true"),
+              {},
+              class: "form-select" %>
+        <%= f.label :active, "Durumu" %>
+      </div>
     </div>
   </div>
 
   <div>
-    <%= f.submit "CREATE COMPANY", class: "btn btn-dark w-100", data: { turbo_confirm: "Müşteri kaydı kaydedilsin mi?" } %>
+    <%= f.submit "CREATE COMPANY", class: "btn btn-success w-100", data: { turbo_confirm: "Musteri kaydi kaydedilsin mi?" } %>
   </div>
 <% end %>

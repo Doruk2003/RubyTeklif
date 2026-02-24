@@ -309,6 +309,52 @@ select option:focus {
   cursor: not-allowed;
 }
 
+/* Bootstrap/Lux form-floating select body uyumu, custom submenu korunur */
+.app-form-standard .form-floating > [data-rt-custom-select],
+.form-floating > [data-rt-custom-select] {
+  position: relative;
+}
+
+.app-form-standard .form-floating > [data-rt-custom-select] .rt-custom-select-trigger.form-select,
+.form-floating > [data-rt-custom-select] .rt-custom-select-trigger.form-select {
+  box-sizing: border-box;
+  height: calc(3.5rem + calc(var(--bs-border-width, 1px) * 2));
+  min-height: calc(3.5rem + calc(var(--bs-border-width, 1px) * 2));
+  padding: 1.625rem 0.75rem 0.5rem 0.75rem;
+  line-height: 1.25;
+  align-items: flex-end;
+  justify-content: space-between;
+  text-align: left;
+  outline: none !important;
+}
+
+.app-form-standard .form-floating > [data-rt-custom-select] .rt-custom-select-label,
+.form-floating > [data-rt-custom-select] .rt-custom-select-label {
+  width: 100%;
+  line-height: 1.25;
+  padding-bottom: 0;
+  text-align: left;
+}
+
+.app-form-standard .form-floating > [data-rt-custom-select] .rt-custom-select-arrow,
+.form-floating > [data-rt-custom-select] .rt-custom-select-arrow {
+  align-self: flex-end;
+  margin-bottom: 0;
+}
+
+.app-form-standard .form-floating > [data-rt-custom-select] ~ label,
+.form-floating > [data-rt-custom-select] ~ label {
+  z-index: 3;
+  padding-left: 0.75rem;
+}
+
+.app-form-standard .form-floating > [data-rt-custom-select].has-value ~ label,
+.app-form-standard .form-floating > [data-rt-custom-select].is-open ~ label,
+.form-floating > [data-rt-custom-select].has-value ~ label,
+.form-floating > [data-rt-custom-select].is-open ~ label {
+  transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
 .rt-price-inline-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -2006,10 +2052,21 @@ select.form-input {
 
 .form-input:focus,
 .form-textarea:focus,
-.rt-custom-select-trigger:focus,
 select.form-input:focus {
   border-color: var(--rt-focus-border) !important;
   box-shadow: var(--rt-focus-shadow) !important;
+}
+
+.rt-custom-select-trigger:focus {
+  border-color: var(--rt-field-border) !important;
+  box-shadow: var(--rt-focus-shadow) !important;
+  outline: none !important;
+}
+
+.rt-custom-select.is-open .rt-custom-select-trigger {
+  border-color: var(--rt-field-border) !important;
+  box-shadow: var(--rt-focus-shadow) !important;
+  outline: none !important;
 }
 
 .bg-slate-50\/90,
@@ -2129,4 +2186,107 @@ select.form-input:focus {
 .rt-icon-btn-layout:hover::after,
 .rt-icon-btn-layout:focus-visible::after {
   opacity: 1;
+}
+
+.app-header-card,
+.admin-users-header-card {
+  background: linear-gradient(90deg, #0f172a, #1e293b) !important;
+  border-color: rgba(15, 23, 42, 0.65) !important;
+}
+
+.app-header-card .h4,
+.admin-users-header-card .h4 {
+  color: #f8fafc !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.app-header-card h1,
+.admin-users-header-card h1 {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.app-header-card .text-secondary,
+.admin-users-header-card .text-secondary {
+  color: rgba(248, 250, 252, 0.75) !important;
+}
+
+.app-header-actions,
+.admin-users-top-actions {
+  align-items: center;
+}
+
+.app-header-actions .button_to,
+.admin-users-top-actions .button_to {
+  margin: 0;
+  display: inline-flex;
+}
+
+.app-header-icon-btn,
+.admin-users-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px !important;
+  border: 1px solid rgba(248, 250, 252, 0.28) !important;
+  background: rgba(248, 250, 252, 0.08) !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+.app-header-icon-btn:hover,
+.app-header-icon-btn:focus-visible,
+.admin-users-icon-btn:hover,
+.admin-users-icon-btn:focus-visible {
+  background: rgba(248, 250, 252, 0.18) !important;
+  border-color: rgba(248, 250, 252, 0.45) !important;
+  color: #ffffff !important;
+}
+
+.app-header-icon-btn .material-symbols-outlined,
+.admin-users-icon-btn .material-symbols-outlined {
+  font-size: 22px;
+  line-height: 1;
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+}
+
+/* Admin users list: prefer Bootstrap/Lux table defaults */
+.app-list-standard table thead tr::after,
+.app-list-standard table tbody tr::after,
+.admin-users-page table thead tr::after,
+.admin-users-page table tbody tr::after {
+  display: none !important;
+  content: none !important;
+}
+
+.app-list-standard .table thead th,
+.app-list-standard .table tbody td,
+.admin-users-page .table thead th,
+.admin-users-page .table tbody td {
+  border-bottom: 1px solid var(--bs-table-border-color, #dee2e6) !important;
+  height: auto !important;
+  padding: var(--bs-table-cell-padding-y, 0.75rem) var(--bs-table-cell-padding-x, 0.75rem) !important;
+  font-size: inherit !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: inherit !important;
+  line-height: inherit !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+}
+
+.app-list-standard .table tbody tr:hover td,
+.admin-users-page .table tbody tr:hover td {
+  background: transparent !important;
+}
+
+/* Card headers: disable forced uppercase for title elements */
+.card h1.text-uppercase,
+.card h2.text-uppercase,
+.card h3.text-uppercase,
+.card h4.text-uppercase,
+.card h5.text-uppercase,
+.card h6.text-uppercase {
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }

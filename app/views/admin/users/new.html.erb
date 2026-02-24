@@ -1,14 +1,15 @@
 <div class="container-fluid py-2">
   <div class="row g-2">
     <div class="col-12">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm app-header-card">
         <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
           <div>
             <h1 class="h4 mb-1">Admin Panel</h1>
-            <p class="text-secondary mb-0">Yeni kullanıcı</p>
+            <p class="text-secondary mb-0">Yeni Kullanici</p>
           </div>
-          <div class="d-flex flex-wrap align-items-center gap-2">
-            <%= link_to "Listeye Dön", admin_users_path, class: "btn-secondary w-100" %>
+          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+            <%= list_nav_button(admin_users_path, label: "Listeye Don", class_name: "app-header-icon-btn") %>
+            <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
           </div>
         </div>
       </div>
@@ -17,28 +18,30 @@
     <div class="col-12">
       <div class="card shadow-sm">
         <div class="card-body">
-          <%= form_with url: admin_users_path, method: :post, local: true, scope: :user, class: "d-grid gap-3" do |f| %>
-            <div>
-              <%= f.label :email, "E-posta", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.email_field :email, value: @user&.[]("email"), class: "form-input", required: true, autocomplete: "email" %>
+          <%= form_with url: admin_users_path, method: :post, local: true, scope: :user, class: app_form_class("d-grid gap-3") do |f| %>
+            <div class="form-floating">
+              <%= f.email_field :email, value: @user&.[]("email"), class: "form-control", required: true, autocomplete: "email", placeholder: "E-posta" %>
+              <%= f.label :email, "E-posta" %>
             </div>
-            <div>
-              <%= f.label :password, "Şifre", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.password_field :password, class: "form-input", required: true, autocomplete: "new-password" %>
+
+            <div class="form-floating">
+              <%= f.password_field :password, class: "form-control", required: true, autocomplete: "new-password", placeholder: "Sifre" %>
+              <%= f.label :password, "Sifre" %>
             </div>
-            <div>
-              <%= f.label :role, "Rol", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+
+            <div class="form-floating">
               <%= f.select :role,
                     options_for_select(Roles::ASSIGNABLE_ROLE_OPTIONS, @user&.[]("role").to_s),
                     {},
-                    class: "form-input" %>
+                    class: "form-select",
+                    data: { float_empty: true } %>
+              <%= f.label :role, "Rol" %>
             </div>
-            <%= f.submit "Oluştur", class: "btn-primary w-100", data: { turbo_confirm: "Yeni kullanıcı oluşturulsun mu?" } %>
+
+            <%= f.submit "Olustur", class: "btn-primary w-100", data: { turbo_confirm: "Yeni kullanici olusturulsun mu?" } %>
           <% end %>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-

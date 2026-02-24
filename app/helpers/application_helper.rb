@@ -11,7 +11,7 @@
 
   def filter_form_with(url:, layout: :standard, class_name: nil, **options, &block)
     layout_class = FILTER_GRID_LAYOUTS.fetch(layout.to_sym) { FILTER_GRID_LAYOUTS[:standard] }
-    classes = ["rt-filter-grid", layout_class, class_name, options.delete(:class)].compact.join(" ")
+    classes = ["rt-filter-grid", layout_class, "app-form-standard", class_name, options.delete(:class)].compact.join(" ")
 
     form_options = { url: url, method: :get, local: true }.merge(options)
     form_options[:class] = classes
@@ -21,6 +21,15 @@
   def filter_actions_row(class_name: nil, **options, &block)
     classes = ["rt-filter-grid-actions", "d-flex", "w-100", "align-items-end", "justify-content-end", "gap-2", class_name, options.delete(:class)].compact.join(" ")
     content_tag(:div, capture(&block), options.merge(class: classes))
+  end
+
+  def app_form_class(*extra_classes)
+    ["app-form-standard", *extra_classes].flatten.compact.join(" ")
+  end
+
+  def app_table_wrapper(class_name: nil, &block)
+    classes = ["table-responsive", "app-list-standard", class_name].compact.join(" ")
+    content_tag(:div, capture(&block), class: classes)
   end
 
   def icon_link_button(path, label:, icon:, variant: :nav, class_name: nil, **options)
