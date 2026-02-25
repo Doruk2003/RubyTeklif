@@ -1,22 +1,10 @@
-﻿class PagesController < ApplicationController
+class PagesController < ApplicationController
   def home
     service = DashboardService.new(client: supabase_user_client, actor_id: current_user.id)
-    @kpis = service.kpis
-    @recent_offers = service.recent_offers
-    @flow_stats = service.flow_stats
-    @reminders = service.reminders
-  rescue ServiceErrors::System => e
-    report_handled_error(e, source: "pages#home", severity: :error)
-    flash.now[:alert] = e.user_message
-    @kpis = []
-    @recent_offers = []
-    @flow_stats = []
-    @reminders = []
-  rescue StandardError
-    @kpis = []
-    @recent_offers = []
-    @flow_stats = []
-    @reminders = []
+    @kpis = safe_dashboard_section(default: [], source: "pages#home.kpis") { service.kpis }
+    @recent_offers = safe_dashboard_section(default: [], source: "pages#home.recent_offers") { service.recent_offers }
+    @flow_stats = safe_dashboard_section(default: [], source: "pages#home.flow_stats") { service.flow_stats }
+    @reminders = safe_dashboard_section(default: [], source: "pages#home.reminders") { service.reminders }
   end
 
   def ajanda
@@ -31,5 +19,17 @@
   rescue StandardError
     @calendar_events = []
     @agenda_items = []
+  end
+
+  private
+
+  def safe_dashboard_section(default:, source:)
+    yield
+  rescue ServiceErrors::System => e
+    report_handled_error(e, source: source, severity: :error)
+    flash.now[:alert] ||= e.user_message
+    default
+  rescue StandardError
+    default
   end
 end

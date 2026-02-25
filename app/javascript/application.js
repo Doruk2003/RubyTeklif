@@ -5,6 +5,12 @@ import { initCustomSelects } from "custom_select"
 
 let globalAgendaAlarmTimer = null
 
+function stopGlobalAgendaAlarmPolling() {
+  if (!globalAgendaAlarmTimer) return
+  clearInterval(globalAgendaAlarmTimer)
+  globalAgendaAlarmTimer = null
+}
+
 function requestGlobalNotificationPermission() {
   if (!("Notification" in window)) return
   if (Notification.permission === "default") Notification.requestPermission()
@@ -31,10 +37,7 @@ function showGlobalAgendaAlarm(eventItem) {
 }
 
 function startGlobalAgendaAlarmPolling(events) {
-  if (globalAgendaAlarmTimer) {
-    clearInterval(globalAgendaAlarmTimer)
-    globalAgendaAlarmTimer = null
-  }
+  stopGlobalAgendaAlarmPolling()
 
   const tick = () => {
     const now = Date.now()
@@ -70,10 +73,16 @@ async function initGlobalAgendaAlarms() {
       headers: { Accept: "application/json" },
       credentials: "same-origin"
     })
-    if (!response.ok) return
+    if (!response.ok) {
+      stopGlobalAgendaAlarmPolling()
+      return
+    }
 
     const events = await response.json()
-    if (!Array.isArray(events)) return
+    if (!Array.isArray(events)) {
+      stopGlobalAgendaAlarmPolling()
+      return
+    }
 
     requestGlobalNotificationPermission()
     startGlobalAgendaAlarmPolling(events)
@@ -314,10 +323,16 @@ function initStableHoverMenus(root = document) {
   bind(".alp-menu", ".alp-menu-item", ".alp-mega-menu")
 }
 
-document.addEventListener("turbo:load", () => {
+const initAppPageBehaviors = () => {
   initCustomSelects()
   applyAutoConfirmDefaults()
   initFilterPanelToggles()
   initStableHoverMenus()
   initGlobalAgendaAlarms()
+}
+
+document.addEventListener("turbo:load", initAppPageBehaviors)
+document.addEventListener("turbo:render", initAppPageBehaviors)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") initGlobalAgendaAlarms()
 })
