@@ -228,6 +228,37 @@ select option:focus {
   display: block;
 }
 
+.rt-custom-select-search-container {
+  padding: 8px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.rt-custom-select-search {
+  border-color: #e2e8f0;
+  font-size: 0.825rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.rt-custom-select-search:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.rt-custom-select-options-list {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.rt-custom-select-options-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.rt-custom-select-options-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
 .rt-custom-select-option {
   width: calc(100% - 16px);
   border: 0;
@@ -310,13 +341,13 @@ select option:focus {
 }
 
 /* Bootstrap/Lux form-floating select body uyumu, custom submenu korunur */
-.app-form-standard .form-floating > [data-rt-custom-select],
-.form-floating > [data-rt-custom-select] {
+.app-form-standard .form-floating>[data-rt-custom-select],
+.form-floating>[data-rt-custom-select] {
   position: relative;
 }
 
-.app-form-standard .form-floating > [data-rt-custom-select] .rt-custom-select-trigger.form-select,
-.form-floating > [data-rt-custom-select] .rt-custom-select-trigger.form-select {
+.app-form-standard .form-floating>[data-rt-custom-select] .rt-custom-select-trigger.form-select,
+.form-floating>[data-rt-custom-select] .rt-custom-select-trigger.form-select {
   box-sizing: border-box;
   height: calc(3.5rem + calc(var(--bs-border-width, 1px) * 2));
   min-height: calc(3.5rem + calc(var(--bs-border-width, 1px) * 2));
@@ -328,30 +359,30 @@ select option:focus {
   outline: none !important;
 }
 
-.app-form-standard .form-floating > [data-rt-custom-select] .rt-custom-select-label,
-.form-floating > [data-rt-custom-select] .rt-custom-select-label {
+.app-form-standard .form-floating>[data-rt-custom-select] .rt-custom-select-label,
+.form-floating>[data-rt-custom-select] .rt-custom-select-label {
   width: 100%;
   line-height: 1.25;
   padding-bottom: 0;
   text-align: left;
 }
 
-.app-form-standard .form-floating > [data-rt-custom-select] .rt-custom-select-arrow,
-.form-floating > [data-rt-custom-select] .rt-custom-select-arrow {
+.app-form-standard .form-floating>[data-rt-custom-select] .rt-custom-select-arrow,
+.form-floating>[data-rt-custom-select] .rt-custom-select-arrow {
   align-self: flex-end;
   margin-bottom: 0;
 }
 
-.app-form-standard .form-floating > [data-rt-custom-select] ~ label,
-.form-floating > [data-rt-custom-select] ~ label {
+.app-form-standard .form-floating>[data-rt-custom-select]~label,
+.form-floating>[data-rt-custom-select]~label {
   z-index: 3;
   padding-left: 0.75rem;
 }
 
-.app-form-standard .form-floating > [data-rt-custom-select].has-value ~ label,
-.app-form-standard .form-floating > [data-rt-custom-select].is-open ~ label,
-.form-floating > [data-rt-custom-select].has-value ~ label,
-.form-floating > [data-rt-custom-select].is-open ~ label {
+.app-form-standard .form-floating>[data-rt-custom-select].has-value~label,
+.app-form-standard .form-floating>[data-rt-custom-select].is-open~label,
+.form-floating>[data-rt-custom-select].has-value~label,
+.form-floating>[data-rt-custom-select].is-open~label {
   transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
 }
 
@@ -488,7 +519,7 @@ select option:focus {
   gap: var(--rt-card-gap);
 }
 
-.rt-page-section + .rt-page-section {
+.rt-page-section+.rt-page-section {
   margin-top: var(--rt-card-gap);
 }
 
@@ -522,7 +553,7 @@ select option:focus {
   overflow: visible;
 }
 
-.rt-page-card.rt-page-offset-top > * {
+.rt-page-card.rt-page-offset-top>* {
   width: 100%;
 }
 
@@ -714,7 +745,7 @@ body.auth-page .app-main {
     linear-gradient(160deg, #f8f6f2 0%, #eceff3 100%) !important;
 }
 
-body.auth-page .app-main > * {
+body.auth-page .app-main>* {
   width: 100%;
 }
 
@@ -810,11 +841,11 @@ body.auth-page .app-main > * {
   gap: 6px !important;
 }
 
-.erp-login-main form > .form-floating:first-child {
+.erp-login-main form>.form-floating:first-child {
   margin-top: 8px;
 }
 
-.erp-login-main form > div {
+.erp-login-main form>div {
   width: 100%;
 }
 
@@ -825,7 +856,7 @@ body.auth-page .app-main > * {
   min-height: 46px;
 }
 
-.erp-login-main .form-floating > .form-input {
+.erp-login-main .form-floating>.form-input {
   min-height: 40px;
   padding-top: 1.25rem !important;
   padding-bottom: 0.375rem !important;
@@ -1012,6 +1043,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
     opacity: 0;
     transform: translateY(-6px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1439,8 +1471,8 @@ body:has(.rt-dashboard) .app-flash-wrap {
   min-height: 42px;
 }
 
-.rt-menu > a,
-.rt-menu-item > button {
+.rt-menu>a,
+.rt-menu-item>button {
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1460,12 +1492,12 @@ body:has(.rt-dashboard) .app-flash-wrap {
   line-height: 1.2;
 }
 
-.rt-menu > a:hover,
-.rt-menu > a.is-active,
-.rt-menu-item > button:hover,
-.rt-menu-item > button:focus-visible,
-.rt-menu-item:hover > button,
-.rt-menu-item.is-open > button {
+.rt-menu>a:hover,
+.rt-menu>a.is-active,
+.rt-menu-item>button:hover,
+.rt-menu-item>button:focus-visible,
+.rt-menu-item:hover>button,
+.rt-menu-item.is-open>button {
   background: transparent;
   color: #f8fafc;
 }
@@ -1536,7 +1568,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
   pointer-events: auto;
 }
 
-.rt-submenu a + a {
+.rt-submenu a+a {
   margin-top: 4px;
 }
 
@@ -1782,7 +1814,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
   vertical-align: middle;
 }
 
-.rt-pipeline-table th > a {
+.rt-pipeline-table th>a {
   display: inline-flex;
   align-items: center;
   min-height: 60px;
@@ -1931,11 +1963,11 @@ body:has(.rt-dashboard) .app-flash-wrap {
     align-items: start;
   }
 
-  .rt-main-grid > .rt-stack:first-child {
+  .rt-main-grid>.rt-stack:first-child {
     grid-column: span 4;
   }
 
-  .rt-main-grid > .rt-stack:last-child {
+  .rt-main-grid>.rt-stack:last-child {
     grid-column: span 2;
     padding-top: 0;
     align-self: start;

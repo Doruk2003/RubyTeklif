@@ -48,8 +48,8 @@
   </div>
 </div>
 
-<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
-  <div class="row g-3 align-items-end">
+<div class="card mb-3 bg-white border border-1 border-light p-4 rounded shadow-sm">
+  <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-3">
       <div class="form-floating">
         <%= f.select :category_id,
@@ -59,8 +59,16 @@
               data: { float_empty: true } %>
         <%= f.label :category_id, "Kategori" %>
       </div>
-      <div class="mt-1">
-        <%= link_to "Yeni Kategori", new_category_path(return_to: request.fullpath), class: "small link-secondary text-decoration-none" %>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="form-floating">
+        <%= f.select :brand_id,
+              options_for_select(@brand_options, value_for.call(:brand_id)),
+              { prompt: "Marka seçmeden devam edebilirsin" },
+              class: "form-select",
+              data: { float_empty: true } %>
+        <%= f.label :brand_id, "Marka" %>
       </div>
     </div>
 
@@ -73,21 +81,6 @@
               data: { float_empty: true } %>
         <%= f.label :item_type, "Tip" %>
       </div>
-      <div class="mt-1 small invisible">placeholder</div>
-    </div>
-
-    <div class="col-12 col-md-6 col-lg-3">
-      <div class="form-floating">
-        <%= f.select :brand_id,
-              options_for_select(@brand_options, value_for.call(:brand_id)),
-              { prompt: "Marka seçmeden devam edebilirsin" },
-              class: "form-select",
-              data: { float_empty: true } %>
-        <%= f.label :brand_id, "Marka" %>
-      </div>
-      <div class="mt-1">
-        <%= link_to "Yeni Marka", new_brand_path(return_to: request.fullpath), class: "small link-secondary text-decoration-none" %>
-      </div>
     </div>
 
     <div class="col-12 col-md-6 col-lg-3">
@@ -99,75 +92,91 @@
               data: { float_empty: true } %>
         <%= f.label :unit, "Birim" %>
       </div>
-      <div class="mt-1 small invisible">placeholder</div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3 bg-white border border-1 border-light p-4 rounded shadow-sm">
+  <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-cash-stack me-2"></i>Fiyatlandırma</h6>
+  <div class="row g-3 align-items-end">
+    <div class="col-12 col-md-6 col-lg-2">
+      <div class="form-floating">
+        <%= f.select :currency_id,
+              options_for_select(@currency_options, value_for.call(:currency_id)),
+              { prompt: "Döviz seçin" },
+              class: "form-select",
+              data: { float_empty: true } %>
+        <%= f.label :currency_id, "Döviz" %>
+      </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-2">
       <div class="form-floating">
         <%= f.number_field :price, value: value_for.call(:price), step: "0.01", placeholder: "Satış Fiyatı", class: "form-control" %>
         <%= f.label :price, "Satış Fiyatı" %>
       </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-2">
       <div class="form-floating">
         <%= f.select :sale_price_vat_included,
               options_for_select([["KDV Hariç", "0"], ["KDV Dahil", "1"]], sale_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
               {},
               class: "form-select",
               data: { float_empty: true } %>
-        <%= f.label :sale_price_vat_included, "Satış KDV Durumu" %>
+        <%= f.label :sale_price_vat_included, "Satış KDV" %>
       </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-2">
       <div class="form-floating">
         <%= f.number_field :cost_price, value: value_for.call(:cost_price, 0), step: "0.01", placeholder: "Maliyet Fiyatı", class: "form-control" %>
         <%= f.label :cost_price, "Maliyet Fiyatı" %>
       </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-2">
       <div class="form-floating">
         <%= f.select :cost_price_vat_included,
               options_for_select([["KDV Hariç", "0"], ["KDV Dahil", "1"]], cost_vat_included.to_s.in?(%w[true 1]) ? "1" : "0"),
               {},
               class: "form-select",
               data: { float_empty: true } %>
-        <%= f.label :cost_price_vat_included, "Maliyet KDV Durumu" %>
+        <%= f.label :cost_price_vat_included, "Maliyet KDV" %>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
-  <div class="row g-3 align-items-end">
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-2">
       <div class="form-floating">
         <%= f.select :vat_rate,
-              options_for_select([["0%", "0"], ["8%", "8"], ["10%", "10"], ["18%", "18"], ["20%", "20"]], value_for.call(:vat_rate, "0")),
+              options_for_select([["0%", "0"], ["1%", "1"], ["8%", "8"], ["10%", "10"], ["18%", "18"], ["20%", "20"]], value_for.call(:vat_rate, "0")),
               {},
               class: "form-select",
               data: { float_empty: true } %>
         <%= f.label :vat_rate, "KDV Oranı" %>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+<div class="card mb-3 bg-white border border-1 border-light p-4 rounded shadow-sm">
+  <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-box-seam me-2"></i>Stok ve Durum</h6>
+  <div class="row g-3 align-items-end">
+    <div class="col-12 col-md-6 col-lg-4">
       <div class="form-floating">
         <%= f.number_field :stock_quantity, value: value_for.call(:stock_quantity, 0), step: "0.01", placeholder: "Mevcut Stok", class: "form-control" %>
         <%= f.label :stock_quantity, "Mevcut Stok" %>
       </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-4">
       <div class="form-floating">
         <%= f.number_field :min_stock_level, value: value_for.call(:min_stock_level, 0), step: "0.01", placeholder: "Minimum Stok", class: "form-control" %>
         <%= f.label :min_stock_level, "Minimum Stok" %>
       </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-4">
       <div class="form-floating">
         <%= f.select :active,
               options_for_select([["Aktif", "1"], ["Pasif", "0"]], active_value.to_s.in?(%w[true 1]) ? "1" : "0"),
@@ -180,22 +189,23 @@
   </div>
 </div>
 
+
 <style>
   .preview-image-wrapper {
     width: 3.5rem;
     height: 3.5rem;
     position: relative;
-    transition: transform 0.2s ease-in-out, z-index 0.2s step-end;
     border-radius: 0.375rem;
-    overflow: hidden;
-    cursor: zoom-in;
-    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-    z-index: 1;
+    overflow: visible;
     border: 1px solid #dee2e6;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    background: #f8fafc;
+    transition: transform 0.2s ease-in-out, z-index 0.2s step-end;
+    z-index: 1;
   }
   .preview-image-wrapper:hover {
     transform: scale(3);
-    z-index: 10;
+    z-index: 100;
     transition: transform 0.2s ease-in-out, z-index 0s step-start;
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
   }
@@ -203,82 +213,147 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 0.375rem;
+    display: block;
+  }
+  .btn-remove-photo {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 </style>
-<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
-  <h6 class="fw-semibold text-secondary mb-2">Fotograf</h6>
+
+<div class="card mb-3 bg-white border border-1 border-light p-4 rounded shadow-sm">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h6 class="fw-bold text-secondary mb-0">Ürün Fotoğrafları</h6>
+    <span class="badge bg-light text-secondary border fw-normal" id="photo_count_badge">0 / 6</span>
+  </div>
 
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div>
-      <div class="d-flex gap-2 flex-wrap align-items-center">
-        <%= f.file_field :photos, multiple: true, accept: "image/png, image/jpeg, image/jpg, image/webp", class: "d-none", id: "photo_upload" %>
-        <label for="photo_upload" class="btn btn-warning btn-sm mb-0">Dosyalari Sec</label>
-        <span class="text-muted small" id="photo_file_names">Dosya secilmemis</span>
-      </div>
-      <p class="small text-muted mb-0 mt-2">Maksimum 6 adet fotograf (PNG, JPG, WEBP) yukleyebilirsiniz.</p>
+    <div class="text-start">
+      <%= f.file_field :photos, multiple: true, accept: "image/png, image/jpeg, image/jpg, image/webp", class: "d-none", id: "photo_upload" %>
+      <label for="photo_upload" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-2 mb-2">
+        <span class="material-symbols-outlined" style="font-size: 18px;">add_a_photo</span>
+        <span>Fotoğraf Seç</span>
+      </label>
+      <p class="small text-muted mb-0">Maksimum 6 adet (PNG, JPG, WEBP) yükleyebilirsiniz.</p>
     </div>
 
-    <div id="image_previews_container" class="d-flex gap-2 flex-wrap justify-content-end d-none"></div>
+    <div id="image_previews_container" class="d-flex gap-2 flex-wrap justify-content-end d-none">
+      <!-- Previews will go here -->
+    </div>
   </div>
 </div>
 
-<div class="d-grid mt-2">
-  <%= f.submit(submit_label.presence || "Kaydet", class: "btn btn-success py-2", data: { turbo_confirm: submit_confirm.presence || "Kaydedilsin mi?" }) %>
+<div class="d-grid mt-4">
+  <%= f.submit(submit_label.presence || "Kaydet", class: "btn btn-success py-3 fw-bold shadow-sm", data: { turbo_confirm: submit_confirm.presence || "Kaydedilsin mi?" }) %>
 </div>
 <% end %>
 
 <script>
-  document.addEventListener('turbo:load', setupPhotoUpload);
-  document.addEventListener('DOMContentLoaded', setupPhotoUpload);
+  (function() {
+    let selectedFiles = [];
 
-  function setupPhotoUpload() {
-    const photoUpload = document.getElementById('photo_upload');
-    const photoFileNames = document.getElementById('photo_file_names');
-    const imagePreviewsContainer = document.getElementById('image_previews_container');
+    function setupPhotoUpload() {
+      const photoUpload = document.getElementById('photo_upload');
+      const container = document.getElementById('image_previews_container');
+      const badge = document.getElementById('photo_count_badge');
+      
+      if (!photoUpload || !container) return;
+      if (photoUpload.dataset.photoInit === 'true') return;
+      photoUpload.dataset.photoInit = 'true';
 
-    if (photoUpload && photoFileNames && imagePreviewsContainer) {
+      selectedFiles = []; // Reset locally on each fresh setup
+      updateDisplay();
+
       photoUpload.addEventListener('change', (e) => {
-        const files = e.target.files;
-        imagePreviewsContainer.innerHTML = '';
+        const newFiles = Array.from(e.target.files);
+        let addedCount = 0;
 
-        if (files.length > 6) {
-          alert('En fazla 6 adet fotograf yukleyebilirsiniz.');
-          photoUpload.value = '';
-          photoFileNames.textContent = 'Dosya secilmemis';
-          imagePreviewsContainer.classList.add('d-none');
-          return;
-        }
-
-        if (files.length === 0) {
-          photoFileNames.textContent = 'Dosya secilmemis';
-          imagePreviewsContainer.classList.add('d-none');
-        } else {
-          if (files.length === 1) {
-            photoFileNames.textContent = files[0].name;
-          } else {
-            photoFileNames.textContent = files.length + ' dosya secildi';
+        newFiles.forEach(file => {
+          const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+          if (!isDuplicate && selectedFiles.length < 6) {
+            selectedFiles.push(file);
+            addedCount++;
           }
+        });
 
-          imagePreviewsContainer.classList.remove('d-none');
-
-          Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) return;
-
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-              const wrapper = document.createElement('div');
-              wrapper.className = 'preview-image-wrapper bg-light';
-
-              const img = document.createElement('img');
-              img.src = evt.target.result;
-
-              wrapper.appendChild(img);
-              imagePreviewsContainer.appendChild(wrapper);
-            };
-            reader.readAsDataURL(file);
-          });
-        }
+        // Clear the native input value so change event can fire again for same file
+        e.target.value = '';
+        updateDisplay();
       });
+
+      function updateDisplay() {
+        container.innerHTML = '';
+        
+        if (selectedFiles.length > 0) {
+          container.classList.remove('d-none');
+        } else {
+          container.classList.add('d-none');
+        }
+
+        selectedFiles.forEach((file, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'preview-image-wrapper';
+          
+          const img = document.createElement('img');
+          img.src = '';
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.className = 'btn-remove-photo';
+          removeBtn.innerHTML = '×';
+          removeBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            removeFile(index);
+          };
+
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          container.appendChild(wrapper);
+
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            img.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        photoUpload.files = dt.files;
+
+        if (badge) {
+          badge.textContent = `${selectedFiles.length} / 6`;
+          badge.className = selectedFiles.length >= 6 ? 'badge bg-danger text-white border' : 'badge bg-light text-secondary border fw-normal';
+        }
+      }
+
+      function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateDisplay();
+      }
     }
-  }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupPhotoUpload);
+    } else {
+      setupPhotoUpload();
+    }
+    document.addEventListener('turbo:load', setupPhotoUpload);
+  })();
 </script>

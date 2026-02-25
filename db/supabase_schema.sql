@@ -1569,7 +1569,6 @@ ALTER TABLE "public"."product_images" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."products" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "user_id" "uuid" NOT NULL,
-    "company_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
     "price" numeric(10,2) NOT NULL,
     "vat_rate" numeric(5,2) NOT NULL,
@@ -1877,7 +1876,6 @@ CREATE INDEX "products_category_id_idx" ON "public"."products" USING "btree" ("c
 
 
 
-CREATE INDEX "products_company_id_idx" ON "public"."products" USING "btree" ("company_id");
 
 
 
@@ -1978,8 +1976,6 @@ ALTER TABLE ONLY "public"."products"
 
 
 
-ALTER TABLE ONLY "public"."products"
-    ADD CONSTRAINT "products_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "public"."companies"("id") ON DELETE CASCADE;
 
 
 

@@ -90,7 +90,7 @@
                     <td class="fw-semibold"><%= product["name"].to_s %></td>
                     <td><%= product.dig("categories", "name").to_s.presence || @category_labels[product["category_id"].to_s].presence || "-" %></td>
                     <td><%= product.dig("brands", "name").to_s.presence || @brand_labels[product["brand_id"].to_s].presence || "-" %></td>
-                    <td><%= product.dig("currencies", "code").to_s.presence || @currency_labels[product["currency_id"].to_s].presence || "TRY" %></td>
+                    <td><%= product.dig("currencies", "name").to_s.presence || @currency_labels[product["currency_id"].to_s].presence || "TRY" %></td>
                     <td><%= product["item_type"].to_s %></td>
                     <td><%= product["unit"].to_s.presence || "-" %></td>
                     <td><%= product["is_stock_item"] ? product["stock_quantity"].to_s.presence || "0" : "-" %></td>
