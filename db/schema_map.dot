@@ -1,0 +1,17 @@
+digraph ERDiagram {
+  rankdir=LR;
+  node [shape=record, fontname=Arial];
+
+  activity_logs [label="{activity_logs|+ id\l+ action\l+ actor_id\l+ target_id\l+ target_type\l+ metadata\l+ created_at\l}"];
+  brands [label="{brands|+ id\l+ user_id\l+ code\l+ name\l+ active\l+ created_at\l+ updated_at\l+ deleted_at\l}"];
+  calendar_events [label="{calendar_events|+ id\l+ user_id\l+ event_date\l+ title\l+ description\l+ color\l+ deleted_at\l+ created_at\l+ updated_at\l+ start_at\l+ remind_minutes_before\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l}"];
+  categories [label="{categories|+ id\l+ user_id\l+ code\l+ name\l+ active\l+ created_at\l+ updated_at\l+ deleted_at\l}"];
+  companies [label="{companies|+ id\l+ user_id\l+ name\l+ tax_number\l+ created_at\l+ updated_at\l+ authorized_person\l+ phone\l+ address\l+ tax_office\l+ active\l+ email\l+ deleted_at\l}"];
+  offers [label="{offers|+ id\l+ user_id\l+ company_id\l+ offer_number\l+ offer_date\l+ net_total\l+ vat_total\l+ gross_total\l+ created_at\l+ updated_at\l+ status\l+ deleted_at\l+ CONSTRAINT\l}"];
+  currencies [label="{currencies|+ id\l+ user_id\l+ code\l+ name\l+ symbol\l+ rate_to_try\l+ active\l+ created_at\l+ updated_at\l+ deleted_at\l+ CONSTRAINT\l}"];
+  offer_items [label="{offer_items|+ id\l+ user_id\l+ offer_id\l+ product_id\l+ description\l+ quantity\l+ unit_price\l+ line_total\l+ created_at\l+ updated_at\l+ discount_rate\l+ deleted_at\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l}"];
+  product_images [label="{product_images|+ id\l+ user_id\l+ product_id\l+ storage_path\l+ file_name\l+ content_type\l+ byte_size\l+ sort_order\l+ created_at\l+ updated_at\l+ deleted_at\l}"];
+  products [label="{products|+ id\l+ user_id\l+ company_id\l+ name\l+ price\l+ vat_rate\l+ item_type\l+ active\l+ created_at\l+ updated_at\l+ category_id\l+ deleted_at\l+ sku\l+ unit\l+ brand_id\l+ is_stock_item\l+ cost_price\l+ sale_price_vat_included\l+ cost_price_vat_included\l+ description\l+ barcode\l+ stock_quantity\l+ min_stock_level\l+ currency_id\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l+ CONSTRAINT\l}"];
+  users [label="{users|+ id\l+ email\l+ role\l+ active\l}"];
+
+}

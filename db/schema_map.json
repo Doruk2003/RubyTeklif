@@ -1,0 +1,195 @@
+{
+  "tables": {
+    "activity_logs": {
+      "columns": [
+        "id",
+        "action",
+        "actor_id",
+        "target_id",
+        "target_type",
+        "metadata",
+        "created_at"
+      ],
+      "foreign_keys": []
+    },
+    "brands": {
+      "columns": [
+        "id",
+        "user_id",
+        "code",
+        "name",
+        "active",
+        "created_at",
+        "updated_at",
+        "deleted_at"
+      ],
+      "foreign_keys": []
+    },
+    "calendar_events": {
+      "columns": [
+        "id",
+        "user_id",
+        "event_date",
+        "title",
+        "description",
+        "color",
+        "deleted_at",
+        "created_at",
+        "updated_at",
+        "start_at",
+        "remind_minutes_before",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT"
+      ],
+      "foreign_keys": []
+    },
+    "categories": {
+      "columns": [
+        "id",
+        "user_id",
+        "code",
+        "name",
+        "active",
+        "created_at",
+        "updated_at",
+        "deleted_at"
+      ],
+      "foreign_keys": []
+    },
+    "companies": {
+      "columns": [
+        "id",
+        "user_id",
+        "name",
+        "tax_number",
+        "created_at",
+        "updated_at",
+        "authorized_person",
+        "phone",
+        "address",
+        "tax_office",
+        "active",
+        "email",
+        "deleted_at"
+      ],
+      "foreign_keys": []
+    },
+    "offers": {
+      "columns": [
+        "id",
+        "user_id",
+        "company_id",
+        "offer_number",
+        "offer_date",
+        "net_total",
+        "vat_total",
+        "gross_total",
+        "created_at",
+        "updated_at",
+        "status",
+        "deleted_at",
+        "CONSTRAINT"
+      ],
+      "foreign_keys": []
+    },
+    "currencies": {
+      "columns": [
+        "id",
+        "user_id",
+        "code",
+        "name",
+        "symbol",
+        "rate_to_try",
+        "active",
+        "created_at",
+        "updated_at",
+        "deleted_at",
+        "CONSTRAINT"
+      ],
+      "foreign_keys": []
+    },
+    "offer_items": {
+      "columns": [
+        "id",
+        "user_id",
+        "offer_id",
+        "product_id",
+        "description",
+        "quantity",
+        "unit_price",
+        "line_total",
+        "created_at",
+        "updated_at",
+        "discount_rate",
+        "deleted_at",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT"
+      ],
+      "foreign_keys": []
+    },
+    "product_images": {
+      "columns": [
+        "id",
+        "user_id",
+        "product_id",
+        "storage_path",
+        "file_name",
+        "content_type",
+        "byte_size",
+        "sort_order",
+        "created_at",
+        "updated_at",
+        "deleted_at"
+      ],
+      "foreign_keys": []
+    },
+    "products": {
+      "columns": [
+        "id",
+        "user_id",
+        "company_id",
+        "name",
+        "price",
+        "vat_rate",
+        "item_type",
+        "active",
+        "created_at",
+        "updated_at",
+        "category_id",
+        "deleted_at",
+        "sku",
+        "unit",
+        "brand_id",
+        "is_stock_item",
+        "cost_price",
+        "sale_price_vat_included",
+        "cost_price_vat_included",
+        "description",
+        "barcode",
+        "stock_quantity",
+        "min_stock_level",
+        "currency_id",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT",
+        "CONSTRAINT"
+      ],
+      "foreign_keys": []
+    },
+    "users": {
+      "columns": [
+        "id",
+        "email",
+        "role",
+        "active"
+      ],
+      "foreign_keys": []
+    }
+  }
+}

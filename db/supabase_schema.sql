@@ -296,6 +296,7 @@ end;
 $$;
 
 
+
 ALTER FUNCTION "public"."archive_currency_with_audit_atomic"("p_actor_id" "uuid", "p_currency_id" "uuid") OWNER TO "postgres";
 
 
@@ -2568,6 +2569,8 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "service_role";
+
+
 
 
 
