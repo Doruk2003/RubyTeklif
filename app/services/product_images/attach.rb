@@ -13,7 +13,7 @@ module ProductImages
     end
 
     def call(product_id:, user_id:, files:)
-      upload_files = Array(files).compact.reject { |f| blank_file?(f) }
+      upload_files = Array(files).compact.select { |f| f.respond_to?(:content_type) }.reject { |f| blank_file?(f) }
       return [] if upload_files.empty?
 
       existing = @repository.list(product_id: product_id, user_id: user_id)

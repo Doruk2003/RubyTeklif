@@ -43,7 +43,12 @@ module Products
         page: page(params),
         per_page: per_page(params),
         scope: normalized_scope(params),
-        category: params[:category].to_s
+        category: params[:category].to_s,
+        brand: params[:brand].to_s,
+        item_type: params[:item_type].to_s,
+        name: params[:name].to_s,
+        sku: params[:sku].to_s,
+        barcode: params[:barcode].to_s
       }
 
       "queries/products/v1/user:#{user_id}/#{Digest::SHA256.hexdigest(filtered.to_json)}"
@@ -53,6 +58,21 @@ module Products
       filters = [deleted_scope_filter(params)].compact
       if params[:category].present?
         filters << "category_id=eq.#{Supabase::FilterValue.eq(params[:category])}"
+      end
+      if params[:brand].present?
+        filters << "brand_id=eq.#{Supabase::FilterValue.eq(params[:brand])}"
+      end
+      if params[:item_type].present?
+        filters << "item_type=eq.#{Supabase::FilterValue.eq(params[:item_type])}"
+      end
+      if params[:name].present?
+        filters << "name=ilike.*#{params[:name]}*"
+      end
+      if params[:sku].present?
+        filters << "sku=ilike.*#{params[:sku]}*"
+      end
+      if params[:barcode].present?
+        filters << "barcode=eq.#{params[:barcode]}"
       end
 
       base = "products?select=id,sku,name,description,barcode,category_id,brand_id,currency_id,price,cost_price,stock_quantity,min_stock_level,vat_rate,item_type,unit,is_stock_item,sale_price_vat_included,cost_price_vat_included,active,deleted_at,categories(name),brands(name),currencies(code,name,symbol)&order=created_at.desc"

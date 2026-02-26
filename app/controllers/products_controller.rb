@@ -163,7 +163,7 @@ class ProductsController < ApplicationController
   end
 
   def product_photos
-    Array(product_params[:photos]).compact.reject { |file| file.respond_to?(:original_filename) && file.original_filename.to_s.blank? }
+    Array(product_params[:photos]).select { |file| file.respond_to?(:content_type) }.reject { |file| file.respond_to?(:original_filename) && file.original_filename.to_s.blank? }
   end
 
   def authorize_products!
@@ -200,8 +200,8 @@ class ProductsController < ApplicationController
 
   def load_currency_options
     rows = Currencies::OptionsQuery.new(client: client).call(active_only: false, user_id: current_user.id)
-    @currency_options = rows.map { |row| ["#{row["code"]} - #{row["name"]}", row["id"].to_s] }
-    @currency_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["code"].to_s }
+    @currency_options = rows.map { |row| [row["name"].to_s, row["id"].to_s] }
+    @currency_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
   rescue ServiceErrors::System => e
     report_handled_error(e, source: "products#load_currency_options", severity: :error)
     flash.now[:alert] ||= e.user_message
