@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Rails Server",
+      "type": "shell",
+      "command": "rails server",
+      "presentation": {
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Schema Watcher",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-NoExit",
+        "-File",
+        "${workspaceFolder}/watch_schema.ps1"
+      ],
+      "presentation": {
+        "panel": "new"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Dev Environment",
+      "dependsOn": ["Rails Server", "Schema Watcher"],
+      "dependsOrder": "parallel"
+    }
+  ]
+}

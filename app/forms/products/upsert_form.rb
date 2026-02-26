@@ -29,6 +29,7 @@ module Products
     attribute :name, :string
     attribute :description, :string
     attribute :barcode, :string
+    attribute :gtip_code, :string
     attribute :price
     attribute :cost_price
     attribute :stock_quantity
@@ -48,6 +49,7 @@ module Products
     validates :name, presence: true, length: { maximum: 150 }
     validates :description, length: { maximum: 2000 }, allow_blank: true
     validates :barcode, length: { maximum: 64 }, format: { with: /\A[a-zA-Z0-9._-]+\z/ }, allow_blank: true
+    validates :gtip_code, length: { maximum: 50 }, allow_blank: true
     validates :item_type, inclusion: { in: ALLOWED_TYPES }
     validates :category_id, presence: true, format: { with: /\A[0-9a-fA-F-]{36}\z/ }
     validates :brand_id, format: { with: /\A[0-9a-fA-F-]{36}\z/ }, allow_blank: true
@@ -73,6 +75,7 @@ module Products
         name: name.to_s.strip,
         description: normalize_nullable_text(description),
         barcode: normalize_barcode(barcode),
+        gtip_code: normalize_gtip_code(gtip_code),
         price: sale_vat_included ? gross_to_net(sale_gross, vat) : sale_gross,
         cost_price: cost_vat_included ? gross_to_net(cost_gross, vat) : cost_gross,
         stock_quantity: stock_item ? decimal_to_float(stock_quantity) : 0.0,
@@ -120,6 +123,10 @@ module Products
     end
 
     def normalize_barcode(value)
+      normalize_nullable_text(value)&.upcase
+    end
+
+    def normalize_gtip_code(value)
       normalize_nullable_text(value)&.upcase
     end
 

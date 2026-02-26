@@ -98,6 +98,13 @@ body.home-page .home-nav {
 .rt-products-table-wrap,
 .alp-table-wrap {
   background: var(--rt-surface-list-card) !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.card:has(.rt-products-table-wrap) .card-body,
+.card-body:has(.rt-products-table-wrap) {
+  overflow: visible !important;
 }
 
 .form-input,
@@ -690,26 +697,25 @@ table tbody tr:last-child::after {
 }
 
 .rt-action-menu {
-  top: 0;
+  top: 100%;
   right: 0;
-  margin-top: 0 !important;
+  margin-top: 4px !important;
   z-index: 130 !important;
+  min-width: 140px;
 }
 
 .rt-action-menu .rt-arrow-hover {
   padding-left: 2rem !important;
 }
 
-.rt-companies-table-wrap {
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-  position: relative;
-}
-
 .rt-companies-table-wrap tbody tr:last-child .rt-action-menu,
-.rt-companies-table-wrap tbody tr:nth-last-child(2) .rt-action-menu {
-  top: auto;
-  bottom: 0;
+.rt-companies-table-wrap tbody tr:nth-last-child(2) .rt-action-menu,
+.rt-products-table-wrap tbody tr:last-child .rt-action-menu,
+.rt-products-table-wrap tbody tr:nth-last-child(2) .rt-action-menu {
+  top: auto !important;
+  bottom: 100% !important;
+  margin-bottom: 8px !important;
+  margin-top: 0 !important;
 }
 
 .rt-table-wrap,

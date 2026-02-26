@@ -1,71 +1,241 @@
-<div class="container-fluid py-2">
-  <div class="row g-2">
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-          <div>
-            <h1 class="h4 mb-1">Urun Detayi</h1>
-            <p class="text-secondary mb-0"><%= @product&.dig("name") || "Urun bulunamadi" %></p>
-          </div>
-          <div class="d-flex flex-wrap align-items-center gap-2">
-            <%= link_to "Urun Listesi", products_path, class: "btn-secondary w-100" %>
-            <% if @product.present? %>
-              <%= link_to "Duzenle", edit_product_path(@product["id"]), class: "btn-secondary w-100" %>
-              <%= link_to "Arsivle", product_path(@product["id"]), data: { turbo_method: :delete, turbo_confirm: "Bu urunu arsivlemek istediginize emin misiniz?" }, class: "btn-secondary w-100" %>
-            <% end %>
-            <%= new_record_button("Yeni Urun", new_product_path) %>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="container-fluid py-3">
+  <% if @product.present? %>
+    <% 
+      currency_name = (@product.dig("currencies", "name") || @currency_labels[@product["currency_id"].to_s]).to_s.presence || "Döviz Bilgisi Yok"
+      currency_symbol = (@product.dig("currencies", "symbol") || @currency_symbols[@product["currency_id"].to_s] || "TL ").to_s
+      price_unit = "#{currency_symbol} "
+    %>
 
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <% if @product.present? %>
-            <% if @product_images.present? %>
-              <div class="mb-4">
-                <div class="small fw-semibold text-uppercase text-secondary mb-2">Fotograflar</div>
-                <div class="row g-2">
-                  <% @product_images.each do |image| %>
-                    <% image_url = product_image_public_url(image["storage_path"]) %>
-                    <div class="col-6 col-sm-4 col-md-2">
-                      <a href="<%= image_url %>" target="_blank" rel="noopener" class="d-block border rounded overflow-hidden bg-light">
-                        <img src="<%= image_url %>" alt="<%= image["file_name"].to_s.presence || "Urun fotografi" %>" class="w-100" style="height:96px;object-fit:cover;" loading="lazy" />
-                      </a>
-                    </div>
+    <div class="row g-3">
+      <!-- HEADER CARD -->
+      <div class="col-12 mb-2">
+        <div class="card shadow-sm app-header-card border-0 rounded-1 overflow-hidden">
+          <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 p-4">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-white bg-opacity-10 p-2 rounded-2">
+                <span class="material-symbols-outlined text-white fs-2">inventory_2</span>
+              </div>
+              <div>
+                <h1 class="h4 fw-bold mb-0 text-white"><%= @product["name"] %></h1>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-10 fw-normal small"><%= @product["sku"].presence || "No SKU" %></span>
+                  <span class="text-white-50 small">|</span>
+                  <span class="text-white-50 small font-monospace"><%= @product["barcode"].presence || "Barkod Yok" %></span>
+                  <% if @product["gtip_code"].present? %>
+                    <span class="text-white-50 small">|</span>
+                    <span class="text-white-50 small fw-light px-2 bg-white bg-opacity-5 rounded">GTIP: <%= @product["gtip_code"] %></span>
                   <% end %>
                 </div>
               </div>
-            <% end %>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+              <%= list_nav_button(products_path, class_name: "app-header-icon-btn", label: "Listeye Dön") %>
+              <%= edit_record_button(edit_product_path(@product["id"]), class_name: "app-header-icon-btn", label: "Düzenle") %>
+              
+              <% if @product["deleted_at"].present? %>
+                <%= link_to restore_product_path(@product["id"]), 
+                      data: { turbo_method: :patch, turbo_confirm: "Geri yükle?", tip: "Geri Yükle" }, 
+                      class: "btn app-header-icon-btn d-inline-flex align-items-center justify-content-center",
+                      aria: { label: "Geri Yükle" } do %>
+                  <span class="material-symbols-outlined">restore_from_trash</span>
+                <% end %>
+              <% else %>
+                <%= link_to product_path(@product["id"]), 
+                      data: { turbo_method: :delete, turbo_confirm: "Arşivle?", tip: "Arşivle" }, 
+                      class: "btn app-header-icon-btn d-inline-flex align-items-center justify-content-center",
+                      aria: { label: "Arşivle" } do %>
+                  <span class="material-symbols-outlined">archive</span>
+                <% end %>
+              <% end %>
+              
+              <%= new_record_button("Yeni Ekle", new_product_path, class_name: "app-header-icon-btn") %>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <dl class="row g-2 mb-0">
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Stok Kodu</dt><dd><%= @product["sku"].to_s.presence || "-" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Urun</dt><dd><%= @product["name"].to_s %></dd></div>
-              <div class="col-12"><dt class="small text-secondary text-uppercase fw-semibold">Aciklama</dt><dd><%= @product["description"].to_s.presence || "-" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Barkod / GTIN</dt><dd><%= @product["barcode"].to_s.presence || "-" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Tip</dt><dd><%= @product["item_type"].to_s %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Kategori</dt><dd><%= @product.dig("categories", "name").to_s.presence || @category_labels[@product["category_id"].to_s].presence || "-" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Marka</dt><dd><%= @product.dig("brands", "name").to_s.presence || @brand_labels[@product["brand_id"].to_s].presence || "-" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Birim</dt><dd><%= @product["unit"].to_s.presence || "-" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Para Birimi</dt><dd><%= @product.dig("currencies", "code").to_s.presence || @currency_labels[@product["currency_id"].to_s].presence || "TRY" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Stok Takibi</dt><dd><%= @product["is_stock_item"] ? "Evet" : "Hayir" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Mevcut Stok</dt><dd><%= @product["stock_quantity"].to_s.presence || "0" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Minimum Stok</dt><dd><%= @product["min_stock_level"].to_s.presence || "0" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Aktif</dt><dd><%= @product["active"] ? "Evet" : "Hayir" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Satis Fiyati (KDV Haric)</dt><dd><%= number_to_currency(@product["price"], unit: "TL ", format: "%u%n") %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Maliyet Fiyati (KDV Haric)</dt><dd><%= number_to_currency(@product["cost_price"], unit: "TL ", format: "%u%n") %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Satis Fiyati Giris Tipi</dt><dd><%= @product["sale_price_vat_included"] ? "KDV Dahil" : "KDV Haric" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">Maliyet Fiyati Giris Tipi</dt><dd><%= @product["cost_price_vat_included"] ? "KDV Dahil" : "KDV Haric" %></dd></div>
-              <div class="col-12 col-md-6"><dt class="small text-secondary text-uppercase fw-semibold">KDV Orani</dt><dd><%= @product["vat_rate"].to_s %> %</dd></div>
-            </dl>
-          <% else %>
-            <div class="text-secondary">Urun bulunamadi.</div>
-          <% end %>
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+            <h6 class="fw-bold text-secondary mb-0 d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined fs-5">info</span>
+              Ürün & Stok Bilgileri
+            </h6>
+          </div>
+          <div class="card-body p-4">
+            <div class="row g-3">
+              <div class="col-6 text-truncate">
+                <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Kategori</div>
+                <div class="text-dark"><%= @product.dig("categories", "name").to_s.presence || @category_labels[@product["category_id"].to_s].presence || "-" %></div>
+              </div>
+                        
+              <div class="col-6 text-truncate">
+                <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Marka</div>
+                <div class="text-dark"><%= @product.dig("brands", "name").to_s.presence || @brand_labels[@product["brand_id"].to_s].presence || "-" %></div>
+              </div>
+              
+              <div class="col-6">
+                <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Tip</div>
+                <div class="text-dark fw-semibold"><%= @product["item_type"].to_s.upcase %></div>
+              </div>
+              <div class="col-6">
+                <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Birim</div>
+                <div class="text-dark fw-semibold"><%= @product["unit"].to_s.upcase.presence || "-" %></div>
+              </div>
+    
+              
+              <div class="col-12 border-top pt-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="small text-secondary fw-bold text-uppercase" style="font-size: 0.7rem;">Durum</span>
+                  <% if @product["active"] %>
+                    <span class="badge bg-success bg-opacity-10 text-success border-0 rounded-pill px-2">Aktif</span>
+                  <% else %>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border-0 rounded-pill px-2">Pasif</span>
+                  <% end %>
+                </div>
+                
+                <% if @product["is_stock_item"].to_s.downcase.in?(%w[true 1 t]) %>
+                  <div class="row bg-light rounded-3 p-2 g-0">
+                    <div class="col-6 border-end text-center">
+                      <div class="small text-secondary" style="font-size: 0.7rem;">Mevcut Stok</div>
+                      <div class="fw-bold text-primary"><%= @product["stock_quantity"].to_f.to_i %> <%= @product["unit"].to_s.upcase %></div>
+                    </div>
+                    <div class="col-6 text-center">
+                      <div class="small text-secondary" style="font-size: 0.7rem;">Min. Stok</div>
+                      <div class="fw-bold text-secondary"><%= @product["min_stock_level"].to_f.to_i %></div>
+                    </div>
+                  </div>
+                <% else %>
+                  <div class="text-center py-2 text-muted small fst-italic">Stok takibi kapalı</div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- TOP ROW: PRICING & INFO/STOCK -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+            <h6 class="fw-bold text-secondary mb-0 d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined fs-5">payments</span>
+              Fiyatlandırma
+            </h6>
+          </div>
+          <div class="card-body p-4">
+            <div class="mb-4">
+              <div class="small text-secondary mb-1">Satış Fiyatı (<%= currency_name %>)</div>
+              <div class="h3 fw-bold text-dark mb-0"><%= number_to_currency(@product["price"], unit: price_unit, format: "%u%n") %></div>
+              <div class="badge <%= @product["sale_price_vat_included"] ? "bg-success-subtle text-success" : "bg-light text-muted" %> border-0 mt-2 fw-normal">
+                <%= @product["sale_price_vat_included"] ? "KDV Dahil" : "KDV Hariç" %>
+              </div>
+            </div>
+            
+            <div class="row g-3 border-top pt-3">
+              <div class="col-6">
+                <div class="small text-secondary mb-1">Maliyet</div>
+                <div class="h5 fw-bold text-dark mb-0 text-truncate"><%= number_to_currency(@product["cost_price"], unit: price_unit, format: "%u%n") %></div>
+                <div class="small text-muted"><%= @product["cost_price_vat_included"] ? "KDV Dahil" : "KDV Hariç" %></div>
+              </div>
+              <div class="col-6">
+                <div class="small text-secondary mb-1">KDV Oranı</div>
+                <div class="h5 fw-bold text-dark mb-0">%<%= @product["vat_rate"].to_f.to_i %></div>
+                <div class="small text-muted">Vergi Oranı</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+
+      <!-- BOTTOM ROW: PHOTOS & DESCRIPTION -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+            <h6 class="fw-bold text-secondary mb-0 d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined fs-5">imagesmode</span>
+              Ürün Fotoğrafları
+            </h6>
+          </div>
+          <div class="card-body p-4">
+            <% if @product_images.present? %>
+              <div class="row g-2">
+                <% @product_images.each_with_index do |image, idx| %>
+                  <% image_url = product_image_public_url(image["storage_path"]) %>
+                  <div class="<%= idx == 0 ? 'col-12 mb-2' : 'col-4 col-md-3' %>">
+                    <a href="<%= image_url %>" target="_blank" rel="noopener" class="d-block border rounded overflow-hidden shadow-sm hover-scale transition">
+                      <img src="<%= image_url %>" alt="Ürün" class="w-100" style="height: <%= idx == 0 ? '240px' : '80px' %>; object-fit: cover;" loading="lazy" />
+                    </a>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="d-flex flex-column align-items-center justify-content-center py-5 bg-light rounded-3 text-muted">
+                <span class="material-symbols-outlined fs-1 mb-2">no_photography</span>
+                <span class="small">Fotoğraf bulunmuyor</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+            <h6 class="fw-bold text-secondary mb-0 d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined fs-5">description</span>
+              Açıklama
+            </h6>
+          </div>
+          <div class="card-body p-4">
+            <p class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6; font-size: 0.95rem;">
+              <%= @product["description"].to_s.presence || "Bu ürün için bir açıklama girilmemiş." %>
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  <% else %>
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-5 text-center">
+        <span class="material-symbols-outlined fs-1 text-muted mb-3">inventory_2</span>
+        <h4 class="fw-bold">Ürün bulunamadı</h4>
+        <p class="text-secondary mb-4">Ulaşmaya çalıştığınız ürün kaydı mevcut değil.</p>
+        <%= link_to "Ürün Listesine Dön", products_path, class: "btn btn-dark px-4" %>
+      </div>
+    </div>
+  <% end %>
 </div>
 
-
+<style>
+  .card { 
+    border-radius: 6px !important; 
+  }
+  .app-header-card {
+    border-radius: 6px !important;
+  }
+  .transition { transition: all 0.3s ease; }
+  .hover-scale:hover { transform: scale(1.02); }
+  
+  [data-tip] { position: relative; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 140ms ease;
+    z-index: 1000;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+</style>

@@ -4,13 +4,13 @@
       <div class="card shadow-sm app-header-card">
         <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
           <div>
-            <h1 class="h4 mb-1">Yeni Urun</h1>
+            <h1 class="h4 mb-1">Yeni Ürün</h1>
             <p class="text-secondary mb-0">Yeni ürün kaydı oluştur.</p>
           </div>
           <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions justify-content-end">
             <%= icon_link_button(new_category_path(return_to: request.fullpath), label: "Yeni Kategori", icon: "category", class_name: "app-header-icon-btn") %>
             <%= icon_link_button(new_brand_path(return_to: request.fullpath), label: "Yeni Marka", icon: "branding_watermark", class_name: "app-header-icon-btn") %>
-            <%= list_nav_button(products_path, label: "Urun Listesi", class_name: "app-header-icon-btn") %>
+            <%= list_nav_button(products_path, label: "Ürün Listesi", class_name: "app-header-icon-btn") %>
             <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
           </div>
         </div>
@@ -25,7 +25,7 @@
                 url: products_path,
                 method: :post,
                 submit_label: "Kaydet",
-                submit_confirm: "Yeni urun kaydedilsin mi?",
+                submit_confirm: "Yeni Ürün kaydedilsin mi?",
                 remaining_photo_count: nil,
                 existing_photo_count: 0 %>
         </div>

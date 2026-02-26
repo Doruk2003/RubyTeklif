@@ -140,6 +140,7 @@ class ProductsController < ApplicationController
       :name,
       :description,
       :barcode,
+      :gtip_code,
       :price,
       :vat_rate,
       :item_type,
@@ -202,6 +203,7 @@ class ProductsController < ApplicationController
     rows = Currencies::OptionsQuery.new(client: client).call(active_only: false, user_id: current_user.id)
     @currency_options = rows.map { |row| [row["name"].to_s, row["id"].to_s] }
     @currency_labels = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["name"].to_s }
+    @currency_symbols = rows.each_with_object({}) { |row, hash| hash[row["id"].to_s] = row["symbol"].to_s }
   rescue ServiceErrors::System => e
     report_handled_error(e, source: "products#load_currency_options", severity: :error)
     flash.now[:alert] ||= e.user_message

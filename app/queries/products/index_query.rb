@@ -75,7 +75,7 @@ module Products
         filters << "barcode=eq.#{params[:barcode]}"
       end
 
-      base = "products?select=id,sku,name,description,barcode,category_id,brand_id,currency_id,price,cost_price,stock_quantity,min_stock_level,vat_rate,item_type,unit,is_stock_item,sale_price_vat_included,cost_price_vat_included,active,deleted_at,categories(name),brands(name),currencies(code,name,symbol)&order=created_at.desc"
+      base = "products?select=id,sku,name,description,barcode,gtip_code,category_id,brand_id,currency_id,price,cost_price,stock_quantity,min_stock_level,vat_rate,item_type,unit,is_stock_item,sale_price_vat_included,cost_price_vat_included,active,deleted_at,categories(name),brands(name),currencies(code,name,symbol)&order=created_at.desc"
       query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
       "#{query}&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
     end

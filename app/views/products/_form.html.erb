@@ -5,8 +5,19 @@
 <% active_value = value_for.call(:active, true) %>
 <%= form_with url: url, method: method, scope: :product, local: true, class: app_form_class("rt-product-form") do |f| %>
 
-<div class="card mb-2 bg-white border border-1 border-light p-4 rounded">
-  <div class="row g-3 align-items-end">
+<% is_editing = value_for.call(:id).present? %>
+
+<div class="card mb-2 bg-white border border-1 border-light p-4 rounded shadow-sm">
+  <% if is_editing %>
+    <div class="mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+      <span class="badge bg-light text-dark border fw-bold px-3 py-2" style="font-size: 0.8rem;">
+        <i class="bi bi-info-circle me-1 text-primary"></i>
+        Seçili Kayıt: <span class="text-secondary ms-1"><%= value_for.call(:sku) %></span>
+      </span>
+    </div>
+  <% end %>
+
+  <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-3">
       <div class="form-floating">
         <%= f.text_field :sku, value: value_for.call(:sku), placeholder: "Stok Kodu", class: "form-control", autocomplete: "off" %>
@@ -16,8 +27,8 @@
 
     <div class="col-12 col-md-6 col-lg-3">
       <div class="form-floating">
-        <%= f.text_field :name, value: value_for.call(:name), placeholder: "Urun Adi", class: "form-control" %>
-        <%= f.label :name, "Urun Adı" %>
+        <%= f.text_field :name, value: value_for.call(:name), placeholder: "Ürün Adı", class: "form-control" %>
+        <%= f.label :name, "Ürün Adı" %>
       </div>
     </div>
 
@@ -30,18 +41,14 @@
 
     <div class="col-12 col-md-6 col-lg-3">
       <div class="form-floating">
-        <%= f.select :is_stock_item,
-              options_for_select([["Evet", "1"], ["Hayir", "0"]], stock_value.to_s.in?(%w[true 1]) ? "1" : "0"),
-              {},
-              class: "form-select",
-              data: { float_empty: true } %>
-        <%= f.label :is_stock_item, "Stok Ürünü" %>
+        <%= f.text_field :gtip_code, value: value_for.call(:gtip_code), placeholder: "GTIP Kodu", class: "form-control", maxlength: 50, autocomplete: "off" %>
+        <%= f.label :gtip_code, "GTIP Kodu" %>
       </div>
     </div>
 
     <div class="col-12">
       <div class="form-floating">
-        <%= f.text_area :description, value: value_for.call(:description), placeholder: "Aciklama", class: "form-control", style: "height: 72px;" %>
+        <%= f.text_area :description, value: value_for.call(:description), placeholder: "Açıklama", class: "form-control", style: "height: 72px;" %>
         <%= f.label :description, "Açıklama" %>
       </div>
     </div>
@@ -54,7 +61,7 @@
       <div class="form-floating">
         <%= f.select :category_id,
               options_for_select(@category_options, value_for.call(:category_id)),
-              { prompt: "Kategori seçin" },
+              { prompt: "Kategori Seçin" },
               class: "form-select",
               data: { float_empty: true } %>
         <%= f.label :category_id, "Kategori" %>
@@ -65,7 +72,7 @@
       <div class="form-floating">
         <%= f.select :brand_id,
               options_for_select(@brand_options, value_for.call(:brand_id)),
-              { prompt: "Marka seçmeden devam edebilirsin" },
+              { prompt: "Marka Seçmeden Devam Edebilirsiniz" },
               class: "form-select",
               data: { float_empty: true } %>
         <%= f.label :brand_id, "Marka" %>
@@ -76,7 +83,7 @@
       <div class="form-floating">
         <%= f.select :item_type,
               options_for_select(Products::UpsertForm::ITEM_TYPE_OPTIONS, value_for.call(:item_type)),
-              { prompt: "Tip seçin" },
+              { prompt: "Tip Seçin" },
               class: "form-select",
               data: { float_empty: true } %>
         <%= f.label :item_type, "Tip" %>
@@ -86,7 +93,7 @@
     <div class="col-12 col-md-6 col-lg-3">
       <div class="form-floating">
         <%= f.select :unit,
-              options_for_select(Products::UpsertForm::UNIT_OPTIONS, value_for.call(:unit, "adet")),
+              options_for_select(Products::UpsertForm::UNIT_OPTIONS, value_for.call(:unit, "Adet")),
               {},
               class: "form-select",
               data: { float_empty: true } %>
@@ -103,7 +110,7 @@
       <div class="form-floating">
         <%= f.select :currency_id,
               options_for_select(@currency_options, value_for.call(:currency_id)),
-              { prompt: "Döviz seçin" },
+              { prompt: "Döviz Seçin" },
               class: "form-select",
               data: { float_empty: true } %>
         <%= f.label :currency_id, "Döviz" %>
@@ -149,7 +156,7 @@
     <div class="col-12 col-md-6 col-lg-2">
       <div class="form-floating">
         <%= f.select :vat_rate,
-              options_for_select([["0%", "0"], ["1%", "1"], ["8%", "8"], ["10%", "10"], ["18%", "18"], ["20%", "20"]], value_for.call(:vat_rate, "0")),
+              options_for_select([["0%", "0"], ["1%", "1"], ["8%", "8"], ["10%", "10"], ["18%", "18"], ["20%", "20"]], value_for.call(:vat_rate, 0).to_f.round.to_s),
               {},
               class: "form-select",
               data: { float_empty: true } %>
@@ -159,36 +166,74 @@
   </div>
 </div>
 
-<div class="card mb-3 bg-white border border-1 border-light p-4 rounded shadow-sm">
-  <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-box-seam me-2"></i>Stok ve Durum</h6>
-  <div class="row g-3 align-items-end">
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="form-floating">
-        <%= f.number_field :stock_quantity, value: value_for.call(:stock_quantity, 0), step: "0.01", placeholder: "Mevcut Stok", class: "form-control" %>
-        <%= f.label :stock_quantity, "Mevcut Stok" %>
+<div class="row g-3 mb-3">
+  <div class="col-12 col-lg-6">
+    <div class="card h-100 bg-white border border-1 border-light p-4 rounded shadow-sm">
+      <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-box-seam me-2"></i>Stok ve Durum</h6>
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-floating">
+            <%= f.select :is_stock_item,
+                  options_for_select([["Evet", "1"], ["Hayır", "0"]], value_for.call(:is_stock_item, true).to_s.downcase.in?(%w[true 1 t]) ? "1" : "0"),
+                  {},
+                  class: "form-select",
+                  data: { float_empty: true } %>
+            <%= f.label :is_stock_item, "Stok Takibi" %>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-floating">
+            <%= f.number_field :stock_quantity, value: value_for.call(:stock_quantity, 0).to_f.to_i, step: "1", placeholder: "Mevcut Stok", class: "form-control" %>
+            <%= f.label :stock_quantity, "Mevcut Stok" %>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-floating">
+            <%= f.number_field :min_stock_level, value: value_for.call(:min_stock_level, 0).to_f.to_i, step: "1", placeholder: "Minimum Stok", class: "form-control" %>
+            <%= f.label :min_stock_level, "Minimum Stok" %>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="form-floating">
+            <%= f.select :active,
+                  options_for_select([["Aktif", "1"], ["Pasif", "0"]], value_for.call(:active, true).to_s.downcase.in?(%w[true 1 t]) ? "1" : "0"),
+                  {},
+                  class: "form-select",
+                  data: { float_empty: true } %>
+            <%= f.label :active, "Durum" %>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="form-floating">
-        <%= f.number_field :min_stock_level, value: value_for.call(:min_stock_level, 0), step: "0.01", placeholder: "Minimum Stok", class: "form-control" %>
-        <%= f.label :min_stock_level, "Minimum Stok" %>
+  <div class="col-12 col-lg-6">
+    <div class="card h-100 bg-white border border-1 border-light p-4 rounded shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold text-secondary mb-0">Ürün Fotoğrafları</h6>
+        <span class="badge bg-light text-secondary border fw-normal" id="photo_count_badge">0 / 6</span>
       </div>
-    </div>
 
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="form-floating">
-        <%= f.select :active,
-              options_for_select([["Aktif", "1"], ["Pasif", "0"]], active_value.to_s.in?(%w[true 1]) ? "1" : "0"),
-              {},
-              class: "form-select",
-              data: { float_empty: true } %>
-        <%= f.label :active, "Durum" %>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="text-start">
+          <%= f.file_field :photos, multiple: true, accept: "image/png, image/jpeg, image/jpg, image/webp", class: "d-none", id: "photo_upload" %>
+          <label for="photo_upload" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-2 mb-2">
+            <span class="material-symbols-outlined" style="font-size: 18px;">add_a_photo</span>
+            <span>Fotoğraf Seç</span>
+          </label>
+          <p class="small text-muted mb-0">6 Adet PNG, JPG, WEBP yüklenebilir.</p>
+        </div>
+
+        <div id="image_previews_container" class="d-flex gap-2 flex-wrap justify-content-end d-none">
+          <!-- Previews will go here -->
+        </div>
       </div>
     </div>
   </div>
 </div>
-
 
 <style>
   .preview-image-wrapper {
@@ -235,28 +280,6 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 </style>
-
-<div class="card mb-3 bg-white border border-1 border-light p-4 rounded shadow-sm">
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <h6 class="fw-bold text-secondary mb-0">Ürün Fotoğrafları</h6>
-    <span class="badge bg-light text-secondary border fw-normal" id="photo_count_badge">0 / 6</span>
-  </div>
-
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <div class="text-start">
-      <%= f.file_field :photos, multiple: true, accept: "image/png, image/jpeg, image/jpg, image/webp", class: "d-none", id: "photo_upload" %>
-      <label for="photo_upload" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-2 mb-2">
-        <span class="material-symbols-outlined" style="font-size: 18px;">add_a_photo</span>
-        <span>Fotoğraf Seç</span>
-      </label>
-      <p class="small text-muted mb-0">Maksimum 6 adet (PNG, JPG, WEBP) yükleyebilirsiniz.</p>
-    </div>
-
-    <div id="image_previews_container" class="d-flex gap-2 flex-wrap justify-content-end d-none">
-      <!-- Previews will go here -->
-    </div>
-  </div>
-</div>
 
 <div class="d-grid mt-4">
   <%= f.submit(submit_label.presence || "Kaydet", class: "btn btn-success py-3 fw-bold shadow-sm", data: { turbo_confirm: submit_confirm.presence || "Kaydedilsin mi?" }) %>
