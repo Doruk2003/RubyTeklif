@@ -1,68 +1,66 @@
-<div class="container-fluid py-2">
-  <div class="row g-2">
-    <div class="col-12">
-      <div class="card shadow-sm app-header-card">
-        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-          <div>
-            <h1 class="h4 mb-1">Kur Duzenle</h1>
-            <p class="text-secondary mb-0">Kur bilgisini guncelleyin.</p>
-          </div>
-          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-            <%= list_nav_button(currencies_path, label: "Kur Listesi", class_name: "app-header-icon-btn") %>
-            <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
-          </div>
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm app-header-card">
+      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+          <h1 class="h4 mb-1 text-white">Kur Düzenle</h1>
+          <p class="text-secondary mb-0">Kur bilgisini güncelleyin.</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+          <%= list_nav_button(currencies_path, label: "Kur Listesi", class_name: "app-header-icon-btn") %>
+          <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <% if @currency.present? %>
-            <%= form_with url: currency_path(@currency["id"]), method: :patch, scope: :currency, local: true, class: app_form_class("row g-2") do |f| %>
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
-                  <%= f.text_field :code, value: @currency["code"], placeholder: "Kod", class: "form-control" %>
-                  <%= f.label :code, "Kod" %>
-                </div>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <% if @currency.present? %>
+          <%= form_with url: currency_path(@currency["id"]), method: :patch, scope: :currency, local: true, class: app_form_class("row g-3") do |f| %>
+            <div class="col-12 col-md-6">
+              <div class="form-floating">
+                <%= f.text_field :code, value: @currency["code"], placeholder: "Kod", class: "form-control" %>
+                <%= f.label :code, "Kod" %>
               </div>
+            </div>
 
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
-                  <%= f.text_field :name, value: @currency["name"], placeholder: "Ad", class: "form-control" %>
-                  <%= f.label :name, "Ad" %>
-                </div>
+            <div class="col-12 col-md-6">
+              <div class="form-floating">
+                <%= f.text_field :name, value: @currency["name"], placeholder: "Ad", class: "form-control" %>
+                <%= f.label :name, "Ad" %>
               </div>
+            </div>
 
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
-                  <%= f.text_field :symbol, value: @currency["symbol"], placeholder: "Sembol", class: "form-control" %>
-                  <%= f.label :symbol, "Sembol" %>
-                </div>
+            <div class="col-12 col-md-6">
+              <div class="form-floating">
+                <%= f.text_field :symbol, value: @currency["symbol"], placeholder: "Sembol", class: "form-control" %>
+                <%= f.label :symbol, "Sembol" %>
               </div>
+            </div>
 
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
-                  <%= f.number_field :rate_to_try, value: @currency["rate_to_try"], step: "0.0001", placeholder: "Kur", class: "form-control" %>
-                  <%= f.label :rate_to_try, "Kur (1 Doviz = TL)" %>
-                </div>
+            <div class="col-12 col-md-6">
+              <div class="form-floating">
+                <%= f.number_field :rate_to_try, value: @currency["rate_to_try"], step: "0.0001", placeholder: "Kur", class: "form-control" %>
+                <%= f.label :rate_to_try, "Kur (1 Döviz = TL)" %>
               </div>
+            </div>
 
-              <div class="col-12">
-                <div class="form-check">
-                  <%= f.check_box :active, { checked: @currency.key?("active") ? @currency["active"] : true, class: "form-check-input" }, "1", "0" %>
-                  <%= f.label :active, "Aktif", class: "form-check-label" %>
-                </div>
+            <div class="col-12">
+              <div class="form-check">
+                <%= f.check_box :active, { checked: @currency.key?("active") ? @currency["active"] : true, class: "form-check-input" }, "1", "0" %>
+                <%= f.label :active, "Aktif", class: "form-check-label" %>
               </div>
+            </div>
 
-              <div class="col-12">
-                <%= f.submit "Guncelle", class: "btn-primary w-100", data: { turbo_confirm: "Kur guncellensin mi?" } %>
-              </div>
-            <% end %>
-          <% else %>
-            <div class="alert alert-secondary mb-0">Kur bulunamadi.</div>
+            <div class="col-12 mt-4 pt-3 border-top">
+              <%= f.submit "Güncelle", class: "btn btn-primary w-100 py-2", data: { turbo_confirm: "Kur güncellensin mi?" } %>
+            </div>
           <% end %>
-        </div>
+        <% else %>
+          <div class="alert alert-secondary mb-0">Kur bulunamadı.</div>
+        <% end %>
       </div>
     </div>
   </div>

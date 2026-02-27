@@ -100,6 +100,8 @@ body.home-page .home-nav {
   background: var(--rt-surface-list-card) !important;
   overflow-x: auto !important;
   overflow-y: visible !important;
+  min-height: 320px;
+  /* Liste kısa olsa bile menülerin açılması için alan yaratır */
 }
 
 .card:has(.rt-products-table-wrap) .card-body,
@@ -324,8 +326,8 @@ select option:focus {
 
 .rt-submenu a:hover,
 .rt-arrow-hover:hover {
-  background: #0f172a;
-  color: #f8fafc;
+  background: #0f172a !important;
+  color: #ffffff !important;
 }
 
 .rt-submenu a:hover::before,
@@ -641,13 +643,13 @@ table thead tr::after {
 
 table thead th {
   border-bottom: 0 !important;
-  color: #111827 !important;
+  color: #475569 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   letter-spacing: 0.025em !important;
   text-transform: uppercase !important;
   text-align: left;
-  height: 60px !important;
+  height: 48px !important;
   padding: 0 12px !important;
   line-height: 1.4 !important;
   vertical-align: middle !important;
@@ -656,7 +658,7 @@ table thead th {
 table tbody td {
   border-bottom: 0 !important;
   color: #0f172a !important;
-  font-size: 13px !important;
+  font-size: 0.80rem !important;
   font-weight: 400 !important;
   height: 60px !important;
   padding: 0 12px !important;
@@ -708,15 +710,28 @@ table tbody tr:last-child::after {
   padding-left: 2rem !important;
 }
 
-.rt-companies-table-wrap tbody tr:last-child .rt-action-menu,
-.rt-companies-table-wrap tbody tr:nth-last-child(2) .rt-action-menu,
-.rt-products-table-wrap tbody tr:last-child .rt-action-menu,
-.rt-products-table-wrap tbody tr:nth-last-child(2) .rt-action-menu {
+/* Menülerin kesilmesini önleyen yön mantığı */
+.rt-action-menu {
+  top: 100%;
+  right: 0;
+  margin-top: 4px !important;
+  z-index: 130 !important;
+  min-width: 140px;
+}
+
+/* Sadece liste uzunsa (3+ kayıt) ve son sıralardaysak yukarı aç */
+.rt-products-table-wrap tbody tr:nth-child(n+3):last-child .rt-action-menu,
+.rt-products-table-wrap tbody tr:nth-child(n+3):nth-last-child(2) .rt-action-menu,
+.rt-companies-table-wrap tbody tr:nth-child(n+3):last-child .rt-action-menu,
+.rt-companies-table-wrap tbody tr:nth-child(n+3):nth-last-child(2) .rt-action-menu {
   top: auto !important;
   bottom: 100% !important;
   margin-bottom: 8px !important;
   margin-top: 0 !important;
 }
+
+/* NOT: İlk 1-2 satır her zaman aşağı açılır, 
+   min-height (320px) sayesinde bu menüler artık asla kesilmez. */
 
 .rt-table-wrap,
 .table-responsive,
@@ -1759,8 +1774,8 @@ body:has(.rt-dashboard) .app-flash-wrap {
 
 .rt-table th {
   border-bottom: 1px solid #e2e8f0;
-  color: #111827;
-  font-size: 12px;
+  color: #475569;
+  font-size: 12px !important;
   font-weight: 600;
   letter-spacing: 0.025em;
   text-transform: uppercase;
@@ -1771,8 +1786,8 @@ body:has(.rt-dashboard) .app-flash-wrap {
 .rt-table td {
   border-bottom: 1px solid #edf2f7;
   color: #0f172a;
-  font-size: 13px;
-  padding: 8px 7px;
+  font-size: 0.80rem !important;
+  padding: 8px 12px;
   transition: background-color 140ms ease;
 }
 
@@ -1798,12 +1813,12 @@ body:has(.rt-dashboard) .app-flash-wrap {
 
 .rt-pipeline-table th {
   border-bottom: 0;
-  color: #111827;
-  font-size: 12px;
+  color: #475569;
+  font-size: 12px !important;
   font-weight: 600;
   letter-spacing: 0.025em;
   text-transform: uppercase;
-  height: 60px;
+  height: 48px;
   padding: 0 12px;
   line-height: 1.4;
   vertical-align: middle;
@@ -1812,7 +1827,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
 .rt-pipeline-table td {
   border-bottom: 0;
   color: #111827;
-  font-size: 13px;
+  font-size: 0.80rem !important;
   font-weight: 400;
   height: 60px;
   padding: 0 12px;
@@ -1823,7 +1838,7 @@ body:has(.rt-dashboard) .app-flash-wrap {
 .rt-pipeline-table th>a {
   display: inline-flex;
   align-items: center;
-  min-height: 60px;
+  min-height: 48px;
 }
 
 .rt-pipeline-table tbody tr:last-child td {
@@ -2298,13 +2313,20 @@ select.form-input:focus {
 }
 
 .app-list-standard .table thead th,
+.admin-users-page .table thead th {
+  border-bottom: 1px solid var(--bs-table-border-color, #dee2e6) !important;
+  height: 48px !important;
+  padding: 0 12px !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+}
+
 .app-list-standard .table tbody td,
-.admin-users-page .table thead th,
 .admin-users-page .table tbody td {
   border-bottom: 1px solid var(--bs-table-border-color, #dee2e6) !important;
   height: auto !important;
   padding: var(--bs-table-cell-padding-y, 0.75rem) var(--bs-table-cell-padding-x, 0.75rem) !important;
-  font-size: inherit !important;
+  font-size: 0.80rem !important;
   letter-spacing: normal !important;
   text-transform: none !important;
   color: inherit !important;

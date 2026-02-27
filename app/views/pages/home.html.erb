@@ -507,8 +507,8 @@
     <div class="col-12 col-xl-8">
       <div class="card shadow-sm mb-3 home-header-card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Haftalik akis ozeti</span>
-          <span class="badge bg-warning text-dark">7 gun</span>
+          <span>Haftalık Akış Özeti</span>
+          <span class="badge bg-warning text-dark">7 Gün</span>
         </div>
         <div class="card-body">
           <div class="row g-2">
@@ -526,7 +526,7 @@
       </div>
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Son teklifler</span>
+          <span>Son Teklifler</span>
           <%= link_to "Tum teklifler", offers_path, class: "btn btn-sm btn-secondary" %>
         </div>
         <div class="table-responsive">
@@ -534,7 +534,7 @@
             <thead>
               <tr>
                 <th>No</th>
-                <th>Musteri</th>
+                <th>Müşteri</th>
                 <th>Tutar</th>
                 <th>Durum</th>
               </tr>
@@ -542,7 +542,7 @@
             <tbody>
               <% if @recent_offers.blank? %>
                 <tr>
-                  <td colspan="4" class="text-center py-4 text-secondary">Kayit bulunamadi.</td>
+                  <td colspan="4" class="text-center py-4 text-secondary">Kayıt bulunamadı.</td>
                 </tr>
               <% else %>
                 <% @recent_offers.each do |offer| %>
@@ -561,26 +561,26 @@
     </div>
     <div class="col-12 col-xl-4">
       <div class="card shadow-sm mb-3">
-        <div class="card-header">Hizli islemler</div>
+        <div class="card-header">Hızlı işlemler</div>
         <div class="list-group list-group-flush">
           <% if current_user && Roles.catalog_manage?(current_user.role) %>
-            <%= link_to "Yeni musteri", new_company_path, class: "list-group-item list-group-item-action" %>
-            <%= link_to "Yeni teklif", new_offer_path, class: "list-group-item list-group-item-action" %>
-            <%= link_to "Yeni urun", new_product_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Yeni Müşteri", new_company_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Yeni Teklif", new_offer_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Yeni Ürün", new_product_path, class: "list-group-item list-group-item-action" %>
           <% end %>
           <% if current_user && Roles.finance_manage?(current_user.role) %>
-            <%= link_to "Kur yonetimi", currencies_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Kur Yönetimi", currencies_path, class: "list-group-item list-group-item-action" %>
           <% end %>
           <% if current_user && Roles.admin?(current_user.role) %>
-            <%= link_to "Kullanici yonetimi", admin_users_path, class: "list-group-item list-group-item-action" %>
+            <%= link_to "Kullanıcı Yönetimi", admin_users_path, class: "list-group-item list-group-item-action" %>
           <% end %>
         </div>
       </div>
       <div class="card shadow-sm">
-        <div class="card-header">Hatirlatmalar</div>
+        <div class="card-header">Hatırlatmalar</div>
         <ul class="list-group list-group-flush">
           <% if @reminders.blank? %>
-            <li class="list-group-item text-secondary">Bugun icin not bulunmuyor.</li>
+            <li class="list-group-item text-secondary">Bugun için not bulunmuyor.</li>
           <% else %>
             <% @reminders.each do |note| %>
               <li class="list-group-item"><%= note %></li>

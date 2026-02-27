@@ -1,130 +1,152 @@
-<div class="container-fluid py-2">
-  <div class="row g-2">
-    <div class="col-12">
-      <div class="card shadow-sm app-header-card">
-        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm app-header-card">
+      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+          <h1 class="h4 mb-1 text-white">Teklifler</h1>
+          <p class="text-secondary mb-0">Toplam <strong><%= @offers.size %></strong> teklif</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+          <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
+          <%= new_record_button("Yeni Teklif", new_offer_path, class_name: "app-header-icon-btn") %>
+          <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 hidden" data-filter-panel>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <%= filter_form_with url: offers_path, layout: :two, class_name: app_form_class do |f| %>
           <div>
-            <h1 class="h4 mb-1">Teklifler</h1>
-            <p class="text-secondary mb-0">Toplam <strong><%= @offers.size %></strong> teklif</p>
+            <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :scope,
+                  options_for_select([
+                    ["Aktif", "active"],
+                    ["Arsiv", "archived"],
+                    ["Tüm Kayıtlar", "all"]
+                  ], @scope || params[:scope] || "active"),
+                  {},
+                  class: "form-input" %>
           </div>
-          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-            <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
-            <%= new_record_button("Yeni Teklif", new_offer_path, class_name: "app-header-icon-btn") %>
-            <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12">
-      <div class="card shadow-sm hidden" data-filter-panel>
-        <div class="card-body">
-          <%= filter_form_with url: offers_path, layout: :two, class_name: app_form_class do |f| %>
-            <div>
-              <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :scope,
-                    options_for_select([
-                      ["Aktif", "active"],
-                      ["Arsiv", "archived"],
-                      ["Tüm Kayıtlar", "all"]
-                    ], @scope || params[:scope] || "active"),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <%= filter_actions_row do %>
-              <%= f.hidden_field :per_page, value: @per_page %>
-              <%= filter_submit_button %>
-              <%= clear_filter_button(offers_path(per_page: @per_page)) %>
-            <% end %>
+          <%= filter_actions_row do %>
+            <%= f.hidden_field :per_page, value: @per_page %>
+            <%= filter_submit_button %>
+            <%= clear_filter_button(offers_path(per_page: @per_page)) %>
           <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
+  </div>
 
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body p-0">
-          <%= app_table_wrapper do %>
-            <table class="table table-hover align-middle mb-0">
-              <thead>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <%= app_table_wrapper(class_name: "rt-offers-table-wrap") do %>
+          <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
+            <thead>
+              <tr>
+                <th>Teklif No</th>
+                <th>Müşteri</th>
+                <th>Tarih</th>
+                <th class="text-end">Toplam</th>
+                <th class="rt-col-center">Durum</th>
+                <th class="rt-col-center">Aksiyon</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @offers.each do |offer| %>
                 <tr>
-                  <th>Teklif No</th>
-                  <th>Müşteri</th>
-                  <th>Tarih</th>
-                  <th class="text-end">Toplam</th>
-                  <th class="text-end">Durum</th>
-                  <th class="text-end">Aksiyon</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @offers.each do |offer| %>
-                  <tr>
-                    <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
-                    <td><%= offer.dig("companies", "name").to_s.presence || "-" %></td>
-                    <td><%= offer["offer_date"].to_s %></td>
-                    <td class="text-end"><%= offer["gross_total"].to_s %></td>
-                    <td class="text-end"><%= offer["status"].to_s %></td>
-                    <td class="text-end">
-                      <div class="d-inline-flex align-items-center gap-2">
-                        <%= link_to "Gör", offer_path(offer["id"]), class: "btn-secondary" %>
+                  <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
+                  <td><%= offer.dig("companies", "name").to_s.presence || "-" %></td>
+                  <td><%= offer["offer_date"].to_s %></td>
+                  <td class="text-end fw-bold"><%= offer["gross_total"].to_s %></td>
+                  <td class="rt-col-center">
+                    <% status = offer["status"].to_s.downcase %>
+                    <% if offer["deleted_at"].present? %>
+                      <span class="badge bg-danger text-white">ARŞİV</span>
+                    <% elsif status == "taslak" %>
+                      <span class="badge bg-secondary">TASLAK</span>
+                    <% elsif %w[onaylandi gonderildi].include?(status) %>
+                      <span class="badge bg-success">AKTİF</span>
+                    <% else %>
+                      <span class="badge bg-info"><%= status.upcase %></span>
+                    <% end %>
+                  </td>
+                  <td class="rt-col-center">
+                    <details class="position-relative d-inline-block text-start rt-action-details">
+                      <summary class="list-unstyled">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded border bg-white text-secondary" style="width:2.25rem;height:2.25rem; cursor:pointer;">
+                          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="5" cy="12" r="1.6"/>
+                            <circle cx="12" cy="12" r="1.6"/>
+                            <circle cx="19" cy="12" r="1.6"/>
+                          </svg>
+                        </span>
+                      </summary>
+                      <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm" style="z-index: 1000; min-width: 120px;">
+                        <%= link_to "Gör", offer_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <% if offer["deleted_at"].present? %>
                           <%= link_to "Geri Yükle",
                                 restore_offer_path(offer["id"]),
-                                data: { turbo_method: :patch, turbo_confirm: "Bu teklifi geri yüklemek istediginize emin misiniz?" },
-                                class: "btn-secondary" %>
+                                data: { turbo_method: :patch, turbo_confirm: "Geri yüklensin mi?" },
+                                class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
                         <% else %>
-                          <%= link_to "Arsivle",
+                          <%= link_to "Arşivle",
                                 offer_path(offer["id"]),
-                                data: { turbo_method: :delete, turbo_confirm: "Bu teklifi arsivlemek istediginize emin misiniz?" },
-                                class: "btn-secondary" %>
+                                data: { turbo_method: :delete, turbo_confirm: "Arşivlensin mi?" },
+                                class: "d-block rounded px-3 py-2 text-decoration-none text-danger rt-arrow-hover" %>
                         <% end %>
                       </div>
-                    </td>
-                  </tr>
-                <% end %>
+                    </details>
+                  </td>
+                </tr>
+              <% end %>
 
-                <% if @offers.empty? %>
-                  <tr>
-                    <td colspan="6" class="text-center py-5">
-                      <div class="mx-auto" style="max-width:420px;">
-                        <div class="fw-semibold mb-1">Henüz kayitli teklif yok</div>
-                        <div class="text-secondary">İlk teklifi olusturmak için yukaridaki butonu kullanin.</div>
-                      </div>
-                    </td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        </div>
+              <% if @offers.empty? %>
+                <tr>
+                  <td colspan="6" class="text-center py-5">
+                    <div class="mx-auto" style="max-width:420px;">
+                      <div class="fw-semibold mb-1">Henüz kayitli teklif yok</div>
+                      <div class="text-secondary">İlk teklifi olusturmak için yukaridaki butonu kullanin.</div>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
       </div>
     </div>
+  </div>
 
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-          <div class="text-secondary">
-            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayit</span>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="text-secondary text-center text-md-start">
+          Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayit</span>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+          <div class="d-none d-sm-flex align-items-center gap-1 me-2">
+            <span class="small text-secondary">Sayfa boyutu:</span>
+            <% [25, 50, 100].each do |size| %>
+              <% active = @per_page == size %>
+              <%= link_to size.to_s, offers_path(request.query_parameters.merge(page: 1, per_page: size)),
+                    class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
+            <% end %>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="d-none d-sm-flex align-items-center gap-1">
-              <span class="small text-secondary">Sayfa boyutu:</span>
-              <% [25, 50, 100].each do |size| %>
-                <% active = @per_page == size %>
-                <%= link_to size.to_s, offers_path(request.query_parameters.merge(page: 1, per_page: size)),
-                      class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
-              <% end %>
-            </div>
+          <div class="btn-group btn-group-sm">
             <% if @has_prev %>
-              <%= link_to "Önceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
+              <%= link_to "Önceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
+              <span class="btn btn-outline-secondary opacity-50 disabled">Önceki</span>
             <% end %>
 
             <% if @has_next %>
-              <%= link_to "Sonraki", offers_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
+              <%= link_to "Sonraki", offers_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+              <span class="btn btn-outline-secondary opacity-50 disabled">Sonraki</span>
             <% end %>
           </div>
         </div>
@@ -132,6 +154,40 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("turbo:load", function () {
+    var tableWrap = document.querySelector(".rt-offers-table-wrap");
+    if (!tableWrap) return;
+    if (tableWrap.dataset.menuInit === "1") return;
+    tableWrap.dataset.menuInit = "1";
+
+    var actionMenus = function () {
+      return Array.from(tableWrap.querySelectorAll("details.rt-action-details"));
+    };
+
+    tableWrap.addEventListener("click", function (event) {
+      var clickedMenu = event.target.closest("details.rt-action-details");
+      var clickedSummary = event.target.closest("details.rt-action-details > summary");
+
+      if (!clickedMenu) {
+        actionMenus().forEach(function (menu) { menu.open = false; });
+        return;
+      }
+
+      if (clickedSummary) {
+        actionMenus().forEach(function (menu) {
+          if (menu !== clickedMenu) menu.open = false;
+        });
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (tableWrap.contains(event.target)) return;
+      actionMenus().forEach(function (menu) { menu.open = false; });
+    });
+  });
+</script>
 
 
 

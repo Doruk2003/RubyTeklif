@@ -8,14 +8,6 @@
 <% is_editing = value_for.call(:id).present? %>
 
 <div class="card mb-2 bg-white border border-1 border-light p-4 rounded shadow-sm">
-  <% if is_editing %>
-    <div class="mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
-      <span class="badge bg-light text-dark border fw-bold px-3 py-2" style="font-size: 0.8rem;">
-        <i class="bi bi-info-circle me-1 text-primary"></i>
-        Seçili Kayıt: <span class="text-secondary ms-1"><%= value_for.call(:sku) %></span>
-      </span>
-    </div>
-  <% end %>
 
   <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-3">
@@ -217,18 +209,40 @@
         <span class="badge bg-light text-secondary border fw-normal" id="photo_count_badge">0 / 6</span>
       </div>
 
-      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 overflow-visible">
         <div class="text-start">
           <%= f.file_field :photos, multiple: true, accept: "image/png, image/jpeg, image/jpg, image/webp", class: "d-none", id: "photo_upload" %>
           <label for="photo_upload" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-2 mb-2">
             <span class="material-symbols-outlined" style="font-size: 18px;">add_a_photo</span>
             <span>Fotoğraf Seç</span>
           </label>
-          <p class="small text-muted mb-0">6 Adet PNG, JPG, WEBP yüklenebilir.</p>
+          <p class="small text-muted mb-0"><%= local_assigns[:existing_photo_count] ? (6 - local_assigns[:existing_photo_count]) : 6 %> Adet PNG, JPG, WEBP yüklenebilir.</p>
         </div>
 
-        <div id="image_previews_container" class="d-flex gap-2 flex-wrap justify-content-end d-none">
-          <!-- Previews will go here -->
+        <div class="flex-grow-1 d-flex gap-2 flex-nowrap justify-content-end overflow-visible" style="min-width: 0;">
+          <%# Mevcut Fotoğraflar (Düzenleme Modu için) %>
+          <% if local_assigns[:existing_photos].present? %>
+            <% local_assigns[:existing_photos].each_with_index do |image, index| %>
+              <% image_url = product_image_public_url(image["storage_path"]) %>
+              <div class="preview-image-wrapper existing-photo" style="flex-shrink: 0;">
+                <img src="<%= image_url %>" alt="Ürün fotoğrafı" />
+                <div class="existing-photo-actions d-none position-absolute top-0 start-0 w-100 h-100 rounded" style="z-index: 101; background: rgba(0,0,0,0.1);">
+                  <button type="button" 
+                          data-delete-url="<%= destroy_image_product_path(@product["id"], image_id: image["id"]) %>"
+                          data-confirm="Silinsin mi?"
+                          class="btn btn-danger p-0 d-flex align-items-center justify-content-center rounded-circle position-absolute rt-delete-confirm-btn" 
+                          style="width: 14px; height: 14px; top: 2px; right: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                    <span class="material-symbols-outlined" style="font-size: 10px;">delete</span>
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <%# Yeni Seçilen Fotoğraflar (Önizleme) %>
+          <div id="image_previews_container" class="d-flex gap-2 flex-nowrap d-none overflow-visible">
+            <!-- Previews will go here -->
+          </div>
         </div>
       </div>
     </div>
@@ -249,10 +263,9 @@
     z-index: 1;
   }
   .preview-image-wrapper:hover {
-    transform: scale(3);
-    z-index: 100;
-    transition: transform 0.2s ease-in-out, z-index 0s step-start;
+    z-index: 2;
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    cursor: zoom-in;
   }
   .preview-image-wrapper img {
     width: 100%;
@@ -260,13 +273,22 @@
     object-fit: cover;
     border-radius: 0.375rem;
     display: block;
+    background: white;
+  }
+  .preview-image-wrapper.existing-photo:hover .existing-photo-actions {
+    display: flex !important;
+  }
+  .btn-xs {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
   }
   .btn-remove-photo {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 16px;
-    height: 16px;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
     background: #dc3545;
     color: white;
     border: none;
@@ -286,7 +308,38 @@
 </div>
 <% end %>
 
+<!-- Photo Lightbox Modal -->
+<div id="rt_photo_lightbox" class="fixed-top w-100 h-100 d-none align-items-center justify-content-center bg-dark bg-opacity-75" style="z-index: 9999; cursor: zoom-out;" onclick="closeRtLightbox()">
+  <div class="position-relative p-3" style="max-width: 90vw; max-height: 90vh;">
+    <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2 border border-secondary" style="z-index: 10001;" onclick="event.stopPropagation(); closeRtLightbox();">
+      <span class="material-symbols-outlined fs-5">close</span>
+    </button>
+    <img id="rt_lightbox_img" src="" class="img-fluid rounded shadow-lg border border-secondary border-opacity-25" style="max-height: 85vh; object-fit: contain;">
+  </div>
+</div>
+
 <script>
+  // Global Lightbox Functions
+  window.rtShowLightbox = function(src) {
+    const lightbox = document.getElementById('rt_photo_lightbox');
+    const lightboxImg = document.getElementById('rt_lightbox_img');
+    if (lightbox && lightboxImg) {
+      lightboxImg.src = src;
+      lightbox.classList.remove('d-none');
+      lightbox.classList.add('d-flex');
+      document.body.style.overflow = 'hidden'; // Scroll stop
+    }
+  };
+
+  window.closeRtLightbox = function() {
+    const lightbox = document.getElementById('rt_photo_lightbox');
+    if (lightbox) {
+      lightbox.classList.add('d-none');
+      lightbox.classList.remove('d-flex');
+      document.body.style.overflow = ''; // Scroll resume
+    }
+  };
+
   (function() {
     let selectedFiles = [];
 
@@ -299,60 +352,43 @@
       if (photoUpload.dataset.photoInit === 'true') return;
       photoUpload.dataset.photoInit = 'true';
 
-      selectedFiles = []; // Reset locally on each fresh setup
+      selectedFiles = [];
       updateDisplay();
 
       photoUpload.addEventListener('change', (e) => {
         const newFiles = Array.from(e.target.files);
-        let addedCount = 0;
-
         newFiles.forEach(file => {
           const isDuplicate = selectedFiles.some(f => f.name === file.name && f.size === file.size);
-          if (!isDuplicate && selectedFiles.length < 6) {
+          if (!isDuplicate && (selectedFiles.length + (<%= local_assigns[:existing_photo_count] || 0 %>)) < 6) {
             selectedFiles.push(file);
-            addedCount++;
           }
         });
-
-        // Clear the native input value so change event can fire again for same file
         e.target.value = '';
         updateDisplay();
       });
 
       function updateDisplay() {
         container.innerHTML = '';
-        
-        if (selectedFiles.length > 0) {
-          container.classList.remove('d-none');
-        } else {
-          container.classList.add('d-none');
-        }
+        if (selectedFiles.length > 0) container.classList.remove('d-none');
+        else container.classList.add('d-none');
 
         selectedFiles.forEach((file, index) => {
           const wrapper = document.createElement('div');
           wrapper.className = 'preview-image-wrapper';
           
           const img = document.createElement('img');
-          img.src = '';
-          
           const removeBtn = document.createElement('button');
           removeBtn.type = 'button';
           removeBtn.className = 'btn-remove-photo';
           removeBtn.innerHTML = '×';
-          removeBtn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            removeFile(index);
-          };
+          removeBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); removeFile(index); };
 
           wrapper.appendChild(img);
           wrapper.appendChild(removeBtn);
           container.appendChild(wrapper);
 
           const reader = new FileReader();
-          reader.onload = (evt) => {
-            img.src = evt.target.result;
-          };
+          reader.onload = (evt) => { img.src = evt.target.result; };
           reader.readAsDataURL(file);
         });
 
@@ -361,8 +397,9 @@
         photoUpload.files = dt.files;
 
         if (badge) {
-          badge.textContent = `${selectedFiles.length} / 6`;
-          badge.className = selectedFiles.length >= 6 ? 'badge bg-danger text-white border' : 'badge bg-light text-secondary border fw-normal';
+          const total = selectedFiles.length + (<%= local_assigns[:existing_photo_count] || 0 %>);
+          badge.textContent = `${total} / 6`;
+          badge.className = total >= 6 ? 'badge bg-danger text-white border' : 'badge bg-light text-secondary border fw-normal';
         }
       }
 
@@ -371,6 +408,34 @@
         updateDisplay();
       }
     }
+
+    // Event Delegation for Lightbox & Delete
+    document.addEventListener('click', (e) => {
+      // Lightbox Trigger
+      const wrapper = e.target.closest('.preview-image-wrapper');
+      const isDeleteBtn = e.target.closest('.rt-delete-confirm-btn') || e.target.closest('.btn-remove-photo');
+      
+      if (wrapper && !isDeleteBtn) {
+        const img = wrapper.querySelector('img');
+        if (img && img.src) window.rtShowLightbox(img.src);
+      }
+
+      // Existing Photo Delete (Manual submit to avoid link_to issues inside forms)
+      const delBtn = e.target.closest('.rt-delete-confirm-btn');
+      if (delBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm(delBtn.dataset.confirm)) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = delBtn.dataset.deleteUrl;
+          const m = document.createElement('input'); m.type = 'hidden'; m.name = '_method'; m.value = 'DELETE';
+          const t = document.createElement('input'); t.type = 'hidden'; t.name = 'authenticity_token'; t.value = document.querySelector('meta[name="csrf-token"]')?.content;
+          form.appendChild(m); form.appendChild(t);
+          document.body.appendChild(form); form.submit();
+        }
+      }
+    });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', setupPhotoUpload);

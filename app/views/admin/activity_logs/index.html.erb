@@ -1,169 +1,164 @@
-<div class="container-fluid py-2">
-  <div class="row g-2">
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm app-header-card">
+      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+          <h1 class="h4 mb-1 text-white">Aktivite Kayıtları</h1>
+          <p class="text-secondary mb-0">Rol değişiklikleri ve admin aksiyonları</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+          <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
+          <%= list_nav_button(admin_users_path, label: "Admin Panel", class_name: "app-header-icon-btn") %>
+          <%= button_to export_admin_activity_logs_path(request.query_parameters),
+                method: :post,
+                class: "btn btn-outline-secondary rt-icon-btn-layout app-header-icon-btn",
+                form_class: "d-inline-block m-0",
+                data: { tip: "CSV Export" },
+                aria: { label: "CSV Export" } do %>
+            <span class="material-symbols-outlined" aria-hidden="true">Download</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if @export.present? %>
     <div class="col-12">
-      <div class="card shadow-sm app-header-card">
+      <div class="card shadow-sm">
         <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div class="small text-secondary">
+            <% if @export[:status].to_s == "ready" %>
+              Son export hazır.
+            <% elsif @export[:status].to_s == "failed" %>
+              Export başarısız oldu. Tekrar deneyin.
+            <% else %>
+              Export hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
+            <% end %>
+          </div>
           <div>
-            <h1 class="h4 mb-1">Aktivite Kayıtları</h1>
-            <p class="text-secondary mb-0">Rol deşişiklikleri ve admin aksiyonları</p>
-          </div>
-          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-            <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
-            <%= list_nav_button(admin_users_path, label: "Admin Panel", class_name: "app-header-icon-btn") %>
-            <%= button_to export_admin_activity_logs_path(request.query_parameters),
-                  method: :post,
-                  class: "btn btn-outline-secondary rt-icon-btn-layout app-header-icon-btn",
-                  form_class: "d-inline-block m-0",
-                  data: { tip: "CSV Export" },
-                  aria: { label: "CSV Export" } do %>
-              <span class="material-symbols-outlined" aria-hidden="true">download</span>
+            <% if @export[:status].to_s == "ready" %>
+              <%= link_to "CSV İndir", download_export_admin_activity_logs_path(token: @export[:token]), class: "btn-secondary" %>
+            <% elsif @export[:status].to_s == "pending" %>
+              <%= link_to "Yenile", admin_activity_logs_path(request.query_parameters), class: "btn-secondary" %>
             <% end %>
           </div>
         </div>
       </div>
     </div>
+  <% end %>
 
-    <% if @export.present? %>
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-            <div class="small text-secondary">
-              <% if @export[:status].to_s == "ready" %>
-                Son export hazır.
-              <% elsif @export[:status].to_s == "failed" %>
-                Export başarısız oldu. Tekrar deneyin.
-              <% else %>
-                Export hazırlanıyor. Birkaç saniye sonra sayfayı yenileyin.
-              <% end %>
-            </div>
-            <div>
-              <% if @export[:status].to_s == "ready" %>
-                <%= link_to "CSV İndir", download_export_admin_activity_logs_path(token: @export[:token]), class: "btn-secondary" %>
-              <% elsif @export[:status].to_s == "pending" %>
-                <%= link_to "Yenile", admin_activity_logs_path(request.query_parameters), class: "btn-secondary" %>
-              <% end %>
-            </div>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body hidden" data-filter-panel>
+        <%= filter_form_with url: admin_activity_logs_path, layout: :seven, class_name: app_form_class do |f| %>
+          <div>
+            <%= f.label :event_action, "Aksiyon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :event_action,
+                  options_for_select([["Tümü", ""]] + @action_options.map { |action| [action, action] }, params[:event_action].to_s),
+                  {},
+                  class: "form-input" %>
           </div>
-        </div>
-      </div>
-    <% end %>
-
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body hidden" data-filter-panel>
-          <%= filter_form_with url: admin_activity_logs_path, layout: :seven, class_name: app_form_class do |f| %>
-            <div>
-              <%= f.label :event_action, "Aksiyon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :event_action,
-                    options_for_select([["Tümü", ""]] + @action_options.map { |action| [action, action] }, params[:event_action].to_s),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <div>
-              <%= f.label :actor, "İşlem Yapan", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :actor,
-                    options_for_select([["Tümü", ""]] + @users_index.map { |id, email| [email, id] }, params[:actor].to_s),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <div>
-              <%= f.label :target, "Hedef Kullanıcı", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :target,
-                    options_for_select([["Tümü", ""]] + @users_index.map { |id, email| [email, id] }, params[:target].to_s),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <div>
-              <%= f.label :target_type, "Hedef Tipi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :target_type,
-                    options_for_select([["Tümü", ""]] + @target_type_options.map { |type| [type, type] }, params[:target_type].to_s),
-                    {},
-                    class: "form-input" %>
-            </div>
-            <div>
-              <%= f.label :from, "Başlangıç", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.date_field :from, value: params[:from], class: "form-input" %>
-            </div>
-            <div>
-              <%= f.label :to, "Bitiş", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.date_field :to, value: params[:to], class: "form-input" %>
-            </div>
-            <%= filter_actions_row(class_name: "items-end") do %>
-              <%= filter_submit_button %>
-              <%= clear_filter_button(admin_activity_logs_path) %>
-            <% end %>
+          <div>
+            <%= f.label :actor, "İşlem Yapan", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :actor,
+                  options_for_select([["Tümü", ""]] + @users_index.map { |id, email| [email, id] }, params[:actor].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :target, "Hedef Kullanıcı", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :target,
+                  options_for_select([["Tümü", ""]] + @users_index.map { |id, email| [email, id] }, params[:target].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :target_type, "Hedef Tipi", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.select :target_type,
+                  options_for_select([["Tümü", ""]] + @target_type_options.map { |type| [type, type] }, params[:target_type].to_s),
+                  {},
+                  class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :from, "Başlangıç", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.date_field :from, value: params[:from], class: "form-input" %>
+          </div>
+          <div>
+            <%= f.label :to, "Bitiş", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <%= f.date_field :to, value: params[:to], class: "form-input" %>
+          </div>
+          <%= filter_actions_row(class_name: "items-end") do %>
+            <%= filter_submit_button %>
+            <%= clear_filter_button(admin_activity_logs_path) %>
           <% end %>
-        </div>
+        <% end %>
+      </div>
 
-        <div class="card-body p-0">
-          <%= app_table_wrapper do %>
-            <table class="table table-hover align-middle mb-0">
-              <thead>
+      <div class="card-body p-0">
+        <%= app_table_wrapper do %>
+          <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
+            <thead>
+              <tr>
+                <th class="ps-4">Tarih</th>
+                <th>Aksiyon</th>
+                <th>İşlem Yapan</th>
+                <th>Hedef Kullanıcı</th>
+                <th>Hedef Tipi</th>
+                <th class="pe-4">Detay</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @logs.each do |log| %>
                 <tr>
-                  <th>Tarih</th>
-                  <th>Aksiyon</th>
-                  <th>İşlem Yapan</th>
-                  <th>Hedef Kullanıcı</th>
-                  <th>Hedef Tipi</th>
-                  <th>Detay</th>
+                  <td class="ps-4 small text-secondary"><%= log["created_at"].to_s %></td>
+                  <td><span class="badge bg-light text-dark border"><%= log["action"].to_s.upcase %></span></td>
+                  <td><%= @users_index[log["actor_id"].to_s].presence || log["actor_id"].to_s %></td>
+                  <td><%= @users_index[log["target_id"].to_s].presence || log["target_id"].to_s %></td>
+                  <td><span class="text-secondary small fw-bold"><%= log["target_type"].to_s %></span></td>
+                  <td class="pe-4 text-secondary small"><%= log["metadata"].to_s %></td>
                 </tr>
-              </thead>
-              <tbody>
-                <% @logs.each do |log| %>
-                  <tr>
-                    <td><%= log["created_at"].to_s %></td>
-                    <td><%= log["action"].to_s %></td>
-                    <td><%= @users_index[log["actor_id"].to_s].presence || log["actor_id"].to_s %></td>
-                    <td><%= @users_index[log["target_id"].to_s].presence || log["target_id"].to_s %></td>
-                    <td><%= log["target_type"].to_s %></td>
-                    <td class="text-secondary"><%= log["metadata"].to_s %></td>
-                  </tr>
-                <% end %>
+              <% end %>
 
-                <% if @logs.empty? %>
-                  <tr>
-                    <td colspan="6" class="text-center py-5 text-secondary">Kayıt yok.</td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% end %>
-        </div>
+              <% if @logs.empty? %>
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-secondary fst-italic">Kayıt bulunamadı.</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
       </div>
     </div>
+  </div>
 
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-          <div class="text-secondary">
-            Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="d-none d-sm-flex align-items-center gap-1">
-              <span class="small text-secondary">Sayfa boyutu:</span>
-              <% [25, 50, 100].each do |size| %>
-                <% active = @per_page == size %>
-                <%= link_to size.to_s, admin_activity_logs_path(request.query_parameters.merge(page: 1, per_page: size)),
-                      class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
-              <% end %>
-            </div>
-            <% if @has_prev %>
-              <%= link_to "Önceki", admin_activity_logs_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn-secondary" %>
-            <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Önceki</span>
-            <% end %>
-
-            <% if @has_next %>
-              <%= link_to "Sonraki", admin_activity_logs_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn-secondary" %>
-            <% else %>
-              <span class="btn-secondary opacity-50 pointer-events-none">Sonraki</span>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="text-secondary small">
+          Sayfa <strong><%= @page %></strong> / <span><%= @per_page %> kayıt</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="d-none d-sm-flex align-items-center gap-1">
+            <span class="small text-secondary">Sayfa boyutu:</span>
+            <% [25, 50, 100].each do |size| %>
+              <% active = @per_page == size %>
+              <%= link_to size.to_s, admin_activity_logs_path(request.query_parameters.merge(page: 1, per_page: size)),
+                    class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
             <% end %>
           </div>
+          <% if @has_prev %>
+            <%= link_to "Önceki", admin_activity_logs_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-sm btn-outline-secondary px-3" %>
+          <% else %>
+            <span class="btn btn-sm btn-outline-secondary opacity-50 px-3" style="pointer-events:none">Önceki</span>
+          <% end %>
+
+          <% if @has_next %>
+            <%= link_to "Sonraki", admin_activity_logs_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-sm btn-outline-secondary px-3" %>
+          <% else %>
+            <span class="btn btn-sm btn-outline-secondary opacity-50 px-3" style="pointer-events:none">Sonraki</span>
+          <% end %>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
-

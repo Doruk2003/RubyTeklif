@@ -1,46 +1,46 @@
-<div class="container-fluid py-2">
-  <div class="row g-2">
-    <div class="col-12">
-      <div class="card shadow-sm app-header-card">
-        <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-          <div>
-            <h1 class="h4 mb-1">Admin Panel</h1>
-            <p class="text-secondary mb-0">Yeni Kullanici</p>
-          </div>
-          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-            <%= list_nav_button(admin_users_path, label: "Listeye Don", class_name: "app-header-icon-btn") %>
-            <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
-          </div>
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm app-header-card">
+      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+          <h1 class="h4 mb-1 text-white">Admin Panel</h1>
+          <p class="text-secondary mb-0">Yeni Kullanıcı</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+          <%= list_nav_button(admin_users_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
+          <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <%= form_with url: admin_users_path, method: :post, local: true, scope: :user, class: app_form_class("d-grid gap-3") do |f| %>
-            <div class="form-floating">
-              <%= f.email_field :email, value: @user&.[]("email"), class: "form-control", required: true, autocomplete: "email", placeholder: "E-posta" %>
-              <%= f.label :email, "E-posta" %>
-            </div>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <%= form_with url: admin_users_path, method: :post, local: true, scope: :user, class: app_form_class("d-grid gap-3") do |f| %>
+          <div class="form-floating">
+            <%= f.email_field :email, value: @user&.[]("email"), class: "form-control", required: true, autocomplete: "email", placeholder: "E-posta" %>
+            <%= f.label :email, "E-posta" %>
+          </div>
 
-            <div class="form-floating">
-              <%= f.password_field :password, class: "form-control", required: true, autocomplete: "new-password", placeholder: "Sifre" %>
-              <%= f.label :password, "Sifre" %>
-            </div>
+          <div class="form-floating">
+            <%= f.password_field :password, class: "form-control", required: true, autocomplete: "new-password", placeholder: "Şifre" %>
+            <%= f.label :password, "Şifre" %>
+          </div>
 
-            <div class="form-floating">
-              <%= f.select :role,
-                    options_for_select(Roles::ASSIGNABLE_ROLE_OPTIONS, @user&.[]("role").to_s),
-                    {},
-                    class: "form-select",
-                    data: { float_empty: true } %>
-              <%= f.label :role, "Rol" %>
-            </div>
+          <div class="form-floating">
+            <%= f.select :role,
+                  options_for_select(Roles::ASSIGNABLE_ROLE_OPTIONS, @user&.[]("role").to_s),
+                  {},
+                  class: "form-select",
+                  data: { float_empty: true } %>
+            <%= f.label :role, "Rol" %>
+          </div>
 
-            <%= f.submit "Olustur", class: "btn-primary w-100", data: { turbo_confirm: "Yeni kullanici olusturulsun mu?" } %>
-          <% end %>
-        </div>
+          <div class="mt-3">
+             <%= f.submit "Kullanıcı Oluştur", class: "btn btn-primary w-100 py-3 fw-bold text-uppercase", style: "letter-spacing: 0.1em;", data: { turbo_confirm: "Yeni kullanıcı oluşturulsun mu?" } %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
