@@ -2,30 +2,24 @@
   <%# ======================== HEADER CARD ======================== %>
   <div class="col-12">
     <div class="card shadow-sm app-header-card">
-      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-        <div>
-          <h1 class="h4 mb-1 text-white">Teklif Poz Girişi</h1>
-          <p class="text-secondary mb-0">Pozları girerek teklif detaylarını oluşturun.</p>
+      <div class="card-body p-4">
+        <!-- Üst Başlık ve Aksiyon Butonları -->
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-4">
+          <div>
+            <h1 class="h4 mb-1 text-white">Teklif Poz Girişi</h1>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+            <%= list_nav_button(offers_standart_index_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
+            <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
+          </div>
         </div>
-        <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-          <%= list_nav_button(offers_standart_index_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
-          <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <%# ======================== INFO BAR ======================== %>
-  <div class="col-12">
-    <div class="card shadow-sm">
-      <div class="card-body py-3 px-4">
+        <!-- Bilgi Çubuğu (İkinci karttan buraya taşındı) -->
         <div class="row g-3 align-items-center">
           <div class="col-12 col-sm-6 col-lg-3">
             <div class="d-flex align-items-center gap-2">
               <span class="material-symbols-outlined text-primary" style="font-size:20px;">tag</span>
               <div>
-                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Proje No</div>
-                <div class="fw-bold text-dark" style="font-size:0.875rem;"><%= @offer["offer_number"].to_s %></div>
+                <div class="fw-bold text-white" style="font-size:0.875rem;"><%= @offer["offer_number"].to_s %></div>
               </div>
             </div>
           </div>
@@ -33,8 +27,7 @@
             <div class="d-flex align-items-center gap-2">
               <span class="material-symbols-outlined text-success" style="font-size:20px;">business</span>
               <div>
-                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Müşteri</div>
-                <div class="fw-semibold text-dark" style="font-size:0.875rem;"><%= @company_name.to_s %></div>
+                <div class="fw-semibold text-white" style="font-size:0.875rem;"><%= @company_name.to_s %></div>
               </div>
             </div>
           </div>
@@ -42,8 +35,7 @@
             <div class="d-flex align-items-center gap-2">
               <span class="material-symbols-outlined text-warning" style="font-size:20px;">folder</span>
               <div>
-                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Proje Adı</div>
-                <div class="fw-semibold text-dark" style="font-size:0.875rem;"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></div>
+                <div class="fw-semibold text-white" style="font-size:0.875rem;"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></div>
               </div>
             </div>
           </div>
@@ -51,8 +43,7 @@
             <div class="d-flex align-items-center gap-2">
               <span class="material-symbols-outlined text-info" style="font-size:20px;">currency_exchange</span>
               <div>
-                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Kur Bilgileri</div>
-                <div class="fw-semibold text-dark" style="font-size:0.85rem;">
+                <div class="fw-semibold text-white" style="font-size:0.85rem;">
                   <% if Array(@currencies).any? %>
                     <%= Array(@currencies).map { |c| "#{c['code']} (#{c['symbol']})" }.join(" · ") %>
                   <% else %>
@@ -66,8 +57,7 @@
       </div>
     </div>
   </div>
-
-  <%# ======================== POZ LİSTESİ TABLOSU ======================== %>
+  <%# ======================== POZ LÄ°STESÄ° TABLOSU ======================== %>
   <div class="col-12">
     <div class="card shadow-sm">
       <div class="card-header bg-white border-bottom pt-4 px-4 pb-3">
@@ -81,7 +71,6 @@
           </span>
         </div>
       </div>
-
       <div class="card-body p-0">
         <%# Table Header %>
         <div class="d-none d-md-block border-bottom bg-light">
@@ -90,7 +79,7 @@
               <span class="poz-th">#</span>
             </div>
             <div class="col-md-4">
-              <span class="poz-th">Ürün</span>
+              <span class="poz-th">ÃœrÃ¼n</span>
             </div>
             <div class="col-md-2 text-end">
               <span class="poz-th">Miktar</span>
@@ -99,59 +88,58 @@
               <span class="poz-th">Birim Fiyat</span>
             </div>
             <div class="col-md-1 text-end">
-              <span class="poz-th">İsk. %</span>
+              <span class="poz-th">Ä°sk. %</span>
             </div>
             <div class="col-md-2 text-end pe-2">
-              <span class="poz-th">İşlem</span>
+              <span class="poz-th">Ä°ÅŸlem</span>
             </div>
           </div>
         </div>
-
         <%# Dynamic Poz List %>
-        <div id="pozListContainer">
+        <div id="pozListContainer" class="table-striped">
           <%# Rows will be injected here by JS %>
         </div>
-
         <%# Empty State %>
         <div id="pozEmptyState" class="text-center py-5">
           <span class="material-symbols-outlined text-muted d-block mb-2" style="font-size:48px;">playlist_add</span>
-          <p class="text-secondary mb-0">Henüz poz eklenmedi.<br>Aşağıdaki <strong>POZ</strong> butonuna tıklayarak eklemeye başlayın.</p>
         </div>
       </div>
     </div>
   </div>
-
   <%# ======================== ALT BUTONLAR ======================== %>
   <div class="col-12">
-    <div class="d-flex gap-3">
-      <button type="button" class="btn btn-dark flex-fill py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" style="letter-spacing:0.1em; font-size:0.9rem;" id="btnOpenPozModal">
+    <!-- d-flex yerine d-grid kullanarak elemanlarÄ± alt alta dizdik -->
+    <div class="d-grid gap-3" >
+      <button type="button" class="btn btn-success py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 w-100" 
+        style="letter-spacing:0.1em; font-size:0.9rem; height: 50px;" 
+        id="btnOpenPozModal">
         POZ EKLE
       </button>
-      <button type="button" class="btn btn-primary flex-fill py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" style="letter-spacing:0.1em; font-size:0.9rem;" id="btnHesapla">
-        
+      <button type="button" class="btn btn-primary py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 w-100" 
+        style="letter-spacing:0.1em; font-size:0.9rem; height: 50px;" 
+        id="btnHesapla">
         HESAPLA
       </button>
     </div>
   </div>
 </div>
-
-<%# ======================== POZ GİRİŞ MODAL ======================== %>
+<%# ======================== POZ GÄ°RÄ°Å MODAL ======================== %>
 <div class="modal fade" id="pozEntryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered" style="max-width:1230px;">
-    <div class="modal-content" style="border:none; border-radius:4px; box-shadow:0 12px 40px rgba(0,0,0,0.25); overflow:hidden;">
-      <div class="modal-header py-3 px-4" style="background:linear-gradient(90deg,#0f172a,#1e293b); border-bottom:none;">
-        <h6 class="modal-title text-white mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600;">
-          Poz Girişi
+  <div class="modal-dialog poz-modal-dialog">
+    <div class="modal-content" style="border:0.05em; border-radius:4px; box-shadow: 0 10px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);">
+      <div class="modal-header py-3 px-4 btn btn-warning" style="border-bottom:none;">
+        <h6 class="modal-title mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600; color:#fff;">
+          POZ GÄ°RÄ°ÅÄ°
         </h6>
       </div>
       <div class="modal-body p-4">
-        <%# Tüm alanlar tek satırda %>
+        <div id="pozInlineMessage" class="alert alert-danger py-2 px-3 mb-3 d-none" role="alert"></div>
+        <%# TÃ¼m alanlar tek satÄ±rda %>
         <div class="row g-2 align-items-end">
-          <div class="col-12 col-md-3">
-            <label class="poz-modal-label">Ürün</label>
+          <div class="col-12 col-md-5 col-lg-5">
+            <label class="poz-modal-label">ÃœrÃ¼n</label>
             <div id="pozModalProductWrapper">
               <select class="form-select form-select-sm" id="pozProductSelect" data-search="true">
-                <option value="">Ürün Seçin</option>
                 <% @products.each do |p| %>
                   <option value="<%= p["id"] %>"
                           data-price="<%= p["price"] %>"
@@ -162,39 +150,38 @@
               </select>
             </div>
           </div>
-          <div class="col-6 col-md-auto" style="min-width:90px;">
+          <div class="col-6 col-md-1 col-lg-1">
             <label class="poz-modal-label">Miktar</label>
             <input type="number" class="form-control form-control-sm" id="pozQuantity" value="1" step="0.01" min="0.01" placeholder="1">
           </div>
-          <div class="col-6 col-md-auto" style="min-width:110px;">
+          <div class="col-6 col-md-2 col-lg-2">
             <label class="poz-modal-label">Birim Fiyat</label>
             <input type="number" class="form-control form-control-sm" id="pozUnitPrice" step="0.01" placeholder="0.00">
           </div>
-          <div class="col-6 col-md-auto" style="min-width:80px;">
-            <label class="poz-modal-label">İsk. %</label>
+          <div class="col-6 col-md-1 col-lg-1">
+            <label class="poz-modal-label">Ä°sk. %</label>
             <input type="number" class="form-control form-control-sm" id="pozDiscount" value="0" step="0.01" min="0" max="100" placeholder="0">
           </div>
-          <div class="col-6 col-md-3">
-            <label class="poz-modal-label">Açıklama</label>
+          <div class="col-6 col-md-3 col-lg-3">
+            <label class="poz-modal-label">AÃ§Ä±klama</label>
             <input type="text" class="form-control form-control-sm" id="pozDescription" placeholder="Opsiyonel...">
           </div>
         </div>
       </div>
-      <div class="modal-footer border-top px-4 py-2 d-flex flex-column gap-1">
+      <div class="modal-footer border-top px-4 py-2 d-flex flex-column gap-20">
         <button type="button" class="btn btn-primary w-100 fw-bold py-2 text-uppercase" id="btnPozSave" style="letter-spacing:0.05em;">
-          <span class="material-symbols-outlined align-middle me-1" style="font-size:18px;">save</span>
           Kaydet
         </button>
-        <button type="button" class="btn btn-danger w-100 fw-bold py-2 text-uppercase" id="btnPozCancel" style="letter-spacing:0.05em;">
-          İptal
+        <button type="button" class="btn btn-secondary w-100 fw-bold py-2 text-dark text-uppercase" id="btnPozCancel" style="letter-spacing:0.05em;">
+          Ä°ptal
         </button>
       </div>
     </div>
   </div>
 </div>
-
 <%# ======================== HIDDEN FORM (for HESAPLA submit) ======================== %>
 <%= form_with url: offers_standart_index_path, method: :post, scope: :offer, local: true, id: "pozMainForm", class: "d-none" do |f| %>
+  <%= f.hidden_field :id, value: @offer["id"] %>
   <%= f.hidden_field :offer_type, value: "standard" %>
   <%= f.hidden_field :company_id, value: @offer["company_id"] %>
   <%= f.hidden_field :offer_number, value: @offer["offer_number"] %>
@@ -204,8 +191,77 @@
   <%= f.hidden_field :product_category_id, value: @selected_category_id %>
   <div id="pozHiddenInputs"></div>
 <% end %>
-
 <style>
+  #pozEntryModal .poz-modal-dialog {
+    max-width: 96vw;
+    margin: 1rem auto 0;
+  }
+
+  #pozEntryModal.show::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.34);
+    -webkit-backdrop-filter: blur(1.8px);
+    backdrop-filter: blur(1.8px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #pozEntryModal .modal-dialog {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 768px) {
+    #pozEntryModal .poz-modal-dialog {
+      max-width: 1230px;
+      margin-top: 6vh;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    #pozEntryModal .poz-modal-dialog {
+      margin-top: 5vh;
+    }
+  }
+
+  /* Disable any backdrop blur on this page */
+  .modal-backdrop,
+  .app-confirm-overlay {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .modal-backdrop {
+    display: none !important;
+    opacity: 0 !important;
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+
+  /* This page does not use the global offer type modal; force-hide it to avoid stale overlay state */
+  #offerTypeModal {
+    display: none !important;
+  }
+
+  /* Hard reset for this modal visual effects (no dim/blur/shadow layers) */
+  #pozEntryModal,
+  #pozEntryModal .modal-dialog {
+    background-color: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+  }
+  #pozEntryModal .modal-content {
+    background-color: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+    min-height: 310px;
+  }
+
   #pozEntryModal .modal-backdrop { z-index: 9998 !important; }
   #pozEntryModal { z-index: 9999 !important; }
 
@@ -282,256 +338,441 @@
     background: rgba(220, 53, 69, 0.08);
     border-color: rgba(220, 53, 69, 0.2);
   }
+
+  .poz-edit-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #0d6efd;
+    transition: all 150ms ease;
+    cursor: pointer;
+  }
+  .poz-edit-btn:hover {
+    color: #0a58ca;
+    background: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.25);
+  }
+
+  #pozListContainer.table-striped .poz-list-row:nth-of-type(odd) {
+    background-color: var(--bs-table-striped-bg, rgba(0, 0, 0, 0.03));
+  }
 </style>
-
 <script>
-(function() {
-  // ── State ──
-  let pozList = [];
-  let pozModalInstance = null;
-  let customSelectInited = false;
+  (function() {
+    // â”€â”€ State â”€â”€
+    let pozList = [];
+    let pozModalInstance = null;
+    let customSelectInited = false;
+    let backdropObserver = null;
+    let editingPozId = null;
 
-  function init() {
-    const modalEl = document.getElementById('pozEntryModal');
-    if (!modalEl) return;
-
-    pozModalInstance = new bootstrap.Modal(modalEl);
-
-    // POZ button → open modal
-    const btnOpen = document.getElementById('btnOpenPozModal');
-    if (btnOpen) {
-      btnOpen.addEventListener('click', function() {
-        resetModalForm();
-        pozModalInstance.show();
-
-        // Init custom select once
-        if (!customSelectInited && window.rtCustomSelect) {
-          setTimeout(function() {
-            window.rtCustomSelect.initCustomSelects(document.getElementById('pozModalProductWrapper'));
-            customSelectInited = true;
-          }, 100);
-        }
-      });
+    function showInlineMessage(message, type) {
+      const box = document.getElementById('pozInlineMessage');
+      if (!box) return;
+      const klass = (type === 'success') ? 'alert-success' : 'alert-danger';
+      box.classList.remove('d-none', 'alert-danger', 'alert-success');
+      box.classList.add(klass);
+      box.textContent = message;
     }
 
-    // Auto-fill unit price when product is selected
-    const productSelect = document.getElementById('pozProductSelect');
-    if (productSelect) {
-      productSelect.addEventListener('change', function() {
-        const selectedOpt = this.options[this.selectedIndex];
-        if (selectedOpt && selectedOpt.dataset.price) {
-          const price = parseFloat(selectedOpt.dataset.price);
-          if (!isNaN(price) && price > 0) {
-            document.getElementById('pozUnitPrice').value = price;
-          }
-        }
-      });
+    function clearInlineMessage() {
+      const box = document.getElementById('pozInlineMessage');
+      if (!box) return;
+      box.classList.add('d-none');
+      box.textContent = '';
     }
 
-    // KAYDET button
-    const btnSave = document.getElementById('btnPozSave');
-    if (btnSave) {
-      btnSave.addEventListener('click', function() {
-        savePoz();
-      });
-    }
+    function ensureProductSelectionSynced() {
+      const productSelect = document.getElementById('pozProductSelect');
+      if (!productSelect || productSelect.value) return;
 
-    // İPTAL button → close modal
-    const btnCancel = document.getElementById('btnPozCancel');
-    if (btnCancel) {
-      btnCancel.addEventListener('click', function() {
-        pozModalInstance.hide();
-      });
-    }
+      const wrapper = document.getElementById('pozModalProductWrapper');
+      if (!wrapper) return;
 
-    // HESAPLA button
-    const btnHesapla = document.getElementById('btnHesapla');
-    if (btnHesapla) {
-      btnHesapla.addEventListener('click', function() {
-        if (pozList.length === 0) {
-          alert('Lütfen en az bir poz ekleyin.');
-          return;
-        }
-        buildHiddenInputs();
-        document.getElementById('pozMainForm').requestSubmit();
-      });
-    }
-
-    // Enter key in modal → save
-    modalEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        savePoz();
+      const active = wrapper.querySelector('.rt-custom-select-option.is-active[data-value]');
+      if (active && active.dataset.value) {
+        productSelect.value = active.dataset.value;
+        productSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
       }
-    });
 
-    renderList();
-  }
-
-  // ── Save Poz ──
-  function savePoz() {
-    const productSelect = document.getElementById('pozProductSelect');
-    const productId = productSelect.value;
-
-    if (!productId) {
-      alert('Lütfen bir ürün seçin.');
-      return;
-    }
-
-    const selectedOpt = productSelect.options[productSelect.selectedIndex];
-    const productName = selectedOpt.dataset.name || selectedOpt.text;
-    const quantity = parseFloat(document.getElementById('pozQuantity').value) || 1;
-    const unitPrice = parseFloat(document.getElementById('pozUnitPrice').value) || 0;
-    const discount = parseFloat(document.getElementById('pozDiscount').value) || 0;
-    const description = document.getElementById('pozDescription').value.trim();
-
-    const poz = {
-      id: Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-      product_id: productId,
-      product_name: productName,
-      quantity: quantity,
-      unit_price: unitPrice,
-      discount_rate: discount,
-      description: description
-    };
-
-    pozList.push(poz);
-    renderList();
-    resetModalForm();
-
-    // Focus product select for next entry
-    setTimeout(function() {
-      const searchInput = document.querySelector('#pozModalProductWrapper .rt-custom-select-search');
-      if (searchInput) {
-        searchInput.focus();
-      }
-    }, 100);
-  }
-
-  // ── Reset Modal ──
-  function resetModalForm() {
-    const productSelect = document.getElementById('pozProductSelect');
-    productSelect.value = '';
-    productSelect.dispatchEvent(new Event('change', { bubbles: true }));
-
-    document.getElementById('pozQuantity').value = '1';
-    document.getElementById('pozUnitPrice').value = '';
-    document.getElementById('pozDiscount').value = '0';
-    document.getElementById('pozDescription').value = '';
-
-    // Reset custom select display
-    const wrapper = document.getElementById('pozModalProductWrapper');
-    if (wrapper) {
       const label = wrapper.querySelector('.rt-custom-select-label');
-      if (label) label.textContent = 'Ürün Seçin';
+      const labelText = label ? label.textContent.trim() : '';
+      if (!labelText || labelText === 'ÃœrÃ¼n SeÃ§in' || labelText === 'SeÃ§in') return;
+
+      const match = Array.from(productSelect.options).find(function(opt) {
+        const optionText = (opt.text || '').trim();
+        const optionName = (opt.dataset && opt.dataset.name ? opt.dataset.name : '').trim();
+        return optionText === labelText || optionName === labelText;
+      });
+
+      if (match) {
+        productSelect.value = match.value;
+        productSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    function setModalMode() {
+      const titleEl = document.querySelector('#pozEntryModal .modal-title');
+      const saveBtn = document.getElementById('btnPozSave');
+      if (editingPozId) {
+        if (titleEl) titleEl.textContent = 'POZ GUNCELLE';
+        if (saveBtn) saveBtn.textContent = 'Guncelle';
+      } else {
+        if (titleEl) titleEl.textContent = 'POZ GIRISI';
+        if (saveBtn) saveBtn.textContent = 'Kaydet';
+      }
+    }
+
+    function syncCustomSelectUI() {
+      const wrapper = document.getElementById('pozModalProductWrapper');
+      const select = document.getElementById('pozProductSelect');
+      if (!wrapper || !select) return;
+
       const root = wrapper.querySelector('[data-rt-custom-select]');
+      const label = wrapper.querySelector('.rt-custom-select-label');
+      const selected = select.options[select.selectedIndex];
+      const hasValue = !!(selected && selected.value);
+
+      if (label) label.textContent = hasValue ? selected.text : 'Urun Secin';
       if (root) {
-        root.classList.remove('has-value');
-        root.classList.add('is-empty');
+        root.classList.toggle('has-value', hasValue);
+        root.classList.toggle('is-empty', !hasValue);
         root.querySelectorAll('.rt-custom-select-option').forEach(function(opt) {
-          opt.classList.remove('is-active');
-          opt.setAttribute('aria-selected', 'false');
+          const active = opt.dataset.value === select.value;
+          opt.classList.toggle('is-active', active);
+          opt.setAttribute('aria-selected', active ? 'true' : 'false');
         });
       }
-      const search = wrapper.querySelector('.rt-custom-select-search');
-      if (search) search.value = '';
-    }
-  }
-
-  // ── Render List ──
-  function renderList() {
-    const container = document.getElementById('pozListContainer');
-    const emptyState = document.getElementById('pozEmptyState');
-    const counter = document.getElementById('pozCounter');
-
-    if (counter) counter.textContent = pozList.length + ' Poz';
-
-    if (pozList.length === 0) {
-      container.innerHTML = '';
-      if (emptyState) emptyState.style.display = '';
-      return;
     }
 
-    if (emptyState) emptyState.style.display = 'none';
+    function init() {
+      document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+      document.body.style.removeProperty('overflow');
+      document.querySelectorAll('.offcanvas-backdrop').forEach(function(el) { el.remove(); });
 
-    const isAppending = container.children.length < pozList.length;
-
-    let html = '';
-    pozList.forEach(function(poz, i) {
-      const isNew = isAppending && i === pozList.length - 1;
-      html += '<div class="poz-list-row border-bottom px-4 py-3' + (isNew ? ' poz-list-row-new poz-list-row-flash' : '') + '" data-poz-id="' + poz.id + '">';
-      html += '  <div class="row g-2 align-items-center">';
-      html += '    <div class="col-md-1 text-center d-none d-md-block">';
-      html += '      <span class="badge bg-light text-dark border fw-bold" style="font-size:0.8rem; min-width:28px;">' + (i + 1) + '</span>';
-      html += '    </div>';
-      html += '    <div class="col-12 col-md-4">';
-      html += '      <div class="fw-semibold text-dark" style="font-size:0.85rem;">' + escapeHtml(poz.product_name) + '</div>';
-      if (poz.description) {
-        html += '      <div class="text-muted" style="font-size:0.75rem;">' + escapeHtml(poz.description) + '</div>';
+      const offerTypeModal = document.getElementById('offerTypeModal');
+      if (offerTypeModal) {
+        offerTypeModal.classList.remove('show');
+        offerTypeModal.setAttribute('aria-hidden', 'true');
+        offerTypeModal.style.display = 'none';
       }
-      html += '    </div>';
-      html += '    <div class="col-4 col-md-2 text-end">';
-      html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.quantity) + '</span>';
-      html += '    </div>';
-      html += '    <div class="col-4 col-md-2 text-end">';
-      html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.unit_price) + '</span>';
-      html += '    </div>';
-      html += '    <div class="col-2 col-md-1 text-end">';
-      if (poz.discount_rate > 0) {
-        html += '      <span class="text-danger fw-semibold" style="font-size:0.85rem;">%' + formatNumber(poz.discount_rate) + '</span>';
+
+      const modalEl = document.getElementById('pozEntryModal');
+      if (!modalEl) return;
+      if (modalEl.dataset.pozInit === '1') return;
+      modalEl.dataset.pozInit = '1';
+
+      pozModalInstance = new bootstrap.Modal(modalEl, { backdrop: false, keyboard: false });
+
+      if (!backdropObserver) {
+        backdropObserver = new MutationObserver(function() {
+          document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
+          document.body.classList.remove('modal-open');
+          document.body.style.removeProperty('padding-right');
+          document.body.style.removeProperty('overflow');
+        });
+        backdropObserver.observe(document.body, { childList: true, subtree: true });
+      }
+
+      // POZ button â†’ open modal
+      const btnOpen = document.getElementById('btnOpenPozModal');
+      if (btnOpen) {
+        btnOpen.addEventListener('click', function() {
+          editingPozId = null;
+          resetModalForm();
+          clearInlineMessage();
+          setModalMode();
+          pozModalInstance.show();
+
+          // Init custom select once
+          if (!customSelectInited && window.rtCustomSelect) {
+            setTimeout(function() {
+              window.rtCustomSelect.initCustomSelects(document.getElementById('pozModalProductWrapper'));
+              customSelectInited = true;
+            }, 100);
+          }
+        });
+      }
+
+      // Auto-fill unit price when product is selected
+      const productSelect = document.getElementById('pozProductSelect');
+      if (productSelect) {
+        productSelect.addEventListener('change', function() {
+          clearInlineMessage();
+          const selectedOpt = this.options[this.selectedIndex];
+          if (selectedOpt && selectedOpt.dataset.price) {
+            const price = parseFloat(selectedOpt.dataset.price);
+            if (!isNaN(price) && price > 0) {
+              document.getElementById('pozUnitPrice').value = price;
+            }
+          }
+        });
+      }
+
+      // KAYDET button
+      const btnSave = document.getElementById('btnPozSave');
+      if (btnSave) {
+        btnSave.addEventListener('click', function() {
+          ensureProductSelectionSynced();
+          savePoz();
+        });
+      }
+
+      // Ä°PTAL button â†’ close modal
+      const btnCancel = document.getElementById('btnPozCancel');
+      if (btnCancel) {
+        btnCancel.addEventListener('click', function() {
+          pozModalInstance.hide();
+        });
+      }
+
+      // HESAPLA button
+      const btnHesapla = document.getElementById('btnHesapla');
+      if (btnHesapla) {
+        btnHesapla.addEventListener('click', function() {
+        if (pozList.length === 0) {
+          resetModalForm();
+          clearInlineMessage();
+          showInlineMessage('Lutfen en az bir poz ekleyin.', 'danger');
+          pozModalInstance.show();
+          return;
+        }
+          buildHiddenInputs();
+          document.getElementById('pozMainForm').requestSubmit();
+        });
+      }
+
+      // Enter key in modal â†’ save
+      modalEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          savePoz();
+        }
+      });
+
+      renderList();
+    }
+
+    // â”€â”€ Save Poz â”€â”€
+    function savePoz() {
+      const productSelect = document.getElementById('pozProductSelect');
+      ensureProductSelectionSynced();
+      const productId = productSelect.value;
+      const wasEditing = !!editingPozId;
+
+      if (!productId) {
+        showInlineMessage('Lutfen bir urun secin.', 'danger');
+        return;
+      }
+
+      const selectedOpt = productSelect.options[productSelect.selectedIndex];
+      const productName = selectedOpt.dataset.name || selectedOpt.text;
+      const quantity = parseFloat(document.getElementById('pozQuantity').value) || 1;
+      const unitPrice = parseFloat(document.getElementById('pozUnitPrice').value) || 0;
+      const discount = parseFloat(document.getElementById('pozDiscount').value) || 0;
+      const description = document.getElementById('pozDescription').value.trim();
+
+      const poz = {
+        id: editingPozId || (Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
+        product_id: productId,
+        product_name: productName,
+        quantity: quantity,
+        unit_price: unitPrice,
+        discount_rate: discount,
+        description: description
+      };
+
+      if (editingPozId) {
+        const idx = pozList.findIndex(function(p) { return p.id === editingPozId; });
+        if (idx >= 0) {
+          pozList[idx] = poz;
+        } else {
+          pozList.push(poz);
+        }
       } else {
-        html += '      <span class="text-muted" style="font-size:0.85rem;">-</span>';
+        pozList.push(poz);
       }
-      html += '    </div>';
-      html += '    <div class="col-2 col-md-2 text-end">';
-      html += '      <button type="button" class="poz-delete-btn" onclick="window.__pozDelete(\'' + poz.id + '\')" title="Sil">';
-      html += '        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>';
-      html += '      </button>';
-      html += '    </div>';
-      html += '  </div>';
-      html += '</div>';
-    });
+      editingPozId = null;
+      setModalMode();
+      renderList();
+      clearInlineMessage();
+      resetModalForm();
 
-    container.innerHTML = html;
-  }
+      if (wasEditing && pozModalInstance) {
+        pozModalInstance.hide();
+      }
 
-  // ── Delete Poz ──
-  window.__pozDelete = function(id) {
-    pozList = pozList.filter(function(p) { return p.id !== id; });
-    renderList();
-  };
+      // Focus product select for next entry
+      setTimeout(function() {
+        const searchInput = document.querySelector('#pozModalProductWrapper .rt-custom-select-search');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 100);
+    }
 
-  // ── Build hidden inputs for form submit ──
-  function buildHiddenInputs() {
-    const container = document.getElementById('pozHiddenInputs');
-    container.innerHTML = '';
-    pozList.forEach(function(poz) {
-      container.innerHTML +=
-        '<input type="hidden" name="offer[items][][product_id]" value="' + poz.product_id + '">' +
-        '<input type="hidden" name="offer[items][][quantity]" value="' + poz.quantity + '">' +
-        '<input type="hidden" name="offer[items][][unit_price]" value="' + poz.unit_price + '">' +
-        '<input type="hidden" name="offer[items][][discount_rate]" value="' + poz.discount_rate + '">' +
-        '<input type="hidden" name="offer[items][][description]" value="' + escapeHtml(poz.description) + '">';
-    });
-  }
+    // â”€â”€ Reset Modal â”€â”€
+    function resetModalForm() {
+      const productSelect = document.getElementById('pozProductSelect');
+      productSelect.value = '';
+      productSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
-  // ── Helpers ──
-  function escapeHtml(str) {
-    if (!str) return '';
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+      document.getElementById('pozQuantity').value = '1';
+      document.getElementById('pozUnitPrice').value = '';
+      document.getElementById('pozDiscount').value = '0';
+      document.getElementById('pozDescription').value = '';
 
-  function formatNumber(n) {
-    if (n === null || n === undefined || n === '') return '-';
-    var num = parseFloat(n);
-    if (isNaN(num)) return '-';
-    return num % 1 === 0 ? num.toString() : num.toFixed(2);
-  }
+      // Reset custom select display
+      const wrapper = document.getElementById('pozModalProductWrapper');
+      if (wrapper) {
+        const label = wrapper.querySelector('.rt-custom-select-label');
+        if (label) label.textContent = 'ÃœrÃ¼n SeÃ§in';
+        const root = wrapper.querySelector('[data-rt-custom-select]');
+        if (root) {
+          root.classList.remove('has-value');
+          root.classList.add('is-empty');
+          root.querySelectorAll('.rt-custom-select-option').forEach(function(opt) {
+            opt.classList.remove('is-active');
+            opt.setAttribute('aria-selected', 'false');
+          });
+        }
+        const search = wrapper.querySelector('.rt-custom-select-search');
+        if (search) search.value = '';
+      }
+      syncCustomSelectUI();
+    }
 
-  // ── Init ──
-  document.addEventListener('turbo:load', init);
-  if (document.readyState !== 'loading') init();
-})();
+    // â”€â”€ Render List â”€â”€
+    function renderList() {
+      const container = document.getElementById('pozListContainer');
+      const emptyState = document.getElementById('pozEmptyState');
+      const counter = document.getElementById('pozCounter');
+
+      if (counter) counter.textContent = pozList.length + ' Poz';
+
+      if (pozList.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.style.display = '';
+        return;
+      }
+
+      if (emptyState) emptyState.style.display = 'none';
+
+      const isAppending = container.children.length < pozList.length;
+
+      let html = '';
+      pozList.forEach(function(poz, i) {
+        const isNew = isAppending && i === pozList.length - 1;
+        html += '<div class="poz-list-row border-bottom px-4 py-3' + (isNew ? ' poz-list-row-new poz-list-row-flash' : '') + '" data-poz-id="' + poz.id + '">';
+        html += '  <div class="row g-2 align-items-center">';
+        html += '    <div class="col-md-1 text-center d-none d-md-block">';
+        html += '      <span class="badge bg-light text-dark border fw-bold" style="font-size:0.8rem; min-width:28px;">' + (i + 1) + '</span>';
+        html += '    </div>';
+        html += '    <div class="col-12 col-md-4">';
+        html += '      <div class="fw-semibold text-dark" style="font-size:0.85rem;">' + escapeHtml(poz.product_name) + '</div>';
+        if (poz.description) {
+          html += '      <div class="text-muted" style="font-size:0.75rem;">' + escapeHtml(poz.description) + '</div>';
+        }
+        html += '    </div>';
+        html += '    <div class="col-4 col-md-2 text-end">';
+        html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.quantity) + '</span>';
+        html += '    </div>';
+        html += '    <div class="col-4 col-md-2 text-end">';
+        html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.unit_price) + '</span>';
+        html += '    </div>';
+        html += '    <div class="col-2 col-md-1 text-end">';
+        if (poz.discount_rate > 0) {
+          html += '      <span class="text-danger fw-semibold" style="font-size:0.85rem;">%' + formatNumber(poz.discount_rate) + '</span>';
+        } else {
+          html += '      <span class="text-muted" style="font-size:0.85rem;">-</span>';
+        }
+        html += '    </div>';
+        html += '    <div class="col-2 col-md-2 text-end d-flex justify-content-end align-items-center gap-1">';
+        html += '      <button type="button" class="poz-edit-btn" onclick="window.__pozEdit(\'' + poz.id + '\')" title="Duzenle">';
+        html += '        <span class="material-symbols-outlined" style="font-size:18px;">edit</span>';
+        html += '      </button>';
+        html += '      <button type="button" class="poz-delete-btn" onclick="window.__pozDelete(\'' + poz.id + '\')" title="Sil">';
+        html += '        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>';
+        html += '      </button>';
+        html += '    </div>';
+        html += '  </div>';
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    // â”€â”€ Delete Poz â”€â”€
+    window.__pozDelete = function(id) {
+      pozList = pozList.filter(function(p) { return p.id !== id; });
+      if (editingPozId === id) {
+        editingPozId = null;
+        setModalMode();
+      }
+      renderList();
+    };
+
+    window.__pozEdit = function(id) {
+      const poz = pozList.find(function(p) { return p.id === id; });
+      if (!poz) return;
+
+      editingPozId = id;
+      setModalMode();
+      clearInlineMessage();
+
+      const productSelect = document.getElementById('pozProductSelect');
+      if (productSelect) {
+        productSelect.value = poz.product_id;
+        productSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      document.getElementById('pozQuantity').value = poz.quantity;
+      document.getElementById('pozUnitPrice').value = poz.unit_price;
+      document.getElementById('pozDiscount').value = poz.discount_rate;
+      document.getElementById('pozDescription').value = poz.description || '';
+      syncCustomSelectUI();
+      pozModalInstance.show();
+    };
+
+    // â”€â”€ Build hidden inputs for form submit â”€â”€
+    function buildHiddenInputs() {
+      const container = document.getElementById('pozHiddenInputs');
+      container.innerHTML = '';
+      pozList.forEach(function(poz) {
+        container.innerHTML +=
+          '<input type="hidden" name="offer[items][][product_id]" value="' + poz.product_id + '">' +
+          '<input type="hidden" name="offer[items][][quantity]" value="' + poz.quantity + '">' +
+          '<input type="hidden" name="offer[items][][unit_price]" value="' + poz.unit_price + '">' +
+          '<input type="hidden" name="offer[items][][discount_rate]" value="' + poz.discount_rate + '">' +
+          '<input type="hidden" name="offer[items][][description]" value="' + escapeHtml(poz.description) + '">';
+      });
+    }
+
+    // â”€â”€ Helpers â”€â”€
+    function escapeHtml(str) {
+      if (!str) return '';
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatNumber(n) {
+      if (n === null || n === undefined || n === '') return '-';
+      var num = parseFloat(n);
+      if (isNaN(num)) return '-';
+      return num % 1 === 0 ? num.toString() : num.toFixed(2);
+    }
+
+    // â”€â”€ Init â”€â”€
+    document.addEventListener('turbo:load', init);
+    if (document.readyState !== 'loading') init();
+  })();
 </script>

@@ -46,7 +46,7 @@
                 <li class="nav-item home-menu-item">
                   <button class="nav-link dropdown-toggle" type="button">TEKLİFLER</button>
                   <div class="home-submenu">
-                    <%= link_to "Yeni Teklif", offers_standart_index_path, class: "rt-arrow-hover" %>
+                    <%= link_to "Yeni Teklif", "#", class: "rt-arrow-hover", data: { bs_toggle: "modal", bs_target: "#offerTypeModal", offer_flow: "type_only" } %>
                     <%= link_to "Teklif Listesi", offers_standart_index_path, class: "rt-arrow-hover" %>
                   </div>
                 </li>
@@ -227,7 +227,7 @@
                 <span class="fw-medium text-dark">Yeni Müşteri Ekle</span>
                 <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>
               <% end %>
-              <%= link_to offers_standart_index_path, class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3" do %>
+              <%= link_to "#", class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3", data: { bs_toggle: "modal", bs_target: "#offerTypeModal", offer_flow: "type_only" } do %>
                 <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-inline-flex"><span class="material-symbols-outlined fs-5">receipt_long</span></div>
                 <span class="fw-medium text-dark">Yeni Teklif Hazırla</span>
                 <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>

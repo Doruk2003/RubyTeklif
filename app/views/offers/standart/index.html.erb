@@ -8,8 +8,8 @@
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
           <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
-          <a href="#" class="btn app-header-icon-btn d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#offerTypeModal" title="Yeni Teklif">
-            <span class="material-symbols-outlined fs-5">add</span>
+          <a href="#" class="btn app-header-icon-btn d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#offerTypeModal" title="Yeni Teklif" data-offer-flow="full" data-offer-type="standart">
+            <span class="material-symbols-outlined fs-5" data-offer-flow="full" data-offer-type="standart">add</span>
           </a>
           <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
         </div>
@@ -123,7 +123,11 @@
                         </span>
                       </summary>
                       <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm" style="z-index: 1000; min-width: 120px;">
-                        <%= link_to "Gör", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                        <% if offer["deleted_at"].blank? && offer["status"].to_s == "taslak" %>
+                          <%= link_to "Devam Et", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
+                        <% else %>
+                          <%= link_to "Gör", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                        <% end %>
                         <% if offer["deleted_at"].present? %>
                           <%= link_to "Geri Yükle",
                                  restore_offers_standart_path(offer["id"]),
@@ -225,8 +229,5 @@
     });
   });
 </script>
-
-
-
 
 

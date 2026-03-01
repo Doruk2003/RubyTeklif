@@ -74,7 +74,7 @@
             <div class="alp-mega-menu">
               <div class="alp-mega-col">
                 <h4>Teklif Islemleri</h4>
-                <%= link_to "Yeni teklif", offers_standart_index_path, class: "rt-arrow-hover" %>
+                <%= link_to "Yeni teklif", "#", class: "rt-arrow-hover", data: { bs_toggle: "modal", bs_target: "#offerTypeModal", offer_flow: "type_only" } %>
                 <%= link_to "Teklif listesi", offers_standart_index_path, class: "rt-arrow-hover" %>
               </div>
             </div>
