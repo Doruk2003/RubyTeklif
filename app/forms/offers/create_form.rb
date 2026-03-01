@@ -10,12 +10,16 @@ module Offers
     attribute :offer_number, :string
     attribute :offer_date, :string
     attribute :status, :string
+    attribute :project, :string
+    attribute :offer_type, :string, default: "standard"
     attribute :items, default: []
 
     validates :company_id, presence: true
     validates :offer_number, presence: true, length: { maximum: 60 }
     validates :offer_date, presence: true
     validates :status, inclusion: { in: Offers::Status::ALLOWED }, allow_blank: true
+    validates :project, presence: true, length: { maximum: 50 }
+    validates :offer_type, presence: true
     validate :offer_date_must_be_parseable
     validate :items_must_be_present
     validate :discount_rates_must_be_valid
@@ -26,6 +30,8 @@ module Offers
         offer_number: offer_number.to_s.strip,
         offer_date: offer_date.to_s,
         status: status.to_s.presence || "taslak",
+        project: project.to_s.strip.presence || "Belirtilmedi",
+        offer_type: offer_type.to_s.presence || "standard",
         items: normalize_items(items)
       }
     end

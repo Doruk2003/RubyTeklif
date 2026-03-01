@@ -31,14 +31,17 @@ Rails.application.routes.draw do
   resources :calendar_events, only: [:index, :create, :update, :destroy]
 
   resources :companies do
-    member do
-      patch :restore
-    end
+    collection { get :options }
+    member { patch :restore }
   end
-  resources :offers, only: [:index, :new, :create, :show, :destroy] do
-    member do
-      patch :restore
+  namespace :offers do
+    resources :standart do
+      member do
+        patch :restore
+      end
     end
+    resources :demonte
+    resources :montaj
   end
   resources :products, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
     member do

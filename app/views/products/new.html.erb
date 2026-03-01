@@ -17,18 +17,14 @@
     </div>
 
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <%= render "form",
-                product: @product,
-                url: products_path,
-                method: :post,
-                submit_label: "Kaydet",
-                submit_confirm: "Yeni Ürün kaydedilsin mi?",
-                remaining_photo_count: nil,
-                existing_photo_count: 0 %>
-        </div>
-      </div>
+      <%= render "form",
+            product: @product,
+            url: products_path,
+            method: :post,
+            submit_label: "BİLGİLERİ KAYDET",
+            submit_confirm: "Ürün kaydı oluşturulsun mu?",
+            remaining_photo_count: nil,
+            existing_photo_count: 0 %>
     </div>
   </div>
 

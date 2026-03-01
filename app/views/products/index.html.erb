@@ -18,36 +18,32 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <%= form_with url: products_path, method: :get, local: true, class: app_form_class("filter-form") do |f| %>
-            <div class="row g-3 align-items-end">
-              <div class="col-12 col-md-6 col-lg-3">
-                <%= f.label :sku, "SKU", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.search_field :sku, value: params[:sku], placeholder: "Stok Kodu", class: "form-control form-control-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-md-6 col-lg-3">
-                <%= f.label :barcode, "Barkod", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.search_field :barcode, value: params[:barcode], placeholder: "Barkod No", class: "form-control form-control-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-md-6 col-lg-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :name, "Ürün", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
                 <%= f.search_field :name, value: params[:name], placeholder: "Ürün Adı", class: "form-control form-control-sm", style: "width: 100%;" %>
               </div>
-              <div class="col-12 col-md-6 col-lg-3">
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :barcode, "Barkod", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.search_field :barcode, value: params[:barcode], placeholder: "Barkod No", class: "form-control form-control-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :category, "Kategori", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
                 <%= f.select :category, options_for_select([["Tümü", ""]] + @category_options, @category || params[:category]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
               </div>
-              <div class="col-12 col-md-6 col-lg-3">
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :item_type, "Tip", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
                 <%= f.select :item_type, options_for_select([["Tümü", ""]] + Products::UpsertForm::ITEM_TYPE_OPTIONS, params[:item_type]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
               </div>
-              <div class="col-12 col-md-6 col-lg-3">
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :brand, "Marka", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
                 <%= f.select :brand, options_for_select([["Tümü", ""]] + @brand_options, params[:brand]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
               </div>
-              <div class="col-12 col-md-6 col-lg-3">
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
                 <%= f.select :scope, options_for_select([["Aktif", "active"], ["Arşiv", "archived"], ["Tüm Kayıtlar", "all"]], @scope || params[:scope] || "active"), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
               </div>
-              <div class="col-12 col-md-6 col-lg-3">
+              <div class="col-12 col-sm-6 col-md-4 col-lg-2">
                 <div class="d-flex gap-2 w-100">
                   <%= f.submit "FİLTRELE", class: "btn btn-sm btn-dark flex-fill" %>
                   <%= link_to "TEMİZLE", products_path(per_page: @per_page), class: "btn btn-sm btn-warning flex-fill" %>

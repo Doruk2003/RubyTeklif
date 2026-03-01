@@ -19,31 +19,39 @@
       <div class="card-body">
         <%= form_with url: companies_path, method: :get, local: true, class: app_form_class("filter-form") do |f| %>
           <div class="row g-3 align-items-end">
-            <div class="col-12 col-md-6 col-lg-4">
-              <%= f.label :q, "Firma Adı / Yetkili", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+            <div class="col-12 col-md-6 col-lg">
+              <%= f.label :q, "Firma / Yetkili", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
               <%= f.search_field :q,
                  value: params[:q],
-                 placeholder: "Örn: Alüminyum, Pro",
+                 placeholder: "Ara...",
                  class: "form-control form-control-sm",
                  style: "width: 100%;" %>
             </div>
-            <div class="col-12 col-md-6 col-lg-2">
-              <%= f.label :tax_number, "Vergi No", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.text_field :tax_number,
-                 value: params[:tax_number],
-                 placeholder: "VKN",
+            <div class="col-12 col-md-6 col-lg">
+              <%= f.label :city, "Şehir", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.text_field :city,
+                 value: params[:city],
+                 placeholder: "Şehir Seçin",
                  class: "form-control form-control-sm",
                  style: "width: 100%;" %>
             </div>
-            <div class="col-12 col-md-6 col-lg-2">
+            <div class="col-12 col-md-6 col-lg">
+              <%= f.label :country, "Ülke", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.text_field :country,
+                 value: params[:country],
+                 placeholder: "Ülke Seçin",
+                 class: "form-control form-control-sm",
+                 style: "width: 100%;" %>
+            </div>
+            <div class="col-12 col-md-6 col-lg">
               <%= f.label :phone, "Telefon", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
               <%= f.search_field :phone,
                  value: params[:phone],
-                 placeholder: "0555...",
+                 placeholder: "05xx...",
                  class: "form-control form-control-sm",
                  style: "width: 100%;" %>
             </div>
-            <div class="col-12 col-md-6 col-lg-1">
+            <div class="col-12 col-md-6 col-lg">
               <%= f.label :active, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
               <%= f.select :active,
                  options_for_select([
@@ -55,7 +63,7 @@
                  class: "form-select form-select-sm",
                  style: "width: 100%;" %>
             </div>
-            <div class="col-12 col-md-6 col-lg-1">
+            <div class="col-12 col-md-6 col-lg">
               <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
               <%= f.select :scope,
                  options_for_select([
@@ -115,10 +123,19 @@
                   <% end %>
                 </th>
                 <th>
-                  <% next_dir = current_sort == "email" && current_dir == "asc" ? "desc" : "asc" %>
-                  <%= link_to companies_path(request.query_parameters.merge(sort: "email", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
-                    <span>Mail</span>
-                    <% if current_sort == "email" %>
+                  <% next_dir = current_sort == "city" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "city", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Şehir</span>
+                    <% if current_sort == "city" %>
+                      <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
+                    <% end %>
+                  <% end %>
+                </th>
+                <th>
+                  <% next_dir = current_sort == "country" && current_dir == "asc" ? "desc" : "asc" %>
+                  <%= link_to companies_path(request.query_parameters.merge(sort: "country", dir: next_dir)), class: "text-decoration-none text-body d-inline-flex align-items-center gap-2" do %>
+                    <span>Ülke</span>
+                    <% if current_sort == "country" %>
                       <span class="small text-secondary"><%= current_dir == "asc" ? "↑" : "↓" %></span>
                     <% end %>
                   <% end %>
@@ -175,13 +192,8 @@
                       -
                     <% end %>
                   </td>
-                  <td>
-                    <% if company.email.present? %>
-                      <%= link_to company.email, "mailto:#{company.email}", class: "text-decoration-none text-body" %>
-                    <% else %>
-                      -
-                    <% end %>
-                  </td>
+                  <td><%= company.city.presence || "-" %></td>
+                  <td><%= company.country.presence || "-" %></td>
                   <td><%= format_tax_number(company.tax_number) %></td>
                   <td><%= company.tax_office.presence || "-" %></td>
                   <td class="rt-col-center">
@@ -211,7 +223,7 @@
                         </span>
                       </summary>
                       <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm">
-                        <%= link_to "Gör", company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                        <%= link_to "Gözlem", company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <%= link_to "Düzenle", edit_company_path(company), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <% if company.deleted_at.present? %>
                           <%= link_to "Geri Yükle",
@@ -231,10 +243,10 @@
               <% end %>
               <% if @companies.empty? %>
                 <tr>
-                  <td colspan="10" class="text-center py-5">
+                  <td colspan="11" class="text-center py-5">
                     <div class="mx-auto" style="max-width: 420px;">
                       <div class="fw-semibold mb-1">Henüz kayıtlı müşteri yok</div>
-                      <div class="text-secondary">İlk müşterinizi eklemek için satış üstteki butonu kullanın.</div>
+                      <div class="text-secondary">İlk müşterinizi eklemek için sağ üstteki butonu kullanın.</div>
                     </div>
                   </td>
                 </tr>

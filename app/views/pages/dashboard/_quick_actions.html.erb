@@ -9,7 +9,7 @@
   <div class="alp-actions">
     <% if current_user && Roles.catalog_manage?(current_user.role) %>
       <%= link_to "Yeni Musteri", new_company_path %>
-      <%= link_to "Yeni Teklif", new_offer_path %>
+      <%= link_to "Yeni Teklif", offers_standart_index_path %>
       <%= link_to "Yeni Urun", new_product_path %>
     <% end %>
     <% if current_user && Roles.finance_manage?(current_user.role) %>

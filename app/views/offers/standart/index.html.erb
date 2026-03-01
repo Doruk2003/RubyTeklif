@@ -3,42 +3,61 @@
     <div class="card shadow-sm app-header-card">
       <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
         <div>
-          <h1 class="h4 mb-1 text-white">Teklifler</h1>
-          <p class="text-secondary mb-0">Toplam <strong><%= @offers.size %></strong> teklif</p>
+          <h1 class="h4 mb-1 text-white">Teklif Listesi</h1>
+          <p class="text-secondary mb-0">Tüm tekliflerinizi (Standart, Demonte, Montaj) buradan yönetebilirsiniz.</p>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
           <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
-          <%= new_record_button("Yeni Teklif", new_offer_path, class_name: "app-header-icon-btn") %>
+          <a href="#" class="btn app-header-icon-btn d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#offerTypeModal" title="Yeni Teklif">
+            <span class="material-symbols-outlined fs-5">add</span>
+          </a>
           <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="col-12 hidden" data-filter-panel>
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <%= filter_form_with url: offers_path, layout: :two, class_name: app_form_class do |f| %>
-          <div>
-            <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-            <%= f.select :scope,
-                  options_for_select([
-                    ["Aktif", "active"],
-                    ["Arsiv", "archived"],
-                    ["Tüm Kayıtlar", "all"]
-                  ], @scope || params[:scope] || "active"),
-                  {},
-                  class: "form-input" %>
-          </div>
-          <%= filter_actions_row do %>
-            <%= f.hidden_field :per_page, value: @per_page %>
-            <%= filter_submit_button %>
-            <%= clear_filter_button(offers_path(per_page: @per_page)) %>
+    <div class="col-12 hidden" data-filter-panel>
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <%= form_with url: offers_standart_index_path, method: :get, local: true, class: app_form_class("filter-form") do |f| %>
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :company_id, "Müşteri", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :company_id, options_for_select([["Tümü", ""]] + Array(@companies).map { |c| [c["name"], c["id"]] }, params[:company_id]), {}, class: "form-select form-select-sm", style: "width: 100%;", data: { search: true } %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :project, "Proje", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.search_field :project, value: params[:project], placeholder: "Proje Adı", class: "form-control form-control-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :offer_date, "Tarih", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.date_field :offer_date, value: params[:offer_date], class: "form-control form-control-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :status, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :status, options_for_select([["Tümü", ""]] + [["Süreç İşliyor", "surec_isliyor"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :offer_type, "Tür", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :offer_type, options_for_select([["Tümü", ""]] + [["Standart", "standard"], ["Demonte", "demonte"], ["Montaj", "montaj"]], params[:offer_type]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg">
+                <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+                <%= f.select :scope, options_for_select([["Aktif", "active"], ["Arşiv", "archived"], ["Tüm Kayıtlar", "all"]], @scope || params[:scope] || "active"), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              </div>
+              <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                <div class="d-flex gap-2 w-100">
+                  <%= f.submit "FİLTRELE", class: "btn btn-sm btn-dark flex-fill" %>
+                  <%= link_to "TEMİZLE", offers_standart_index_path(per_page: @per_page), class: "btn btn-sm btn-warning flex-fill" %>
+                  <%= f.hidden_field :per_page, value: @per_page %>
+                </div>
+              </div>
+            </div>
           <% end %>
-        <% end %>
+        </div>
       </div>
     </div>
-  </div>
 
   <div class="col-12">
     <div class="card shadow-sm">
@@ -48,8 +67,10 @@
             <thead>
               <tr>
                 <th>Teklif No</th>
+                <th>Proje</th>
                 <th>Müşteri</th>
                 <th>Tarih</th>
+                <th>Tür</th>
                 <th class="text-end">Toplam</th>
                 <th class="rt-col-center">Durum</th>
                 <th class="rt-col-center">Aksiyon</th>
@@ -58,18 +79,34 @@
             <tbody>
               <% @offers.each do |offer| %>
                 <tr>
-                  <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
-                  <td><%= offer.dig("companies", "name").to_s.presence || "-" %></td>
-                  <td><%= offer["offer_date"].to_s %></td>
-                  <td class="text-end fw-bold"><%= offer["gross_total"].to_s %></td>
+                    <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
+                    <td class="text-secondary small"><%= offer["project"].to_s.presence || "-" %></td>
+                    <td><%= offer.dig("companies", "name").to_s.presence || "-" %></td>
+                    <td><%= offer["offer_date"].to_s %></td>
+                    <td>
+                      <% type = offer["offer_type"].to_s.downcase %>
+                      <% case type %>
+                      <% when "standart", "standard" %>
+                        <span class="badge bg-light text-dark fw-normal border">Standart</span>
+                      <% when "demonte" %>
+                        <span class="badge bg-light text-primary fw-normal border">Demonte</span>
+                      <% when "montaj" %>
+                        <span class="badge bg-light text-success fw-normal border">Montaj</span>
+                      <% else %>
+                        <span class="badge bg-light text-secondary fw-normal border"><%= type.capitalize %></span>
+                      <% end %>
+                    </td>
+                    <td class="text-end fw-bold"><%= offer["gross_total"].to_s %></td>
                   <td class="rt-col-center">
                     <% status = offer["status"].to_s.downcase %>
                     <% if offer["deleted_at"].present? %>
                       <span class="badge bg-danger text-white">ARŞİV</span>
-                    <% elsif status == "taslak" %>
-                      <span class="badge bg-secondary">TASLAK</span>
-                    <% elsif %w[onaylandi gonderildi].include?(status) %>
-                      <span class="badge bg-success">AKTİF</span>
+                    <% elsif %w[surec_isliyor taslak beklemede].include?(status) %>
+                      <span class="badge bg-primary text-white">SÜREÇ İŞLİYOR</span>
+                    <% elsif status == "onaylandi" %>
+                      <span class="badge bg-success">ONAYLANDI</span>
+                    <% elsif status == "reddedildi" %>
+                      <span class="badge bg-danger">RED EDİLDİ</span>
                     <% else %>
                       <span class="badge bg-info"><%= status.upcase %></span>
                     <% end %>
@@ -86,15 +123,15 @@
                         </span>
                       </summary>
                       <div class="rt-action-menu position-absolute end-0 mt-2 p-1 bg-white border rounded shadow-sm" style="z-index: 1000; min-width: 120px;">
-                        <%= link_to "Gör", offer_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                        <%= link_to "Gör", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <% if offer["deleted_at"].present? %>
                           <%= link_to "Geri Yükle",
-                                restore_offer_path(offer["id"]),
+                                 restore_offers_standart_path(offer["id"]),
                                 data: { turbo_method: :patch, turbo_confirm: "Geri yüklensin mi?" },
                                 class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
                         <% else %>
                           <%= link_to "Arşivle",
-                                offer_path(offer["id"]),
+                                 offers_standart_path(offer["id"]),
                                 data: { turbo_method: :delete, turbo_confirm: "Arşivlensin mi?" },
                                 class: "d-block rounded px-3 py-2 text-decoration-none text-danger rt-arrow-hover" %>
                         <% end %>
@@ -132,19 +169,19 @@
             <span class="small text-secondary">Sayfa boyutu:</span>
             <% [25, 50, 100].each do |size| %>
               <% active = @per_page == size %>
-              <%= link_to size.to_s, offers_path(request.query_parameters.merge(page: 1, per_page: size)),
+              <%= link_to size.to_s, offers_standart_index_path(request.query_parameters.merge(page: 1, per_page: size)),
                     class: "btn btn-sm #{active ? 'btn-dark' : 'btn-outline-secondary'}" %>
             <% end %>
           </div>
           <div class="btn-group btn-group-sm">
             <% if @has_prev %>
-              <%= link_to "Önceki", offers_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
+              <%= link_to "Önceki", offers_standart_index_path(request.query_parameters.merge(page: @page - 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
               <span class="btn btn-outline-secondary opacity-50 disabled">Önceki</span>
             <% end %>
 
             <% if @has_next %>
-              <%= link_to "Sonraki", offers_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
+              <%= link_to "Sonraki", offers_standart_index_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
               <span class="btn btn-outline-secondary opacity-50 disabled">Sonraki</span>
             <% end %>

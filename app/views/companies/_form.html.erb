@@ -53,10 +53,31 @@
       </div>
     </div>
 
-    <div class="col-12">
+    <div class="col-md-6">
       <div class="form-floating">
         <%= f.text_area :address, class: "form-control", placeholder: "Adres", style: "height: 110px" %>
         <%= f.label :address, "Adres" %>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <%= f.text_area :description, class: "form-control", placeholder: "Açıklama", style: "height: 110px" %>
+        <%= f.label :description, "Açıklama" %>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <%= f.text_field :city, class: "form-control", placeholder: "Şehir" %>
+        <%= f.label :city, "Şehir" %>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <%= f.text_field :country, class: "form-control", placeholder: "Ülke" %>
+        <%= f.label :country, "Ülke" %>
       </div>
     </div>
 
@@ -72,6 +93,9 @@
   </div>
 
   <div>
-    <%= f.submit "CREATE COMPANY", class: "btn btn-success w-100", data: { turbo_confirm: "Musteri kaydi kaydedilsin mi?" } %>
+    <% is_new = !company.persisted? %>
+    <% submit_label = is_new ? "BİLGİLERİ KAYDET" : "BİLGİLERİ GÜNCELLE" %>
+    <% confirm_msg = is_new ? "Müşteri kaydı oluşturulsun mu?" : "Müşteri bilgileri güncellensin mi?" %>
+    <%= f.submit submit_label, class: "btn btn-success w-100", data: { turbo_confirm: confirm_msg } %>
   </div>
 <% end %>

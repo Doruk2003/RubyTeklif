@@ -27,26 +27,22 @@
     </div>
 
     <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <% if @product.present? %>
-            <% existing_photo_count = @product_images.to_a.size %>
-            <% remaining_photo_count = [6 - existing_photo_count, 0].max %>
+      <% if @product.present? %>
+        <% existing_photo_count = @product_images.to_a.size %>
+        <% remaining_photo_count = [6 - existing_photo_count, 0].max %>
 
-            <%= render "form",
-                  product: @product,
-                  url: product_path(@product["id"]),
-                  method: :patch,
-                  submit_label: "Guncelle",
-                  submit_confirm: "Urun guncellensin mi?",
-                  remaining_photo_count: remaining_photo_count,
-                  existing_photo_count: existing_photo_count,
-                  existing_photos: @product_images %>
-          <% else %>
-            <div class="text-secondary">Urun bulunamadi.</div>
-          <% end %>
-        </div>
-      </div>
+        <%= render "form",
+              product: @product,
+              url: product_path(@product["id"]),
+              method: :patch,
+              submit_label: "BİLGİLERİ GÜNCELLE",
+              submit_confirm: "Ürün bilgileri güncellensin mi?",
+              remaining_photo_count: remaining_photo_count,
+              existing_photo_count: existing_photo_count,
+              existing_photos: @product_images %>
+      <% else %>
+        <div class="text-secondary">Urun bulunamadi.</div>
+      <% end %>
     </div>
   </div>
 </div>

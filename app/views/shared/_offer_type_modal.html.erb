@@ -1,0 +1,171 @@
+<style>
+  #offerTypeModal {
+    background: rgba(0, 0, 0, 0.45) !important;
+    z-index: 9999 !important;
+  }
+  #offerTypeModal .modal-dialog {
+    max-width: 600px !important;
+    margin: 1.75rem auto;
+  }
+  #offerTypeModal .modal-content {
+    border: none !important;
+    border-radius: 4px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+    overflow: hidden;
+  }
+  #offerTypeModal .modal-header {
+    background: #f8f9fa !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    padding: 0.75rem 1.25rem !important;
+  }
+  #offerTypeModal .modal-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+    text-transform: capitalize;
+  }
+  #offerTypeModal .modal-body {
+    padding: 1.5rem 1.25rem !important;
+  }
+  #offerTypeModal .step-label {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #6c757d !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  #offerTypeModal .form-control, #offerTypeModal .form-select {
+    border-radius: 4px !important;
+    border: 1px solid #ced4da !important;
+    padding: 0.6rem 0.75rem !important;
+  }
+  #offerTypeModal .btn-continue {
+    background-color: #00c292 !important;
+    border-color: #00c292 !important;
+    color: #fff !important;
+  }
+  #offerTypeModal .btn-close-modal {
+    background-color: #f46a4e !important;
+    border-color: #f46a4e !important;
+    color: #fff !important;
+  }
+  #offerTypeModal .hidden-step {
+    display: none !important;
+  }
+</style>
+
+<div class="modal fade" id="offerTypeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header d-flex align-items-center justify-content-between">
+        <h5 class="modal-title mb-0">İşlemler</h5>
+      </div>   
+      <div class="modal-body">
+        <!-- Step 1: Offer Type -->
+        <div id="offerStep1">
+          <label class="step-label">Teklif Türü</label>
+          <div class="mb-4">
+            <select class="form-select" id="offerTypeSelect">
+              <option value="standart">Standard Teklif</option>
+              <option value="demonte">Demonte Teklif</option>
+              <option value="montaj">Montaj Teklif</option>
+            </select>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
+            Kapat
+            </button>
+            <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" id="toStep2">
+              Devam Et
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Customer & Project -->
+        <div id="offerStep2" class="hidden-step">
+          <div class="mb-3">
+            <label class="step-label">Müşteri</label>
+            <div id="customerSelectWrapper">
+              <select class="form-select" id="modalCustomerSelect" data-search="true" data-search-url="/companies/options">       
+              </select>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="step-label">Proje</label>
+            <input type="text" class="form-control" id="modalProjectInput" placeholder="Proje Adı Giriniz">
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-danger flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
+              Kapat
+            </button>
+            <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" id="confirmOfferCreation">
+              Seç ve Devam Et
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    let customerSelectInitialized = false;
+
+    function initOfferModalLogic() {
+      const modalEl = document.getElementById('offerTypeModal');
+      if (!modalEl || modalEl.dataset.logicInit === '1') return;
+      modalEl.dataset.logicInit = '1';
+
+      modalEl.addEventListener('show.bs.modal', () => {
+        document.getElementById('offerStep1').classList.remove('hidden-step');
+        document.getElementById('offerStep2').classList.add('hidden-step');
+        document.getElementById('modalProjectInput').value = '';
+      });
+
+      const toStep2Btn = document.getElementById('toStep2');
+      const confirmBtn = document.getElementById('confirmOfferCreation');
+      const customerSelect = document.getElementById('modalCustomerSelect');
+
+      if (toStep2Btn) {
+        toStep2Btn.addEventListener('click', () => {
+          document.getElementById('offerStep1').classList.add('hidden-step');
+          document.getElementById('offerStep2').classList.remove('hidden-step');
+          
+          // Init custom select only once — server-side search via data-search-url
+          if (!customerSelectInitialized) {
+            if (window.rtCustomSelect) {
+              window.rtCustomSelect.initCustomSelects(document.getElementById('customerSelectWrapper'));
+            }
+            customerSelectInitialized = true;
+          }
+        });
+      }
+
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+          const type = document.getElementById('offerTypeSelect').value;
+          const customerId = customerSelect.value;
+          const project = document.getElementById('modalProjectInput').value;
+
+          if (!customerId) {
+            alert('Lütfen bir müşteri seçin.');
+            return;
+          }
+
+          let basePath = (type === 'standart') ? '/offers/standart' : `/offers/${type}`;
+          const url = `${basePath}/new?company_id=${customerId}&project=${encodeURIComponent(project)}`;
+          
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          if (modal) modal.hide();
+          Turbo.visit(url);
+        });
+      }
+    }
+
+    document.addEventListener('turbo:load', initOfferModalLogic);
+    if (document.readyState !== 'loading') initOfferModalLogic();
+  })();
+</script>

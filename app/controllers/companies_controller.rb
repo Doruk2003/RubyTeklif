@@ -1,6 +1,15 @@
 ﻿class CompaniesController < ApplicationController
   before_action :authorize_companies!
 
+  def options
+    companies = Companies::OptionsQuery.new(client: client).call(
+      active_only: false,
+      user_id: current_user.id,
+      q: params[:q]
+    )
+    render json: companies.map { |c| { id: c["id"], name: c["name"] } }
+  end
+
   def index
     result = Companies::IndexQuery.new(client: client).call(params: params, user_id: current_user.id)
     @companies = result[:items]
@@ -97,7 +106,7 @@
   private
 
   def company_params
-    params.require(:company).permit(:name, :tax_number, :tax_office, :authorized_person, :phone, :email, :address, :active)
+    params.require(:company).permit(:name, :tax_number, :tax_office, :authorized_person, :phone, :email, :address, :description, :city, :country, :active)
   end
 
   def client

@@ -43,7 +43,8 @@ module Companies
         per_page: per_page(params),
         scope: normalized_scope(params),
         q: params[:q].to_s.strip,
-        tax_number: params[:tax_number].to_s.strip,
+        city: params[:city].to_s.strip,
+        country: params[:country].to_s.strip,
         phone: params[:phone].to_s.strip,
         active: params[:active].to_s,
         has_offers: params[:has_offers].to_s,
@@ -67,7 +68,7 @@ module Companies
 
     def build_companies_query(params)
       query_parts = []
-      query_parts << "select=id,name,tax_number,tax_office,authorized_person,phone,email,address,active,deleted_at,offers_count"
+      query_parts << "select=id,name,tax_number,tax_office,authorized_person,phone,email,address,description,city,country,active,deleted_at,offers_count"
       query_parts << sort_clause(params)
       query_parts << "limit=#{per_page(params) + 1}"
       query_parts << "offset=#{offset(params)}"
@@ -78,8 +79,11 @@ module Companies
         query_parts << "or=(name.ilike.*#{escaped}*,authorized_person.ilike.*#{escaped}*,email.ilike.*#{escaped}*)"
       end
 
-      tax_number = params[:tax_number].to_s.strip
-      query_parts << "tax_number=ilike.*#{escape_like_value(tax_number)}*" if tax_number.present?
+      city = params[:city].to_s.strip
+      query_parts << "city=ilike.*#{escape_like_value(city)}*" if city.present?
+
+      country = params[:country].to_s.strip
+      query_parts << "country=ilike.*#{escape_like_value(country)}*" if country.present?
 
       phone = params[:phone].to_s.strip
       query_parts << "phone=ilike.*#{escape_like_value(phone)}*" if phone.present?
@@ -108,6 +112,8 @@ module Companies
         "authorized_person" => "authorized_person",
         "phone" => "phone",
         "email" => "email",
+        "city" => "city",
+        "country" => "country",
         "tax_number" => "tax_number",
         "tax_office" => "tax_office",
         "active" => "active",
@@ -167,6 +173,9 @@ module Companies
         phone: row["phone"],
         email: row["email"],
         address: row["address"],
+        description: row["description"],
+        city: row["city"],
+        country: row["country"],
         active: row.key?("active") ? row["active"] : true,
         deleted_at: row["deleted_at"],
         offers_count: row["offers_count"].to_i

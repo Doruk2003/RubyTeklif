@@ -35,9 +35,20 @@ class ProductsController < ApplicationController
   end
 
   def show
-    @product = Products::ShowQuery.new(client: client).call(params[:id])
+    query_service = Products::ShowQuery.new(client: client)
+    @product = query_service.call(params[:id])
+
+    if @product.nil?
+      redirect_to products_path, alert: "Urun bulunamadi."
+      return
+    end
+
+    @stock_movements = [] # Placeholder for future stock module
+    @offer_movements = Array(query_service.fetch_offer_movements(@product["id"], user_id: current_user.id)).flatten
   rescue Supabase::Client::ConfigurationError
     @product = nil
+    @stock_movements = []
+    @offer_movements = []
   end
 
   def new

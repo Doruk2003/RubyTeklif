@@ -1,409 +1,4 @@
 <div class="container-fluid pt-0 pb-3 px-0 home-page-root">
-  <style>
-    body.home-page {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    body.home-page .app-main {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    body.home-page .app-flash-wrap {
-      top: auto !important;
-      left: auto !important;
-      right: 16px !important;
-      bottom: 16px !important;
-      transform: none !important;
-      width: min(420px, calc(100vw - 24px)) !important;
-    }
-
-    body.home-page .home-page-root {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-    }
-
-    .home-page-root {
-      margin-top: 0 !important;
-    }
-
-    html,
-    body,
-    body .app-main {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    body {
-      padding-top: 0 !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-    }
-
-    :root {
-      --home-top-height: 84px;
-    }
-
-    .home-header-card .card-body {
-      height: var(--home-top-height);
-    }
-
-    .home-nav {
-      position: relative;
-      z-index: 3000;
-      overflow: visible !important;
-      min-height: 54px;
-      height: auto;
-      padding-top: 0;
-      padding-bottom: 0;
-      background-color: var(--bs-primary) !important;
-      background-image: none !important;
-      border: 0 !important;
-    }
-
-    .home-nav .navbar-collapse {
-      overflow: visible !important;
-    }
-
-    .home-nav .container-fluid {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      padding-top: 0;
-      padding-bottom: 0;
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-
-    .home-nav-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 8px 0 6px;
-    }
-
-    .home-nav-bottom {
-      width: 100%;
-      border-top: 0;
-      padding: 5px 0;
-      position: relative;
-      min-height: 52px;
-    }
-
-    .home-nav-top-title {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.2;
-    }
-
-    .home-nav .home-search {
-      display: inline-flex;
-      align-items: center;
-      height: 27px;
-      margin-top: 0;
-      margin-bottom: 0;
-      gap: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.65);
-      padding: 0 0 2px;
-      transition: border-bottom-color 120ms ease, border-bottom-width 120ms ease;
-    }
-
-    .home-nav .home-search:focus-within {
-      border-bottom-color: rgba(255, 255, 255, 0.95);
-      border-bottom-width: 2px;
-    }
-
-    .home-nav .home-search .form-control {
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
-      align-self: center;
-      height: 22px;
-      min-height: 22px;
-      padding-top: 0;
-      padding-bottom: 0;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: normal;
-      line-height: 1;
-      width: 220px;
-      border: 0;
-      border-radius: 0;
-      background: transparent !important;
-      color: #fff;
-      box-shadow: none !important;
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    .home-nav .home-search .form-control::placeholder {
-      color: rgba(255, 255, 255, 0.95);
-      opacity: 1;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: normal;
-    }
-
-    .home-nav .home-search .form-control:focus {
-      border: 0;
-      outline: 0;
-      box-shadow: none !important;
-      background: transparent !important;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .home-nav .home-search .form-control::-webkit-search-cancel-button {
-      -webkit-appearance: searchfield-cancel-button;
-      cursor: pointer;
-      filter: brightness(0) invert(1) opacity(0.95);
-    }
-
-    .home-nav-menu-row {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: end;
-      min-height: 22px;
-      gap: 12px;
-    }
-
-    .home-nav-menu-row .navbar-nav {
-      justify-self: center;
-    }
-
-    .home-nav-menu-row .home-user-meta {
-      justify-self: start;
-      align-self: end;
-    }
-
-    .home-nav-menu-row .home-search {
-      justify-self: end;
-      align-self: end;
-    }
-
-    .home-user-meta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.75rem;
-      color: #a3acb9;
-      white-space: nowrap;
-      text-transform: none !important;
-      letter-spacing: normal !important;
-    }
-
-    .home-user-meta strong {
-      font-weight: 400;
-      color: #b6beca;
-      text-transform: none !important;
-      letter-spacing: normal !important;
-    }
-
-    .home-nav .nav-link.dropdown-toggle {
-      background: transparent;
-      border: 0;
-      text-decoration: none;
-      font-size: 0.8rem;
-      padding-top: 2px;
-      padding-bottom: 2px;
-    }
-
-    .home-power-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
-      border: 0;
-      background: transparent;
-      color: #cbd5e1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      transition: color 120ms ease;
-    }
-
-    .home-power-btn:hover {
-      background: transparent;
-      color: #fff;
-    }
-
-    .home-power-btn .material-symbols-outlined {
-      font-size: 19px;
-      line-height: 1;
-      font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-    }
-
-    .home-agenda-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
-      border: 0;
-      background: transparent;
-      color: #cbd5e1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      transition: color 120ms ease;
-    }
-
-    .home-agenda-btn:hover {
-      background: transparent;
-      color: #fff;
-    }
-
-    .home-agenda-btn .material-symbols-outlined {
-      font-size: 19px;
-      line-height: 1;
-      font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-    }
-
-    .home-nav .rt-icon-btn::after {
-      background: transparent !important;
-      box-shadow: none !important;
-      font-weight: 400 !important;
-    }
-
-    .home-nav .home-menu-item:hover > .nav-link.dropdown-toggle,
-    .home-nav .home-menu-item:focus-within > .nav-link.dropdown-toggle {
-      color: var(--bs-navbar-active-color);
-      opacity: 1;
-    }
-
-    .home-nav .home-menu-item {
-      position: relative;
-      z-index: 1;
-    }
-
-    .home-nav .home-menu-item:hover,
-    .home-nav .home-menu-item:focus-within {
-      z-index: 3200;
-    }
-
-    .home-nav .home-menu-item::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 100%;
-      height: 0;
-    }
-
-    .home-nav .home-submenu {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      min-width: 220px;
-      background: #fff;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 6px;
-      padding: 6px;
-      box-shadow: 0 14px 30px -18px rgba(2, 6, 23, 0.55);
-      z-index: 3300;
-      pointer-events: auto;
-    }
-
-    .home-nav .home-menu-item:hover > .home-submenu {
-      display: block;
-    }
-
-    .home-nav .home-submenu:hover {
-      display: block;
-    }
-
-    .home-nav .home-submenu .rt-arrow-hover {
-      display: block;
-      position: relative;
-      z-index: 1;
-      color: #334155;
-      text-decoration: none;
-      border-radius: 4px;
-      padding: 9px 10px 9px 36px;
-      margin: 0;
-      text-transform: capitalize !important;
-      font-size: 14px !important;
-      font-weight: 400 !important;
-      letter-spacing: normal !important;
-      line-height: 1.3 !important;
-    }
-
-    .home-nav .home-submenu .rt-arrow-hover:hover {
-      color: #f8fafc;
-    }
-
-    .home-nav .home-submenu .rt-arrow-hover + .rt-arrow-hover {
-      margin-top: 4px;
-    }
-
-    @media (min-width: 992px) {
-      .home-nav .home-menu-item:focus-within > .home-submenu {
-        display: block;
-      }
-
-      .home-nav #navbarColor03 {
-        display: block !important;
-        width: 100%;
-      }
-
-      .home-nav #navbarColor03 .navbar-nav {
-        margin: 0 !important;
-        display: flex;
-        align-items: center;
-      }
-
-      .home-nav #navbarColor03 .home-search {
-        margin: 0;
-      }
-    }
-
-    @media (max-width: 991.98px) {
-      .home-nav .home-menu-item:focus-within > .home-submenu {
-        display: block;
-      }
-
-      .home-nav-top {
-        padding-top: 3px;
-        padding-bottom: 3px;
-      }
-
-      .home-nav-bottom {
-        border-top: 0;
-        padding-top: 0;
-        min-height: 0;
-      }
-
-      .home-nav .home-search {
-        height: auto;
-        margin-top: 8px;
-      }
-
-      .home-nav .home-search .form-control {
-        width: 100%;
-      }
-
-      .home-nav-menu-row {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-
-      .home-nav-menu-row .navbar-nav,
-      .home-nav-menu-row .home-user-meta,
-      .home-nav-menu-row .home-search {
-        justify-self: auto;
-      }
-
-      .home-user-meta {
-        white-space: normal;
-      }
-    }
-  </style>
   <nav class="navbar navbar-expand-lg bg-primary home-nav mb-3 w-100 rounded-0" data-bs-theme="dark">
     <div class="container-fluid">
       <div class="home-nav-top w-100">
@@ -451,8 +46,8 @@
                 <li class="nav-item home-menu-item">
                   <button class="nav-link dropdown-toggle" type="button">TEKLİFLER</button>
                   <div class="home-submenu">
-                    <%= link_to "Yeni Teklif", new_offer_path, class: "rt-arrow-hover" %>
-                    <%= link_to "Teklif Listesi", offers_path, class: "rt-arrow-hover" %>
+                    <%= link_to "Yeni Teklif", offers_standart_index_path, class: "rt-arrow-hover" %>
+                    <%= link_to "Teklif Listesi", offers_standart_index_path, class: "rt-arrow-hover" %>
                   </div>
                 </li>
                 <li class="nav-item home-menu-item">
@@ -490,103 +85,204 @@
       </div>
     </div>
   </nav>
-  <div class="row g-3 mb-3">
-    <% @kpis.first(3).each do |kpi| %>
-      <div class="col-12 col-md-4">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <div class="text-secondary small text-uppercase mb-1"><%= kpi[:label] %></div>
-            <div class="h4 mb-1"><%= kpi[:value] %></div>
-            <div class="small text-secondary"><%= kpi[:delta] %></div>
+  <div style="padding: 0 16px;">
+    <!-- KPIs Section -->
+    <div class="row g-4 mb-4">
+      <% 
+        kpi_colors = [
+          { text: 'text-primary', bg: 'bg-primary bg-opacity-10', icon: 'monitoring' },
+          { text: 'text-success', bg: 'bg-success bg-opacity-10', icon: 'account_balance_wallet' },
+          { text: 'text-info', bg: 'bg-info bg-opacity-10', icon: 'assignment_turned_in' }
+        ]
+      %>
+      <% @kpis.first(3).each_with_index do |kpi, index| %>
+        <% color = kpi_colors[index % 3] %>
+        <div class="col-12 col-md-4">
+          <div class="card shadow-sm border-0 rounded-4 h-100 transition hover-scale" style="background: linear-gradient(145deg, #ffffff, #fdfdfd);">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="flex-shrink-0 me-3">
+                <div class="d-flex align-items-center justify-content-center rounded-3 <%= color[:bg] %> <%= color[:text] %>" style="width: 56px; height: 56px;">
+                  <span class="material-symbols-outlined fs-2"><%= color[:icon] %></span>
+                </div>
+              </div>
+              <div class="flex-grow-1">
+                <div class="text-secondary small fw-bold text-uppercase tracking-wider mb-1 opacity-75"><%= kpi[:label] %></div>
+                <div class="h3 fw-bolder mb-1 text-dark"><%= kpi[:value] %></div>
+                <div class="small fw-medium <%= kpi[:delta].to_s.include?('-') ? 'text-danger' : 'text-success' %> d-flex align-items-center">
+                  <span class="material-symbols-outlined fs-6 me-1"><%= kpi[:delta].to_s.include?('-') ? 'trending_down' : 'trending_up' %></span>
+                  <%= kpi[:delta] %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-12 col-xl-8">
+        <!-- Haftalık Akış Özeti -->
+        <div class="card shadow-sm mb-4 border-0 rounded-4">
+          <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-warning">data_exploration</span>
+              Haftalık Akış Özeti
+            </h5>
+            <span class="badge bg-warning bg-opacity-25 text-dark fw-bold px-3 py-2 rounded-pill shadow-sm">Son 7 Gün</span>
+          </div>
+          <div class="card-body px-4 pb-4 pt-2">
+            <div class="row g-3">
+              <% flow_colors = ['border-primary', 'border-success', 'border-info'] %>
+              <% @flow_stats.each_with_index do |item, idx| %>
+                <div class="col-12 col-md-4">
+                  <div class="p-3 h-100 bg-light rounded-4 border-start border-4 <%= flow_colors[idx % 3] %> shadow-sm transition hover-scale">
+                    <div class="h4 fw-bolder text-dark mb-1"><%= item[:value] %></div>
+                    <div class="small fw-bold text-secondary text-uppercase tracking-wider mb-2"><%= item[:label] %></div>
+                    <div class="small text-muted mb-0"><%= item[:note] %></div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Son Teklifler -->
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-primary">receipt_long</span>
+              Son Teklifler
+            </h5>
+            <%= link_to offers_standart_index_path, class: "btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1" do %>
+              Tümü <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            <% end %>
+          </div>
+          <div class="card-body p-0 mt-2">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0 border-top">
+                <thead class="bg-light bg-opacity-50">
+                  <tr>
+                    <th class="border-0 text-secondary fw-bold small text-uppercase ps-4">Sayfa / No</th>
+                    <th class="border-0 text-secondary fw-bold small text-uppercase">Müşteri</th>
+                    <th class="border-0 text-secondary fw-bold small text-uppercase">Tutar</th>
+                    <th class="border-0 text-secondary fw-bold small text-uppercase">Durum</th>
+                  </tr>
+                </thead>
+                <tbody class="border-top-0">
+                  <% if @recent_offers.blank? %>
+                    <tr>
+                      <td colspan="4" class="text-center py-5">
+                        <div class="text-muted d-flex flex-column align-items-center">
+                          <span class="material-symbols-outlined fs-1 mb-2 opacity-50">inbox</span>
+                          <span class="fw-medium">Henüz kayıt yok</span>
+                        </div>
+                      </td>
+                    </tr>
+                  <% else %>
+                    <% @recent_offers.each do |offer| %>
+                      <tr>
+                        <td class="ps-4">
+                          <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 fw-medium border border-secondary border-opacity-10 font-monospace">
+                            <%= offer[:number].presence || "-" %>
+                          </span>
+                        </td>
+                        <td class="fw-bold text-dark"><%= offer[:company].presence || "-" %></td>
+                        <td class="fw-bolder"><%= offer[:amount] %></td>
+                        <td>
+                          <% 
+                            status_bg = case offer[:status].to_s.downcase
+                                        when /onay/ then 'bg-success text-success'
+                                        when /iptal|ret/ then 'bg-danger text-danger'
+                                        when /bekle/ then 'bg-warning text-warning'
+                                        else 'bg-primary text-primary'
+                                        end
+                          %>
+                          <span class="badge <%= status_bg %> bg-opacity-10 border border-0 rounded-pill px-3 py-2 fw-bold">
+                            <%= offer[:status].presence || "Hazırlanıyor" %>
+                          </span>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-    <% end %>
-  </div>
-  <div class="row g-3">
-    <div class="col-12 col-xl-8">
-      <div class="card shadow-sm mb-3 home-header-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Haftalık Akış Özeti</span>
-          <span class="badge bg-warning text-dark">7 Gün</span>
+
+      <div class="col-12 col-xl-4">
+        <!-- Hızlı İşlemler -->
+        <div class="card shadow-sm mb-4 border-0 rounded-4 overflow-hidden">
+          <div class="card-header bg-primary text-white border-0 p-4">
+            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined">bolt</span>
+              Hızlı İşlemler
+            </h5>
+          </div>
+          <div class="list-group list-group-flush border-0">
+            <% if current_user && Roles.catalog_manage?(current_user.role) %>
+              <%= link_to new_company_path, class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3" do %>
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-inline-flex"><span class="material-symbols-outlined fs-5">domain_add</span></div>
+                <span class="fw-medium text-dark">Yeni Müşteri Ekle</span>
+                <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>
+              <% end %>
+              <%= link_to offers_standart_index_path, class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3" do %>
+                <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-inline-flex"><span class="material-symbols-outlined fs-5">receipt_long</span></div>
+                <span class="fw-medium text-dark">Yeni Teklif Hazırla</span>
+                <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>
+              <% end %>
+              <%= link_to new_product_path, class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3" do %>
+                <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 d-inline-flex"><span class="material-symbols-outlined fs-5">inventory_2</span></div>
+                <span class="fw-medium text-dark">Yeni Ürün Ekle</span>
+                <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>
+              <% end %>
+            <% end %>
+            <% if current_user && Roles.finance_manage?(current_user.role) %>
+              <%= link_to currencies_path, class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3" do %>
+                <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2 d-inline-flex"><span class="material-symbols-outlined fs-5">currency_exchange</span></div>
+                <span class="fw-medium text-dark">Döviz Kurlarını Güncelle</span>
+                <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>
+              <% end %>
+            <% end %>
+            <% if current_user && Roles.admin?(current_user.role) %>
+              <%= link_to admin_users_path, class: "list-group-item list-group-item-action border-0 px-4 py-3 d-flex align-items-center gap-3" do %>
+                <div class="bg-dark bg-opacity-10 text-dark rounded-circle p-2 d-inline-flex"><span class="material-symbols-outlined fs-5">manage_accounts</span></div>
+                <span class="fw-medium text-dark">Kullanıcı Yönetimi</span>
+                <span class="material-symbols-outlined ms-auto text-muted fs-5 opacity-50">chevron_right</span>
+              <% end %>
+            <% end %>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="row g-2">
-            <% @flow_stats.each do |item| %>
-              <div class="col-12 col-md-4">
-                <div class="border rounded p-2 h-100 bg-light-subtle">
-                  <div class="h5 mb-1"><%= item[:value] %></div>
-                  <div class="small fw-semibold"><%= item[:label] %></div>
-                  <div class="small text-secondary"><%= item[:note] %></div>
-                </div>
+
+        <!-- Hatırlatmalar -->
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-danger">event_note</span>
+              Ajanda & Hatırlatmalar
+            </h5>
+          </div>
+          <div class="card-body px-4 pb-4 pt-2">
+            <% if @reminders.blank? %>
+              <div class="text-center p-4 bg-light rounded-4">
+                <span class="material-symbols-outlined text-muted fs-1 mb-2 opacity-50">event_available</span>
+                <p class="text-muted small mb-0 fw-medium">Bugün için hatırlatıcı veya not bulunmuyor. Harika bir gün!</p>
+              </div>
+            <% else %>
+              <div class="d-flex flex-column gap-3 mt-2">
+                <% @reminders.each do |note| %>
+                  <div class="d-flex align-items-start gap-3 p-3 bg-danger bg-opacity-10 rounded-4 border border-danger border-opacity-10">
+                    <div class="text-danger mt-1"><span class="material-symbols-outlined fs-5">notifications_active</span></div>
+                    <div class="flex-grow-1 text-dark fw-medium small lh-sm">
+                      <%= note %>
+                    </div>
+                  </div>
+                <% end %>
               </div>
             <% end %>
           </div>
         </div>
-      </div>
-      <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Son Teklifler</span>
-          <%= link_to "Tum teklifler", offers_path, class: "btn btn-sm btn-secondary" %>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Müşteri</th>
-                <th>Tutar</th>
-                <th>Durum</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% if @recent_offers.blank? %>
-                <tr>
-                  <td colspan="4" class="text-center py-4 text-secondary">Kayıt bulunamadı.</td>
-                </tr>
-              <% else %>
-                <% @recent_offers.each do |offer| %>
-                  <tr>
-                    <td><%= offer[:number].presence || "-" %></td>
-                    <td><%= offer[:company].presence || "-" %></td>
-                    <td><%= offer[:amount] %></td>
-                    <td><%= offer[:status].presence || "-" %></td>
-                  </tr>
-                <% end %>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-xl-4">
-      <div class="card shadow-sm mb-3">
-        <div class="card-header">Hızlı işlemler</div>
-        <div class="list-group list-group-flush">
-          <% if current_user && Roles.catalog_manage?(current_user.role) %>
-            <%= link_to "Yeni Müşteri", new_company_path, class: "list-group-item list-group-item-action" %>
-            <%= link_to "Yeni Teklif", new_offer_path, class: "list-group-item list-group-item-action" %>
-            <%= link_to "Yeni Ürün", new_product_path, class: "list-group-item list-group-item-action" %>
-          <% end %>
-          <% if current_user && Roles.finance_manage?(current_user.role) %>
-            <%= link_to "Kur Yönetimi", currencies_path, class: "list-group-item list-group-item-action" %>
-          <% end %>
-          <% if current_user && Roles.admin?(current_user.role) %>
-            <%= link_to "Kullanıcı Yönetimi", admin_users_path, class: "list-group-item list-group-item-action" %>
-          <% end %>
-        </div>
-      </div>
-      <div class="card shadow-sm">
-        <div class="card-header">Hatırlatmalar</div>
-        <ul class="list-group list-group-flush">
-          <% if @reminders.blank? %>
-            <li class="list-group-item text-secondary">Bugun için not bulunmuyor.</li>
-          <% else %>
-            <% @reminders.each do |note| %>
-              <li class="list-group-item"><%= note %></li>
-            <% end %>
-          <% end %>
-        </ul>
       </div>
     </div>
   </div>

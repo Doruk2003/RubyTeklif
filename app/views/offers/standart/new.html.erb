@@ -1,0 +1,537 @@
+<div class="row g-3">
+  <%# ======================== HEADER CARD ======================== %>
+  <div class="col-12">
+    <div class="card shadow-sm app-header-card">
+      <div class="card-body d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+        <div>
+          <h1 class="h4 mb-1 text-white">Teklif Poz Girişi</h1>
+          <p class="text-secondary mb-0">Pozları girerek teklif detaylarını oluşturun.</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+          <%= list_nav_button(offers_standart_index_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
+          <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ======================== INFO BAR ======================== %>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body py-3 px-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-primary" style="font-size:20px;">tag</span>
+              <div>
+                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Proje No</div>
+                <div class="fw-bold text-dark" style="font-size:0.875rem;"><%= @offer["offer_number"].to_s %></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-success" style="font-size:20px;">business</span>
+              <div>
+                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Müşteri</div>
+                <div class="fw-semibold text-dark" style="font-size:0.875rem;"><%= @company_name.to_s %></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-warning" style="font-size:20px;">folder</span>
+              <div>
+                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Proje Adı</div>
+                <div class="fw-semibold text-dark" style="font-size:0.875rem;"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined text-info" style="font-size:20px;">currency_exchange</span>
+              <div>
+                <div class="text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Kur Bilgileri</div>
+                <div class="fw-semibold text-dark" style="font-size:0.85rem;">
+                  <% if Array(@currencies).any? %>
+                    <%= Array(@currencies).map { |c| "#{c['code']} (#{c['symbol']})" }.join(" · ") %>
+                  <% else %>
+                    <span class="text-muted">Kur tanımlı değil</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ======================== POZ LİSTESİ TABLOSU ======================== %>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white border-bottom pt-4 px-4 pb-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="fw-bold text-secondary mb-0 d-flex align-items-center gap-2">
+            <span class="material-symbols-outlined fs-5">list_alt</span>
+            Poz Listesi
+          </h6>
+          <span class="badge bg-dark rounded-pill px-3 py-2" id="pozCounter" style="font-size:0.75rem;">
+            0 Poz
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <%# Table Header %>
+        <div class="d-none d-md-block border-bottom bg-light">
+          <div class="row g-0 px-4 py-2 align-items-center">
+            <div class="col-md-1 text-center">
+              <span class="poz-th">#</span>
+            </div>
+            <div class="col-md-4">
+              <span class="poz-th">Ürün</span>
+            </div>
+            <div class="col-md-2 text-end">
+              <span class="poz-th">Miktar</span>
+            </div>
+            <div class="col-md-2 text-end">
+              <span class="poz-th">Birim Fiyat</span>
+            </div>
+            <div class="col-md-1 text-end">
+              <span class="poz-th">İsk. %</span>
+            </div>
+            <div class="col-md-2 text-end pe-2">
+              <span class="poz-th">İşlem</span>
+            </div>
+          </div>
+        </div>
+
+        <%# Dynamic Poz List %>
+        <div id="pozListContainer">
+          <%# Rows will be injected here by JS %>
+        </div>
+
+        <%# Empty State %>
+        <div id="pozEmptyState" class="text-center py-5">
+          <span class="material-symbols-outlined text-muted d-block mb-2" style="font-size:48px;">playlist_add</span>
+          <p class="text-secondary mb-0">Henüz poz eklenmedi.<br>Aşağıdaki <strong>POZ</strong> butonuna tıklayarak eklemeye başlayın.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ======================== ALT BUTONLAR ======================== %>
+  <div class="col-12">
+    <div class="d-flex gap-3">
+      <button type="button" class="btn btn-dark flex-fill py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" style="letter-spacing:0.1em; font-size:0.9rem;" id="btnOpenPozModal">
+        POZ EKLE
+      </button>
+      <button type="button" class="btn btn-primary flex-fill py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2" style="letter-spacing:0.1em; font-size:0.9rem;" id="btnHesapla">
+        
+        HESAPLA
+      </button>
+    </div>
+  </div>
+</div>
+
+<%# ======================== POZ GİRİŞ MODAL ======================== %>
+<div class="modal fade" id="pozEntryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:1230px;">
+    <div class="modal-content" style="border:none; border-radius:4px; box-shadow:0 12px 40px rgba(0,0,0,0.25); overflow:hidden;">
+      <div class="modal-header py-3 px-4" style="background:linear-gradient(90deg,#0f172a,#1e293b); border-bottom:none;">
+        <h6 class="modal-title text-white mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600;">
+          Poz Girişi
+        </h6>
+      </div>
+      <div class="modal-body p-4">
+        <%# Tüm alanlar tek satırda %>
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-md-3">
+            <label class="poz-modal-label">Ürün</label>
+            <div id="pozModalProductWrapper">
+              <select class="form-select form-select-sm" id="pozProductSelect" data-search="true">
+                <option value="">Ürün Seçin</option>
+                <% @products.each do |p| %>
+                  <option value="<%= p["id"] %>"
+                          data-price="<%= p["price"] %>"
+                          data-name="<%= p["name"] %> (<%= p.dig("categories", "name").to_s.presence || @category_labels[p["category_id"].to_s].presence || "-" %>)">
+                    <%= p["name"] %> (<%= p.dig("categories", "name").to_s.presence || @category_labels[p["category_id"].to_s].presence || "-" %>)
+                  </option>
+                <% end %>
+              </select>
+            </div>
+          </div>
+          <div class="col-6 col-md-auto" style="min-width:90px;">
+            <label class="poz-modal-label">Miktar</label>
+            <input type="number" class="form-control form-control-sm" id="pozQuantity" value="1" step="0.01" min="0.01" placeholder="1">
+          </div>
+          <div class="col-6 col-md-auto" style="min-width:110px;">
+            <label class="poz-modal-label">Birim Fiyat</label>
+            <input type="number" class="form-control form-control-sm" id="pozUnitPrice" step="0.01" placeholder="0.00">
+          </div>
+          <div class="col-6 col-md-auto" style="min-width:80px;">
+            <label class="poz-modal-label">İsk. %</label>
+            <input type="number" class="form-control form-control-sm" id="pozDiscount" value="0" step="0.01" min="0" max="100" placeholder="0">
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="poz-modal-label">Açıklama</label>
+            <input type="text" class="form-control form-control-sm" id="pozDescription" placeholder="Opsiyonel...">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top px-4 py-2 d-flex flex-column gap-1">
+        <button type="button" class="btn btn-primary w-100 fw-bold py-2 text-uppercase" id="btnPozSave" style="letter-spacing:0.05em;">
+          <span class="material-symbols-outlined align-middle me-1" style="font-size:18px;">save</span>
+          Kaydet
+        </button>
+        <button type="button" class="btn btn-danger w-100 fw-bold py-2 text-uppercase" id="btnPozCancel" style="letter-spacing:0.05em;">
+          İptal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# ======================== HIDDEN FORM (for HESAPLA submit) ======================== %>
+<%= form_with url: offers_standart_index_path, method: :post, scope: :offer, local: true, id: "pozMainForm", class: "d-none" do |f| %>
+  <%= f.hidden_field :offer_type, value: "standard" %>
+  <%= f.hidden_field :company_id, value: @offer["company_id"] %>
+  <%= f.hidden_field :offer_number, value: @offer["offer_number"] %>
+  <%= f.hidden_field :offer_date, value: @offer["offer_date"] %>
+  <%= f.hidden_field :status, value: @offer["status"] %>
+  <%= f.hidden_field :project, value: @offer["project"] %>
+  <%= f.hidden_field :product_category_id, value: @selected_category_id %>
+  <div id="pozHiddenInputs"></div>
+<% end %>
+
+<style>
+  #pozEntryModal .modal-backdrop { z-index: 9998 !important; }
+  #pozEntryModal { z-index: 9999 !important; }
+
+  .poz-th {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6c757d;
+  }
+
+  .poz-modal-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  .poz-list-row {
+    transition: background-color 200ms ease, opacity 200ms ease;
+  }
+  .poz-list-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  .poz-list-row:last-child {
+    border-bottom: none !important;
+  }
+
+  @keyframes pozFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .poz-list-row-new {
+    animation: pozFadeIn 300ms ease forwards;
+  }
+
+  @keyframes pozFlash {
+    0%   { background-color: rgba(0, 194, 146, 0.15); }
+    100% { background-color: transparent; }
+  }
+  .poz-list-row-flash {
+    animation: pozFlash 800ms ease forwards;
+  }
+
+  /* Success indicator in modal */
+  @keyframes pozSaved {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  .poz-saved-pulse {
+    animation: pozSaved 300ms ease;
+  }
+
+  .poz-delete-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #adb5bd;
+    transition: all 150ms ease;
+    cursor: pointer;
+  }
+  .poz-delete-btn:hover {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.08);
+    border-color: rgba(220, 53, 69, 0.2);
+  }
+</style>
+
+<script>
+(function() {
+  // ── State ──
+  let pozList = [];
+  let pozModalInstance = null;
+  let customSelectInited = false;
+
+  function init() {
+    const modalEl = document.getElementById('pozEntryModal');
+    if (!modalEl) return;
+
+    pozModalInstance = new bootstrap.Modal(modalEl);
+
+    // POZ button → open modal
+    const btnOpen = document.getElementById('btnOpenPozModal');
+    if (btnOpen) {
+      btnOpen.addEventListener('click', function() {
+        resetModalForm();
+        pozModalInstance.show();
+
+        // Init custom select once
+        if (!customSelectInited && window.rtCustomSelect) {
+          setTimeout(function() {
+            window.rtCustomSelect.initCustomSelects(document.getElementById('pozModalProductWrapper'));
+            customSelectInited = true;
+          }, 100);
+        }
+      });
+    }
+
+    // Auto-fill unit price when product is selected
+    const productSelect = document.getElementById('pozProductSelect');
+    if (productSelect) {
+      productSelect.addEventListener('change', function() {
+        const selectedOpt = this.options[this.selectedIndex];
+        if (selectedOpt && selectedOpt.dataset.price) {
+          const price = parseFloat(selectedOpt.dataset.price);
+          if (!isNaN(price) && price > 0) {
+            document.getElementById('pozUnitPrice').value = price;
+          }
+        }
+      });
+    }
+
+    // KAYDET button
+    const btnSave = document.getElementById('btnPozSave');
+    if (btnSave) {
+      btnSave.addEventListener('click', function() {
+        savePoz();
+      });
+    }
+
+    // İPTAL button → close modal
+    const btnCancel = document.getElementById('btnPozCancel');
+    if (btnCancel) {
+      btnCancel.addEventListener('click', function() {
+        pozModalInstance.hide();
+      });
+    }
+
+    // HESAPLA button
+    const btnHesapla = document.getElementById('btnHesapla');
+    if (btnHesapla) {
+      btnHesapla.addEventListener('click', function() {
+        if (pozList.length === 0) {
+          alert('Lütfen en az bir poz ekleyin.');
+          return;
+        }
+        buildHiddenInputs();
+        document.getElementById('pozMainForm').requestSubmit();
+      });
+    }
+
+    // Enter key in modal → save
+    modalEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        savePoz();
+      }
+    });
+
+    renderList();
+  }
+
+  // ── Save Poz ──
+  function savePoz() {
+    const productSelect = document.getElementById('pozProductSelect');
+    const productId = productSelect.value;
+
+    if (!productId) {
+      alert('Lütfen bir ürün seçin.');
+      return;
+    }
+
+    const selectedOpt = productSelect.options[productSelect.selectedIndex];
+    const productName = selectedOpt.dataset.name || selectedOpt.text;
+    const quantity = parseFloat(document.getElementById('pozQuantity').value) || 1;
+    const unitPrice = parseFloat(document.getElementById('pozUnitPrice').value) || 0;
+    const discount = parseFloat(document.getElementById('pozDiscount').value) || 0;
+    const description = document.getElementById('pozDescription').value.trim();
+
+    const poz = {
+      id: Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      product_id: productId,
+      product_name: productName,
+      quantity: quantity,
+      unit_price: unitPrice,
+      discount_rate: discount,
+      description: description
+    };
+
+    pozList.push(poz);
+    renderList();
+    resetModalForm();
+
+    // Focus product select for next entry
+    setTimeout(function() {
+      const searchInput = document.querySelector('#pozModalProductWrapper .rt-custom-select-search');
+      if (searchInput) {
+        searchInput.focus();
+      }
+    }, 100);
+  }
+
+  // ── Reset Modal ──
+  function resetModalForm() {
+    const productSelect = document.getElementById('pozProductSelect');
+    productSelect.value = '';
+    productSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+    document.getElementById('pozQuantity').value = '1';
+    document.getElementById('pozUnitPrice').value = '';
+    document.getElementById('pozDiscount').value = '0';
+    document.getElementById('pozDescription').value = '';
+
+    // Reset custom select display
+    const wrapper = document.getElementById('pozModalProductWrapper');
+    if (wrapper) {
+      const label = wrapper.querySelector('.rt-custom-select-label');
+      if (label) label.textContent = 'Ürün Seçin';
+      const root = wrapper.querySelector('[data-rt-custom-select]');
+      if (root) {
+        root.classList.remove('has-value');
+        root.classList.add('is-empty');
+        root.querySelectorAll('.rt-custom-select-option').forEach(function(opt) {
+          opt.classList.remove('is-active');
+          opt.setAttribute('aria-selected', 'false');
+        });
+      }
+      const search = wrapper.querySelector('.rt-custom-select-search');
+      if (search) search.value = '';
+    }
+  }
+
+  // ── Render List ──
+  function renderList() {
+    const container = document.getElementById('pozListContainer');
+    const emptyState = document.getElementById('pozEmptyState');
+    const counter = document.getElementById('pozCounter');
+
+    if (counter) counter.textContent = pozList.length + ' Poz';
+
+    if (pozList.length === 0) {
+      container.innerHTML = '';
+      if (emptyState) emptyState.style.display = '';
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    const isAppending = container.children.length < pozList.length;
+
+    let html = '';
+    pozList.forEach(function(poz, i) {
+      const isNew = isAppending && i === pozList.length - 1;
+      html += '<div class="poz-list-row border-bottom px-4 py-3' + (isNew ? ' poz-list-row-new poz-list-row-flash' : '') + '" data-poz-id="' + poz.id + '">';
+      html += '  <div class="row g-2 align-items-center">';
+      html += '    <div class="col-md-1 text-center d-none d-md-block">';
+      html += '      <span class="badge bg-light text-dark border fw-bold" style="font-size:0.8rem; min-width:28px;">' + (i + 1) + '</span>';
+      html += '    </div>';
+      html += '    <div class="col-12 col-md-4">';
+      html += '      <div class="fw-semibold text-dark" style="font-size:0.85rem;">' + escapeHtml(poz.product_name) + '</div>';
+      if (poz.description) {
+        html += '      <div class="text-muted" style="font-size:0.75rem;">' + escapeHtml(poz.description) + '</div>';
+      }
+      html += '    </div>';
+      html += '    <div class="col-4 col-md-2 text-end">';
+      html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.quantity) + '</span>';
+      html += '    </div>';
+      html += '    <div class="col-4 col-md-2 text-end">';
+      html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.unit_price) + '</span>';
+      html += '    </div>';
+      html += '    <div class="col-2 col-md-1 text-end">';
+      if (poz.discount_rate > 0) {
+        html += '      <span class="text-danger fw-semibold" style="font-size:0.85rem;">%' + formatNumber(poz.discount_rate) + '</span>';
+      } else {
+        html += '      <span class="text-muted" style="font-size:0.85rem;">-</span>';
+      }
+      html += '    </div>';
+      html += '    <div class="col-2 col-md-2 text-end">';
+      html += '      <button type="button" class="poz-delete-btn" onclick="window.__pozDelete(\'' + poz.id + '\')" title="Sil">';
+      html += '        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>';
+      html += '      </button>';
+      html += '    </div>';
+      html += '  </div>';
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  // ── Delete Poz ──
+  window.__pozDelete = function(id) {
+    pozList = pozList.filter(function(p) { return p.id !== id; });
+    renderList();
+  };
+
+  // ── Build hidden inputs for form submit ──
+  function buildHiddenInputs() {
+    const container = document.getElementById('pozHiddenInputs');
+    container.innerHTML = '';
+    pozList.forEach(function(poz) {
+      container.innerHTML +=
+        '<input type="hidden" name="offer[items][][product_id]" value="' + poz.product_id + '">' +
+        '<input type="hidden" name="offer[items][][quantity]" value="' + poz.quantity + '">' +
+        '<input type="hidden" name="offer[items][][unit_price]" value="' + poz.unit_price + '">' +
+        '<input type="hidden" name="offer[items][][discount_rate]" value="' + poz.discount_rate + '">' +
+        '<input type="hidden" name="offer[items][][description]" value="' + escapeHtml(poz.description) + '">';
+    });
+  }
+
+  // ── Helpers ──
+  function escapeHtml(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatNumber(n) {
+    if (n === null || n === undefined || n === '') return '-';
+    var num = parseFloat(n);
+    if (isNaN(num)) return '-';
+    return num % 1 === 0 ? num.toString() : num.toFixed(2);
+  }
+
+  // ── Init ──
+  document.addEventListener('turbo:load', init);
+  if (document.readyState !== 'loading') init();
+})();
+</script>

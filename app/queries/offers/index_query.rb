@@ -41,10 +41,52 @@ module Offers
     end
 
     def build_query(params, page:, per_page:)
-      filters = [deleted_scope_filter(params)].compact
-      base = "offers?select=id,offer_number,offer_date,gross_total,status,deleted_at,companies(name)&order=offer_date.desc"
+      filters = [
+        deleted_scope_filter(params),
+        type_filter(params),
+        company_filter(params),
+        project_filter(params),
+        date_filter(params),
+        status_filter(params)
+      ].compact
+      base = "offers?select=id,project,offer_type,offer_number,offer_date,gross_total,status,deleted_at,companies(name)&order=offer_date.desc"
       query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
       "#{query}&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
+    end
+
+    def type_filter(params)
+      type = params[:offer_type].to_s
+      return nil if type.blank?
+
+      "offer_type=eq.#{Supabase::FilterValue.eq(type)}"
+    end
+
+    def company_filter(params)
+      company_id = params[:company_id].to_s
+      return nil if company_id.blank?
+
+      "company_id=eq.#{Supabase::FilterValue.eq(company_id)}"
+    end
+
+    def project_filter(params)
+      project = params[:project].to_s.strip
+      return nil if project.blank?
+
+      "project=ilike.*#{Supabase::FilterValue.ilike(project)}*"
+    end
+
+    def date_filter(params)
+      date = params[:offer_date].to_s
+      return nil if date.blank?
+
+      "offer_date=eq.#{Supabase::FilterValue.eq(date)}"
+    end
+
+    def status_filter(params)
+      status = params[:status].to_s
+      return nil if status.blank?
+
+      "status=eq.#{Supabase::FilterValue.eq(status)}"
     end
 
     def normalized_scope(params)

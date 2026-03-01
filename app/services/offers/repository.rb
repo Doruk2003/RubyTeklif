@@ -36,6 +36,8 @@ module Offers
         p_net_total: offer_body[:net_total],
         p_vat_total: offer_body[:vat_total],
         p_gross_total: offer_body[:gross_total],
+        p_project: offer_body[:project],
+        p_offer_type: offer_body[:offer_type],
         p_items: items.map do |item|
           {
             product_id: item[:product_id],

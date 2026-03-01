@@ -18,7 +18,10 @@ module Companies
           p_phone: payload[:phone],
           p_email: payload[:email],
           p_address: payload[:address],
-          p_active: payload[:active]
+          p_active: payload[:active],
+          p_description: payload[:description],
+          p_city: payload[:city],
+          p_country: payload[:country]
         }
       )
     end
@@ -36,7 +39,10 @@ module Companies
           p_phone: payload[:phone],
           p_email: payload[:email],
           p_address: payload[:address],
-          p_active: payload[:active]
+          p_active: payload[:active],
+          p_description: payload[:description],
+          p_city: payload[:city],
+          p_country: payload[:country]
         }
       )
     end

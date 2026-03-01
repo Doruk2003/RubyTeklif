@@ -10,6 +10,9 @@ module Companies
     attribute :phone, :string
     attribute :email, :string
     attribute :address, :string
+    attribute :description, :string
+    attribute :city, :string
+    attribute :country, :string
     attribute :active
 
     validates :name, presence: true, length: { maximum: 150 }
@@ -18,6 +21,9 @@ module Companies
     validates :authorized_person, length: { maximum: 120 }, allow_blank: true
     validates :phone, length: { maximum: 40 }, allow_blank: true
     validates :address, length: { maximum: 500 }, allow_blank: true
+    validates :description, length: { maximum: 1000 }, allow_blank: true
+    validates :city, length: { maximum: 100 }, allow_blank: true
+    validates :country, length: { maximum: 100 }, allow_blank: true
     validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
 
     def normalized_attributes
@@ -29,6 +35,9 @@ module Companies
         phone: phone.to_s.strip,
         email: email.to_s.strip,
         address: address.to_s.strip,
+        description: description.to_s.strip,
+        city: city.to_s.strip,
+        country: country.to_s.strip,
         active: normalize_active(active)
       }
     end
