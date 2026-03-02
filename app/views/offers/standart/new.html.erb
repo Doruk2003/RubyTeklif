@@ -3,7 +3,7 @@
   <div class="col-12">
     <div class="card shadow-sm app-header-card">
       <div class="card-body p-4">
-        <!-- Ãœst BaÅŸlÄ±k ve Aksiyon ButonlarÄ± -->
+        <!-- Üst Başlık ve Aksiyon Butonları -->
         <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-4">
           <div>
             <h1 class="h4 mb-1 text-white">Teklif Poz Girişi</h1>
@@ -43,7 +43,7 @@
       </div>
     </div>
   </div>
-  <%# ======================== POZ LÃ„Â°STESÃ„Â° TABLOSU ======================== %>
+  <%# ======================== POZ LİSTESİ TABLOSU ======================== %>
   <div class="col-12">
     <div class="card shadow-sm">
       <div class="card-header bg-white border-bottom pt-4 px-4 pb-3">
@@ -97,7 +97,7 @@
   </div>
   <%# ======================== ALT BUTONLAR ======================== %>
   <div class="col-12">
-    <!-- d-flex yerine d-grid kullanarak elemanlarÃ„Â± alt alta dizdik -->
+    <!-- d-flex yerine d-grid kullanarak elemanları alt alta dizdik -->
     <div class="d-grid gap-3" >
       <button type="button" class="btn btn-success py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 w-100" 
         style="letter-spacing:0.1em; font-size:0.9rem; height: 50px;" 
@@ -112,13 +112,13 @@
     </div>
   </div>
 </div>
-<%# ======================== POZ GÃ„Â°RÃ„Â°Ã…Â MODAL ======================== %>
+<%# ======================== POZ GİRİŞ MODAL ======================== %>
 <div class="modal fade" id="pozEntryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
   <div class="modal-dialog poz-modal-dialog">
     <div class="modal-content" style="border:0.05em; border-radius:4px; box-shadow: 0 10px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);">
       <div class="modal-header py-3 px-4 btn btn-warning" style="border-bottom:none;">
         <h6 class="modal-title mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600; color:#fff;">
-          POZ GÃœNCELLE
+          POZ GÜNCELLE
         </h6>
       </div>
       <div class="modal-body p-4">
@@ -126,7 +126,7 @@
         <%# TÃƒÂ¼m alanlar tek satÃ„Â±rda %>
         <div class="row g-2 align-items-end">
           <div class="col-12 col-md-5 col-lg-5">
-            <label class="poz-modal-label">ÃœRÃœN</label>
+            <label class="poz-modal-label">Ürün</label>
             <div id="pozModalProductWrapper">
               <select class="form-select form-select-sm" id="pozProductSelect" data-search="true">
                 <% @products.each do |p| %>
@@ -148,11 +148,11 @@
             <input type="number" class="form-control form-control-sm" id="pozUnitPrice" step="0.01" placeholder="0.00">
           </div>
           <div class="col-6 col-md-1 col-lg-1">
-            <label class="poz-modal-label">iskonto</label>
+            <label class="poz-modal-label">İskonto</label>
             <input type="number" class="form-control form-control-sm" id="pozDiscount" value="0" step="0.01" min="0" max="100" placeholder="0">
           </div>
           <div class="col-6 col-md-3 col-lg-3">
-            <label class="poz-modal-label">AÃ§Ä±klama</label>
+            <label class="poz-modal-label">Açıklama</label>
             <input type="text" class="form-control form-control-sm" id="pozDescription" placeholder="Opsiyonel...">
           </div>
         </div>
@@ -162,7 +162,7 @@
           Kaydet
         </button>
         <button type="button" class="btn btn-secondary w-100 fw-bold py-2 text-dark text-uppercase" id="btnPozCancel" style="letter-spacing:0.05em;">
-          Ä°ptal
+          İptal
         </button>
       </div>
     </div>

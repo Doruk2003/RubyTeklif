@@ -2,11 +2,10 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header d-flex align-items-center justify-content-between">
-        <h5 class="modal-title mb-0">Islemler</h5>
+        <h5 class="modal-title mb-0">İşlemler</h5>
       </div>
       <div class="modal-body">
         <div id="offerTypeInlineMessage" class="alert alert-danger py-2 px-3 mb-3 d-none" role="alert"></div>
-
         <div class="mb-3">
           <label class="step-label">Teklif Turu</label>
           <select class="form-select" id="offerTypeSelect">
@@ -15,25 +14,22 @@
             <option value="montaj">Montaj Teklif</option>
           </select>
         </div>
-
         <div class="mb-3">
-          <label class="step-label">Musteri</label>
+          <label class="step-label">Müşteri</label>
           <div id="customerSelectWrapper">
             <select class="form-select" id="modalCustomerSelect" data-search="true" data-search-url="/companies/options">
             </select>
           </div>
         </div>
-
         <div class="mb-4">
           <label class="step-label">Proje</label>
           <input type="text" class="form-control" id="modalProjectInput" placeholder="Proje Adi Giriniz">
         </div>
-
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-danger flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
             Kapat
           </button>
-          <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" id="confirmOfferCreation">
+          <button type="button" class="btn btn-success flex-fill fw-bold py-2 text-uppercase" id="confirmOfferCreation">
             Sec ve Devam Et
           </button>
         </div>

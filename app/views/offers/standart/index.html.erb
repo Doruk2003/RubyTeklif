@@ -16,49 +16,47 @@
       </div>
     </div>
   </div>
-
-    <div class="col-12 hidden" data-filter-panel>
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <%= form_with url: offers_standart_index_path, method: :get, local: true, class: app_form_class("filter-form") do |f| %>
-            <div class="row g-2 align-items-end">
-              <div class="col-12 col-sm-6 col-md-4 col-lg">
-                <%= f.label :company_id, "Müşteri", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.select :company_id, options_for_select([["Tümü", ""]] + Array(@companies).map { |c| [c["name"], c["id"]] }, params[:company_id]), {}, class: "form-select form-select-sm", style: "width: 100%;", data: { search: true } %>
-              </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg">
-                <%= f.label :project, "Proje", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.search_field :project, value: params[:project], placeholder: "Proje Adı", class: "form-control form-control-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg">
-                <%= f.label :offer_date, "Tarih", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.date_field :offer_date, value: params[:offer_date], class: "form-control form-control-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg">
-                <%= f.label :status, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.select :status, options_for_select([["Tümü", ""]] + [["Hazırlanıyor", "taslak"], ["Süreç İşliyor", "surec_isliyor"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg">
-                <%= f.label :offer_type, "Tür", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.select :offer_type, options_for_select([["Tümü", ""]] + [["Standart", "standard"], ["Demonte", "demonte"], ["Montaj", "montaj"]], params[:offer_type]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg">
-                <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.select :scope, options_for_select([["Aktif", "active"], ["Arşiv", "archived"], ["Tüm Kayıtlar", "all"]], @scope || params[:scope] || "active"), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
-              </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                <div class="d-flex gap-2 w-100">
-                  <%= f.submit "FİLTRELE", class: "btn btn-sm btn-dark flex-fill" %>
-                  <%= link_to "TEMİZLE", offers_standart_index_path(per_page: @per_page), class: "btn btn-sm btn-warning flex-fill" %>
-                  <%= f.hidden_field :per_page, value: @per_page %>
-                </div>
+  <div class="col-12 hidden" data-filter-panel>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <%= form_with url: offers_standart_index_path, method: :get, local: true, class: app_form_class("filter-form") do |f| %>
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
+              <%= f.label :company_id, "Müşteri", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :company_id, options_for_select([["Tümü", ""]] + Array(@companies).map { |c| [c["name"], c["id"]] }, params[:company_id]), {}, class: "form-select form-select-sm", style: "width: 100%;", data: { search: true } %>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
+              <%= f.label :project, "Proje", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.search_field :project, value: params[:project], placeholder: "Proje Adı", class: "form-control form-control-sm", style: "width: 100%;" %>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
+              <%= f.label :offer_date, "Tarih", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.date_field :offer_date, value: params[:offer_date], class: "form-control form-control-sm", style: "width: 100%;" %>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
+              <%= f.label :status, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :status, options_for_select([["Tümü", ""]] + [["Hazırlanıyor", "taslak"], ["Süreç İşliyor", "surec_isliyor"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
+              <%= f.label :offer_type, "Tür", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :offer_type, options_for_select([["Tümü", ""]] + [["Standart", "standard"], ["Demonte", "demonte"], ["Montaj", "montaj"]], params[:offer_type]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
+              <%= f.label :scope, "Kapsam", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
+              <%= f.select :scope, options_for_select([["Aktif", "active"], ["Arşiv", "archived"], ["Tüm Kayıtlar", "all"]], @scope || params[:scope] || "active"), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+              <div class="d-flex gap-2 w-100">
+                <%= f.submit "FİLTRELE", class: "btn btn-sm btn-dark flex-fill" %>
+                <%= link_to "TEMİZLE", offers_standart_index_path(per_page: @per_page), class: "btn btn-sm btn-secondary flex-fill" %>
+                <%= f.hidden_field :per_page, value: @per_page %>
               </div>
             </div>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
       </div>
     </div>
-
+  </div>
   <div class="col-12">
     <div class="card shadow-sm">
       <div class="card-body p-0">
@@ -79,36 +77,36 @@
             <tbody>
               <% @offers.each do |offer| %>
                 <tr>
-                    <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
-                    <td class="text-secondary small"><%= offer["project"].to_s.presence || "-" %></td>
-                    <td><%= (@company_name_map || {})[offer["company_id"].to_s].to_s.presence || "-" %></td>
-                    <td><%= offer["offer_date"].to_s %></td>
-                    <td>
-                      <% type = offer["offer_type"].to_s.downcase %>
-                      <% case type %>
-                      <% when "standart", "standard" %>
-                        <span class="badge bg-light text-dark fw-normal border">Standart</span>
-                      <% when "demonte" %>
-                        <span class="badge bg-light text-primary fw-normal border">Demonte</span>
-                      <% when "montaj" %>
-                        <span class="badge bg-light text-success fw-normal border">Montaj</span>
-                      <% else %>
-                        <span class="badge bg-light text-secondary fw-normal border"><%= type.capitalize %></span>
-                      <% end %>
-                    </td>
-                    <td class="text-end fw-bold"><%= offer["gross_total"].to_s %></td>
+                  <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
+                  <td class="text-secondary small"><%= offer["project"].to_s.presence || "-" %></td>
+                  <td><%= (@company_name_map || {})[offer["company_id"].to_s].to_s.presence || "-" %></td>
+                  <td><%= offer["offer_date"].to_s %></td>
+                  <td>
+                    <% type = offer["offer_type"].to_s.downcase %>
+                    <% case type %>
+                    <% when "standart", "standard" %>
+                      <span class="text-dark fw-normal border">Standart</span>
+                    <% when "demonte" %>
+                      <span class="text-dark fw-normal border">Demonte</span>
+                    <% when "montaj" %>
+                      <span class="text-success fw-normal border">Montaj</span>
+                    <% else %>
+                      <span class="text-info fw-normal border"><%= type.capitalize %></span>
+                    <% end %>
+                  </td>
+                  <td class="text-end fw-bold"><%= offer["gross_total"].to_s %></td>
                   <td class="rt-col-center">
                     <% status = offer["status"].to_s.downcase %>
                     <% if offer["deleted_at"].present? %>
                       <span class="badge bg-danger text-white">ARŞİV</span>
                     <% elsif status == "taslak" %>
-                      <span class="badge bg-warning text-dark">HAZIRLANIYOR</span>
+                      <span class="text-warning">HAZIRLANIYOR</span>
                     <% elsif %w[surec_isliyor beklemede].include?(status) %>
-                      <span class="badge bg-primary text-white">SÜREÇ İŞLİYOR</span>
+                      <span class="text-info">SÜREÇ İŞLİYOR</span>
                     <% elsif status == "onaylandi" %>
-                      <span class="badge bg-success">ONAYLANDI</span>
+                      <span class="text-success">ONAYLANDI</span>
                     <% elsif status == "reddedildi" %>
-                      <span class="badge bg-danger">RED EDİLDİ</span>
+                      <span class="text-danger">RED EDİLDİ</span>
                     <% else %>
                       <span class="badge bg-info"><%= status.upcase %></span>
                     <% end %>
@@ -146,7 +144,6 @@
                   </td>
                 </tr>
               <% end %>
-
               <% if @offers.empty? %>
                 <tr>
                   <td colspan="6" class="text-center py-5">
@@ -163,7 +160,6 @@
       </div>
     </div>
   </div>
-
   <div class="col-12">
     <div class="card shadow-sm">
       <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -185,7 +181,6 @@
             <% else %>
               <span class="btn btn-outline-secondary opacity-50 disabled">Önceki</span>
             <% end %>
-
             <% if @has_next %>
               <%= link_to "Sonraki", offers_standart_index_path(request.query_parameters.merge(page: @page + 1, per_page: @per_page)), class: "btn btn-outline-secondary" %>
             <% else %>
