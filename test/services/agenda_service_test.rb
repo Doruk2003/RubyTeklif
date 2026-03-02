@@ -28,7 +28,7 @@ class AgendaServiceTest < ActiveSupport::TestCase
 
     assert_equal 1, events.size
     assert_equal "Toplanti", events.first[:title]
-    assert_equal "2026-03-09", events.first[:start]
+    assert_match(/\A2026-03-09T00:00:00/, events.first[:start].to_s)
     assert_equal "#22c55e", events.first[:color]
   end
 

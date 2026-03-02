@@ -20,12 +20,13 @@ module CalendarEvents
       service = CalendarEvents::Create.new(repository: repository)
 
       result = service.call(
-        form_payload: { event_date: "2026-03-01", title: "  Demo  ", description: "  Aciklama  ", color: "#22c55e" },
+        form_payload: { event_date: "2026-03-01", event_time: "09:30", title: "  Demo  ", description: "  Aciklama  ", color: "#22c55e" },
         user_id: "user-1"
       )
 
       assert_equal "evt-1", result["id"]
       assert_equal "2026-03-01", repository.payload[:event_date]
+      assert_match(/\A2026-03-01T09:30:00/, repository.payload[:start_at].to_s)
       assert_equal "Demo", repository.payload[:title]
       assert_equal "Aciklama", repository.payload[:description]
       assert_equal "user-1", repository.payload[:user_id]

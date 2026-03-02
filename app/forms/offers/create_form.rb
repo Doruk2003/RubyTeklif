@@ -18,7 +18,7 @@ module Offers
     validates :offer_number, presence: true, length: { maximum: 60 }
     validates :offer_date, presence: true
     validates :status, inclusion: { in: Offers::Status::ALLOWED }, allow_blank: true
-    validates :project, presence: true, length: { maximum: 50 }
+    validates :project, length: { maximum: 50 }, allow_blank: true
     validates :offer_type, presence: true
     validate :offer_date_must_be_parseable
     validate :items_must_be_present

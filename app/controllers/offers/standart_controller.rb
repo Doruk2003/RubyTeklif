@@ -10,6 +10,7 @@ class Offers::StandartController < ApplicationController
     @has_prev = result[:has_prev]
     @has_next = result[:has_next]
     @companies = Companies::OptionsQuery.new(client: supabase_user_client).call(active_only: false, user_id: current_user.id)
+    @company_name_map = Array(@companies).each_with_object({}) { |c, h| h[c["id"].to_s] = c["name"].to_s }
   rescue Supabase::Client::ConfigurationError
     @offers = []
     @scope = "active"
@@ -17,6 +18,7 @@ class Offers::StandartController < ApplicationController
     @per_page = 50
     @has_prev = false
     @has_next = false
+    @company_name_map = {}
   rescue ServiceErrors::System => e
     report_handled_error(e, source: "offers/standart#index", severity: :error)
     @offers = []
@@ -25,6 +27,7 @@ class Offers::StandartController < ApplicationController
     @per_page = 50
     @has_prev = false
     @has_next = false
+    @company_name_map = {}
     flash.now[:alert] = e.user_message
   end
 
@@ -86,7 +89,7 @@ class Offers::StandartController < ApplicationController
     @offer ||= {}
     @offer["id"] ||= ""
     @offer["company_id"] ||= params[:company_id].to_s
-    @offer["offer_number"] ||= "PRJ-#{Date.current.strftime('%Y%m%d')}-#{SecureRandom.hex(2).upcase}"
+    @offer["offer_number"] ||= "PRJ-#{Date.current.strftime('%Y%m%d')}-001"
     @offer["offer_date"] ||= Date.current.iso8601
     @offer["status"] ||= "taslak"
     @offer["project"] ||= params[:project].to_s
@@ -132,6 +135,23 @@ class Offers::StandartController < ApplicationController
     @company_name = "Yuklenemedi"
     render :new, status: :unprocessable_entity
   end
+
+  def sync_items
+    permitted = sync_items_params.to_h
+    offer_id = permitted["offer_id"].to_s
+    items = Array(permitted["items"]).map { |item| item.to_h.deep_symbolize_keys }
+
+    sync_result = standart_draft_flow.sync_draft_items!(offer_id: offer_id, items: items)
+    clear_offer_caches!
+
+    render json: { ok: true, items_count: sync_result[:items_count], saved_at: sync_result[:saved_at] }
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers/standart#sync_items")
+    render json: { ok: false, error: e.user_message }, status: :unprocessable_entity
+  rescue Supabase::Client::ConfigurationError
+    render json: { ok: false, error: "Taslak kaydi su anda kullanilamiyor." }, status: :service_unavailable
+  end
+
   private
 
   def offer_params
@@ -146,6 +166,10 @@ class Offers::StandartController < ApplicationController
       :product_category_id,
       items: %i[product_id description quantity unit_price discount_rate]
     )
+  end
+
+  def sync_items_params
+    params.permit(:offer_id, items: %i[product_id description quantity unit_price discount_rate])
   end
 
   def load_form_data(category_id:)
@@ -183,142 +207,23 @@ class Offers::StandartController < ApplicationController
   end
 
   def create_draft_offer!(company_id:, project:, offer_type:)
-    cid = company_id.to_s
-    raise ServiceErrors::Validation.new(user_message: "Musteri secimi zorunludur.") if cid.blank?
-
-    generated_offer_number = "PRJ-#{Date.current.strftime('%Y%m%d')}-#{SecureRandom.hex(2).upcase}"
-    payload = {
-      user_id: current_user.id,
-      company_id: cid,
-      offer_number: generated_offer_number,
-      offer_date: Date.current.iso8601,
-      status: "taslak",
-      net_total: 0,
-      vat_total: 0,
-      gross_total: 0,
-      project: project.to_s.strip.presence || "Belirtilmedi",
-      offer_type: offer_type.to_s.presence || "standard"
-    }
-
-    created = supabase_user_client.post("offers", body: payload, headers: { "Prefer" => "return=representation" })
-    draft_id = extract_inserted_offer_id(created)
-
-    # Some configurations allow insert but do not return inserted rows.
-    # Resolve the created draft id by querying with the generated offer number.
-    if draft_id.blank?
-      path = "offers?" \
-             "offer_number=eq.#{Supabase::FilterValue.eq(generated_offer_number)}&" \
-             "deleted_at=is.null&" \
-             "select=id&order=created_at.desc&limit=1"
-      rows = supabase_user_client.get(path)
-      fallback_row = rows.is_a?(Array) ? rows.first : nil
-      draft_id = fallback_row.is_a?(Hash) ? fallback_row["id"].to_s : ""
-    end
-
-    raise ServiceErrors::System.new(user_message: "Taslak teklif olusturulamadi.") if draft_id.blank?
-
-    draft_id
-  end
-
-  def extract_inserted_offer_id(created_payload)
-    return "" if created_payload.nil?
-
-    if created_payload.is_a?(Array)
-      row = created_payload.first
-      return row["id"].to_s if row.is_a?(Hash) && row["id"].present?
-    end
-
-    if created_payload.is_a?(Hash)
-      return created_payload["id"].to_s if created_payload["id"].present?
-
-      data = created_payload["data"]
-      if data.is_a?(Array)
-        row = data.first
-        return row["id"].to_s if row.is_a?(Hash) && row["id"].present?
-      elsif data.is_a?(Hash)
-        return data["id"].to_s if data["id"].present?
-      end
-    end
-
-    ""
+    standart_draft_flow.create_draft_offer!(company_id: company_id, project: project, offer_type: offer_type)
   end
 
   def load_offer_for_continue!(offer_id)
-    path = "offers?id=eq.#{Supabase::FilterValue.eq(offer_id)}" \
-           "&deleted_at=is.null" \
-           "&offer_items.deleted_at=is.null" \
-           "&select=id,company_id,offer_number,offer_date,status,project,offer_type,companies(name),offer_items(id,product_id,description,quantity,unit_price,discount_rate,line_total)"
-    rows = supabase_user_client.get(path)
-    row = rows.is_a?(Array) ? rows.first : nil
-    raise ServiceErrors::System.new(user_message: "Teklif bulunamadi.") unless row.is_a?(Hash)
-
-    @offer = {
-      "id" => row["id"].to_s,
-      "company_id" => row["company_id"].to_s,
-      "offer_number" => row["offer_number"].to_s,
-      "offer_date" => row["offer_date"].to_s,
-      "status" => row["status"].to_s.presence || "taslak",
-      "project" => row["project"].to_s,
-      "offer_type" => row["offer_type"].to_s.presence || "standard"
-    }
-    @company_name = row.dig("companies", "name").to_s.presence || "Bilinmeyen Musteri"
+    result = standart_draft_flow.load_offer_for_continue!(offer_id: offer_id)
+    @offer = result[:offer]
+    @company_name = result[:company_name]
   end
 
   def finalize_existing_offer!(offer_id:, payload:)
-    form = Offers::CreateForm.new(payload)
-    unless form.valid?
-      raise ServiceErrors::Validation.new(user_message: form.errors.full_messages.join(", "))
-    end
-
-    normalized = form.normalized_attributes
-    items = normalized.delete(:items)
-
-    repository = Offers::Repository.new(client: supabase_user_client)
-    product_map = repository.fetch_products(items.map { |i| i[:product_id] })
-    built_items = Offers::ItemBuilder.new(product_map).build(items)
-    raise ServiceErrors::Validation.new(user_message: "Kalemler gecersiz.") if built_items.empty?
-
-    totals = Offers::TotalsCalculator.new.call(built_items)
-    now_iso = Time.now.utc.iso8601
-
-    supabase_user_client.patch(
-      "offers?id=eq.#{Supabase::FilterValue.eq(offer_id)}&user_id=eq.#{Supabase::FilterValue.eq(current_user.id)}&deleted_at=is.null",
-      body: {
-        company_id: normalized[:company_id],
-        offer_number: normalized[:offer_number],
-        offer_date: normalized[:offer_date],
-        status: Offers::Status.normalize(normalized[:status]),
-        project: normalized[:project],
-        offer_type: normalized[:offer_type],
-        net_total: totals[:net_total].to_s,
-        vat_total: totals[:vat_total].to_s,
-        gross_total: totals[:gross_total].to_s,
-        updated_at: now_iso
-      },
-      headers: { "Prefer" => "return=representation" }
-    )
-
-    supabase_user_client.patch(
-      "offer_items?offer_id=eq.#{Supabase::FilterValue.eq(offer_id)}&user_id=eq.#{Supabase::FilterValue.eq(current_user.id)}&deleted_at=is.null",
-      body: { deleted_at: now_iso, updated_at: now_iso }
-    )
-
-    item_rows = built_items.map do |item|
-      {
-        user_id: current_user.id,
-        offer_id: offer_id,
-        product_id: item[:product_id],
-        description: item[:description],
-        quantity: item[:quantity].to_s,
-        unit_price: item[:unit_price].to_s,
-        discount_rate: item[:discount_rate].to_s,
-        line_total: item[:line_total].to_s
-      }
-    end
-    supabase_user_client.post("offer_items", body: item_rows, headers: { "Prefer" => "return=minimal" })
-
-    offer_id
+    standart_draft_flow.finalize_existing_offer!(offer_id: offer_id, payload: payload)
   end
+
+  def standart_draft_flow
+    @standart_draft_flow ||= Offers::StandartDraftFlow.new(client: supabase_user_client, user_id: current_user.id)
+  end
+
   def default_item
     { product_id: "", description: "", quantity: "1", unit_price: "", discount_rate: "0" }
   end

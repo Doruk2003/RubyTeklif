@@ -36,6 +36,9 @@ Rails.application.routes.draw do
   end
   namespace :offers do
     resources :standart do
+      collection do
+        post :sync_items
+      end
       member do
         patch :restore
       end

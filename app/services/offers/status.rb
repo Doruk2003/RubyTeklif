@@ -1,9 +1,10 @@
 module Offers
   module Status
-    ALLOWED = %w[surec_isliyor onaylandi reddedildi].freeze
+    ALLOWED = %w[taslak surec_isliyor onaylandi reddedildi].freeze
     LABELS = {
-      "surec_isliyor" => "Süreç İşliyor",
-      "onaylandi" => "Onaylandı",
+      "taslak" => "Hazirlaniyor",
+      "surec_isliyor" => "Surec Isliyor",
+      "onaylandi" => "Onaylandi",
       "reddedildi" => "Red Edildi"
     }.freeze
 

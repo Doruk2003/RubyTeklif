@@ -229,15 +229,28 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
 
   test "viewer cannot access offers index" do
     with_authenticated_context(role: Roles::VIEWER) do
-      get offers_path
+      get offers_standart_index_path
       assert_redirected_to root_path
+    end
+  end
+
+  class FakeStandartDraftFlow
+    attr_reader :calls
+
+    def initialize
+      @calls = []
+    end
+
+    def sync_draft_items!(offer_id:, items:)
+      @calls << { offer_id: offer_id, items: items }
+      { items_count: items.size, saved_at: Time.current.iso8601 }
     end
   end
 
   test "operator can access offers index" do
     with_authenticated_context(role: Roles::OPERATOR) do
       with_stubbed_constructor(Offers::IndexQuery, FakeOffersIndexQuery.new) do
-        get offers_path
+        get offers_standart_index_path
         assert_response :success
       end
     end
@@ -249,16 +262,17 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
 
     with_authenticated_context(role: Roles::OPERATOR) do
       with_stubbed_constructor(Sales::UseCases::Offers::Create, fake_use_case) do
-        post offers_path,
+        post offers_standart_index_path,
              params: {
                offer: {
                  company_id: "cmp-1",
-                 offer_number: "TK-1",
-                 offer_date: Date.current.iso8601,
-                 status: "taslak",
-                 items: []
-               }
-             }
+                  offer_number: "TK-1",
+                  offer_date: Date.current.iso8601,
+                  status: "taslak",
+                  project: "Belirtilmedi",
+                  items: []
+                }
+              }
         assert_response :unprocessable_entity
       end
     end
@@ -281,13 +295,37 @@ class OffersProductsFlowTest < ActionDispatch::IntegrationTest
   test "operator can archive and restore offer" do
     with_authenticated_context(role: Roles::OPERATOR) do
       with_stubbed_constructor(Sales::UseCases::Offers::Archive, FakeOffersArchiveUseCase.new) do
-        delete offer_path("off-1")
-        assert_redirected_to offers_path
+        delete offers_standart_path("off-1")
+        assert_redirected_to offers_standart_index_path
       end
 
       with_stubbed_constructor(Sales::UseCases::Offers::Restore, FakeOffersRestoreUseCase.new) do
-        patch restore_offer_path("off-1")
-        assert_redirected_to offers_path(scope: "archived")
+        patch restore_offers_standart_path("off-1")
+        assert_redirected_to offers_standart_index_path(scope: "archived")
+      end
+    end
+  end
+
+  test "operator can autosave draft offer items" do
+    fake_flow = FakeStandartDraftFlow.new
+
+    with_authenticated_context(role: Roles::OPERATOR) do
+      with_stubbed_constructor(Offers::StandartDraftFlow, fake_flow) do
+        post sync_items_offers_standart_index_path,
+             params: {
+               offer_id: "off-1",
+               items: [
+                 { product_id: "prd-1", description: "Kalem 1", quantity: "2", unit_price: "10", discount_rate: "0" }
+               ]
+             },
+             as: :json
+
+        assert_response :success
+        parsed = JSON.parse(response.body)
+        assert_equal true, parsed["ok"]
+        assert_equal 1, parsed["items_count"]
+        assert parsed["saved_at"].present?
+        assert_equal "off-1", fake_flow.calls.first[:offer_id]
       end
     end
   end

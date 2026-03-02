@@ -43,6 +43,7 @@ module Companies
         per_page: per_page(params),
         scope: normalized_scope(params),
         q: params[:q].to_s.strip,
+        tax_number: params[:tax_number].to_s.strip,
         city: params[:city].to_s.strip,
         country: params[:country].to_s.strip,
         phone: params[:phone].to_s.strip,
@@ -78,6 +79,9 @@ module Companies
         escaped = escape_like_value(q)
         query_parts << "or=(name.ilike.*#{escaped}*,authorized_person.ilike.*#{escaped}*,email.ilike.*#{escaped}*)"
       end
+
+      tax_number = params[:tax_number].to_s.strip
+      query_parts << "tax_number=ilike.*#{escape_like_value(tax_number)}*" if tax_number.present?
 
       city = params[:city].to_s.strip
       query_parts << "city=ilike.*#{escape_like_value(city)}*" if city.present?

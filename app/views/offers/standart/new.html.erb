@@ -1,63 +1,49 @@
-<div class="row g-3">
+﻿<div class="row g-3">
   <%# ======================== HEADER CARD ======================== %>
   <div class="col-12">
     <div class="card shadow-sm app-header-card">
       <div class="card-body p-4">
-        <!-- Üst Başlık ve Aksiyon Butonları -->
+        <!-- Ãœst BaÅŸlÄ±k ve Aksiyon ButonlarÄ± -->
         <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-4">
           <div>
             <h1 class="h4 mb-1 text-white">Teklif Poz Girişi</h1>
+            <div id="draftSaveStatus" class="small text-white-50">Taslak kaydı bekleniyor</div>
           </div>
           <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-            <%= list_nav_button(offers_standart_index_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
+            <%= list_nav_button(offers_standart_index_path, label: "Listeye DÃ¶n", class_name: "app-header-icon-btn") %>
             <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
           </div>
         </div>
-        <!-- Bilgi Çubuğu (İkinci karttan buraya taşındı) -->
-        <div class="row g-3 align-items-center">
-          <div class="col-12 col-sm-6 col-lg-3">
-            <div class="d-flex align-items-center gap-2">
-              <span class="material-symbols-outlined text-primary" style="font-size:20px;">tag</span>
-              <div>
-                <div class="fw-bold text-white" style="font-size:0.875rem;"><%= @offer["offer_number"].to_s %></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-lg-3">
-            <div class="d-flex align-items-center gap-2">
-              <span class="material-symbols-outlined text-success" style="font-size:20px;">business</span>
-              <div>
-                <div class="fw-semibold text-white" style="font-size:0.875rem;"><%= @company_name.to_s %></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-lg-3">
-            <div class="d-flex align-items-center gap-2">
-              <span class="material-symbols-outlined text-warning" style="font-size:20px;">folder</span>
-              <div>
-                <div class="fw-semibold text-white" style="font-size:0.875rem;"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-lg-3">
-            <div class="d-flex align-items-center gap-2">
-              <span class="material-symbols-outlined text-info" style="font-size:20px;">currency_exchange</span>
-              <div>
-                <div class="fw-semibold text-white" style="font-size:0.85rem;">
-                  <% if Array(@currencies).any? %>
-                    <%= Array(@currencies).map { |c| "#{c['code']} (#{c['symbol']})" }.join(" · ") %>
-                  <% else %>
-                    <span class="text-muted">Kur tanımlı değil</span>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          </div>
+        <% filtered_currencies = Array(@currencies).reject { |c| c["code"].to_s.casecmp("TRY").zero? || c["symbol"].to_s == "₺" } %>
+        <div class="d-flex flex-wrap align-items-center text-white" style="column-gap:0.6rem; row-gap:0.4rem; font-size:0.85rem;">
+          <span class="material-symbols-outlined text-light" style="font-size:18px;">military_tech</span>
+          <span class="material-symbols-outlined text-primary" style="font-size:18px;">tag</span>
+          <span class="fw-semibold"><%= @offer["offer_number"].to_s %></span>
+          <span class="text-white-50">|</span>
+          <span class="material-symbols-outlined text-success" style="font-size:18px;">business</span>
+          <span class="fw-semibold"><%= @company_name.to_s %></span>
+          <span class="text-white-50">|</span>
+          <span class="material-symbols-outlined text-warning" style="font-size:18px;">folder</span>
+          <span class="fw-semibold"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></span>
+          <span class="text-white-50">|</span>
+          <span class="material-symbols-outlined text-info" style="font-size:18px;">currency_exchange</span>
+          <span class="fw-semibold">
+            <% if filtered_currencies.any? %>
+              <%= filtered_currencies.map { |c|
+  symbol = c["symbol"].to_s.presence || c["code"].to_s
+  raw_rate = c["rate_to_try"].to_s
+  rate = raw_rate.present? ? sprintf("%.2f", raw_rate.to_f).sub(/\.00\z/, "") : "-"
+  "#{symbol} : #{rate}"
+}.join(" · ") %>
+            <% else %>
+              <span class="text-muted">Kur tanımlı değil</span>
+            <% end %>
+          </span>
         </div>
       </div>
     </div>
   </div>
-  <%# ======================== POZ LÄ°STESÄ° TABLOSU ======================== %>
+  <%# ======================== POZ LÃ„Â°STESÃ„Â° TABLOSU ======================== %>
   <div class="col-12">
     <div class="card shadow-sm">
       <div class="card-header bg-white border-bottom pt-4 px-4 pb-3">
@@ -79,7 +65,7 @@
               <span class="poz-th">#</span>
             </div>
             <div class="col-md-4">
-              <span class="poz-th">ÃœrÃ¼n</span>
+              <span class="poz-th">Ürün</span>
             </div>
             <div class="col-md-2 text-end">
               <span class="poz-th">Miktar</span>
@@ -88,15 +74,18 @@
               <span class="poz-th">Birim Fiyat</span>
             </div>
             <div class="col-md-1 text-end">
-              <span class="poz-th">Ä°sk. %</span>
+              <span class="poz-th">İskonto %</span>
             </div>
             <div class="col-md-2 text-end pe-2">
-              <span class="poz-th">Ä°ÅŸlem</span>
+              <span class="poz-th">Açıklama</span>
             </div>
           </div>
         </div>
         <%# Dynamic Poz List %>
-        <div id="pozListContainer" class="table-striped">
+        <div id="pozListContainer"
+             class="table-striped"
+             data-initial-pozs="<%= json_escape(Array(@offer["offer_items"]).to_json) %>"
+             data-sync-url="<%= sync_items_offers_standart_index_path %>">
           <%# Rows will be injected here by JS %>
         </div>
         <%# Empty State %>
@@ -108,7 +97,7 @@
   </div>
   <%# ======================== ALT BUTONLAR ======================== %>
   <div class="col-12">
-    <!-- d-flex yerine d-grid kullanarak elemanlarÄ± alt alta dizdik -->
+    <!-- d-flex yerine d-grid kullanarak elemanlarÃ„Â± alt alta dizdik -->
     <div class="d-grid gap-3" >
       <button type="button" class="btn btn-success py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 w-100" 
         style="letter-spacing:0.1em; font-size:0.9rem; height: 50px;" 
@@ -123,21 +112,21 @@
     </div>
   </div>
 </div>
-<%# ======================== POZ GÄ°RÄ°Å MODAL ======================== %>
+<%# ======================== POZ GÃ„Â°RÃ„Â°Ã…Â MODAL ======================== %>
 <div class="modal fade" id="pozEntryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
   <div class="modal-dialog poz-modal-dialog">
     <div class="modal-content" style="border:0.05em; border-radius:4px; box-shadow: 0 10px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);">
       <div class="modal-header py-3 px-4 btn btn-warning" style="border-bottom:none;">
         <h6 class="modal-title mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600; color:#fff;">
-          POZ GÄ°RÄ°ÅÄ°
+          POZ GÃœNCELLE
         </h6>
       </div>
       <div class="modal-body p-4">
         <div id="pozInlineMessage" class="alert alert-danger py-2 px-3 mb-3 d-none" role="alert"></div>
-        <%# TÃ¼m alanlar tek satÄ±rda %>
+        <%# TÃƒÂ¼m alanlar tek satÃ„Â±rda %>
         <div class="row g-2 align-items-end">
           <div class="col-12 col-md-5 col-lg-5">
-            <label class="poz-modal-label">ÃœrÃ¼n</label>
+            <label class="poz-modal-label">ÃœRÃœN</label>
             <div id="pozModalProductWrapper">
               <select class="form-select form-select-sm" id="pozProductSelect" data-search="true">
                 <% @products.each do |p| %>
@@ -159,7 +148,7 @@
             <input type="number" class="form-control form-control-sm" id="pozUnitPrice" step="0.01" placeholder="0.00">
           </div>
           <div class="col-6 col-md-1 col-lg-1">
-            <label class="poz-modal-label">Ä°sk. %</label>
+            <label class="poz-modal-label">iskonto</label>
             <input type="number" class="form-control form-control-sm" id="pozDiscount" value="0" step="0.01" min="0" max="100" placeholder="0">
           </div>
           <div class="col-6 col-md-3 col-lg-3">
@@ -191,588 +180,3 @@
   <%= f.hidden_field :product_category_id, value: @selected_category_id %>
   <div id="pozHiddenInputs"></div>
 <% end %>
-<style>
-  #pozEntryModal .poz-modal-dialog {
-    max-width: 96vw;
-    margin: 1rem auto 0;
-  }
-
-  #pozEntryModal.show::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.34);
-    -webkit-backdrop-filter: blur(1.8px);
-    backdrop-filter: blur(1.8px);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  #pozEntryModal .modal-dialog {
-    position: relative;
-    z-index: 1;
-  }
-
-  @media (min-width: 768px) {
-    #pozEntryModal .poz-modal-dialog {
-      max-width: 1230px;
-      margin-top: 6vh;
-    }
-  }
-
-  @media (min-width: 1200px) {
-    #pozEntryModal .poz-modal-dialog {
-      margin-top: 5vh;
-    }
-  }
-
-  /* Disable any backdrop blur on this page */
-  .modal-backdrop,
-  .app-confirm-overlay {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-  .modal-backdrop {
-    display: none !important;
-    opacity: 0 !important;
-    background: transparent !important;
-    pointer-events: none !important;
-  }
-
-  /* This page does not use the global offer type modal; force-hide it to avoid stale overlay state */
-  #offerTypeModal {
-    display: none !important;
-  }
-
-  /* Hard reset for this modal visual effects (no dim/blur/shadow layers) */
-  #pozEntryModal,
-  #pozEntryModal .modal-dialog {
-    background-color: transparent !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    filter: none !important;
-    box-shadow: none !important;
-  }
-  #pozEntryModal .modal-content {
-    background-color: #fff !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    filter: none !important;
-    box-shadow: none !important;
-    min-height: 310px;
-  }
-
-  #pozEntryModal .modal-backdrop { z-index: 9998 !important; }
-  #pozEntryModal { z-index: 9999 !important; }
-
-  .poz-th {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6c757d;
-  }
-
-  .poz-modal-label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 0.35rem;
-  }
-
-  .poz-list-row {
-    transition: background-color 200ms ease, opacity 200ms ease;
-  }
-  .poz-list-row:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-  }
-  .poz-list-row:last-child {
-    border-bottom: none !important;
-  }
-
-  @keyframes pozFadeIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .poz-list-row-new {
-    animation: pozFadeIn 300ms ease forwards;
-  }
-
-  @keyframes pozFlash {
-    0%   { background-color: rgba(0, 194, 146, 0.15); }
-    100% { background-color: transparent; }
-  }
-  .poz-list-row-flash {
-    animation: pozFlash 800ms ease forwards;
-  }
-
-  /* Success indicator in modal */
-  @keyframes pozSaved {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.1); }
-    100% { transform: scale(1); }
-  }
-  .poz-saved-pulse {
-    animation: pozSaved 300ms ease;
-  }
-
-  .poz-delete-btn {
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: #adb5bd;
-    transition: all 150ms ease;
-    cursor: pointer;
-  }
-  .poz-delete-btn:hover {
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.08);
-    border-color: rgba(220, 53, 69, 0.2);
-  }
-
-  .poz-edit-btn {
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: #0d6efd;
-    transition: all 150ms ease;
-    cursor: pointer;
-  }
-  .poz-edit-btn:hover {
-    color: #0a58ca;
-    background: rgba(13, 110, 253, 0.1);
-    border-color: rgba(13, 110, 253, 0.25);
-  }
-
-  #pozListContainer.table-striped .poz-list-row:nth-of-type(odd) {
-    background-color: var(--bs-table-striped-bg, rgba(0, 0, 0, 0.03));
-  }
-</style>
-<script>
-  (function() {
-    // â”€â”€ State â”€â”€
-    let pozList = [];
-    let pozModalInstance = null;
-    let customSelectInited = false;
-    let backdropObserver = null;
-    let editingPozId = null;
-
-    function showInlineMessage(message, type) {
-      const box = document.getElementById('pozInlineMessage');
-      if (!box) return;
-      const klass = (type === 'success') ? 'alert-success' : 'alert-danger';
-      box.classList.remove('d-none', 'alert-danger', 'alert-success');
-      box.classList.add(klass);
-      box.textContent = message;
-    }
-
-    function clearInlineMessage() {
-      const box = document.getElementById('pozInlineMessage');
-      if (!box) return;
-      box.classList.add('d-none');
-      box.textContent = '';
-    }
-
-    function ensureProductSelectionSynced() {
-      const productSelect = document.getElementById('pozProductSelect');
-      if (!productSelect || productSelect.value) return;
-
-      const wrapper = document.getElementById('pozModalProductWrapper');
-      if (!wrapper) return;
-
-      const active = wrapper.querySelector('.rt-custom-select-option.is-active[data-value]');
-      if (active && active.dataset.value) {
-        productSelect.value = active.dataset.value;
-        productSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        return;
-      }
-
-      const label = wrapper.querySelector('.rt-custom-select-label');
-      const labelText = label ? label.textContent.trim() : '';
-      if (!labelText || labelText === 'ÃœrÃ¼n SeÃ§in' || labelText === 'SeÃ§in') return;
-
-      const match = Array.from(productSelect.options).find(function(opt) {
-        const optionText = (opt.text || '').trim();
-        const optionName = (opt.dataset && opt.dataset.name ? opt.dataset.name : '').trim();
-        return optionText === labelText || optionName === labelText;
-      });
-
-      if (match) {
-        productSelect.value = match.value;
-        productSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    }
-
-    function setModalMode() {
-      const titleEl = document.querySelector('#pozEntryModal .modal-title');
-      const saveBtn = document.getElementById('btnPozSave');
-      if (editingPozId) {
-        if (titleEl) titleEl.textContent = 'POZ GUNCELLE';
-        if (saveBtn) saveBtn.textContent = 'Guncelle';
-      } else {
-        if (titleEl) titleEl.textContent = 'POZ GIRISI';
-        if (saveBtn) saveBtn.textContent = 'Kaydet';
-      }
-    }
-
-    function syncCustomSelectUI() {
-      const wrapper = document.getElementById('pozModalProductWrapper');
-      const select = document.getElementById('pozProductSelect');
-      if (!wrapper || !select) return;
-
-      const root = wrapper.querySelector('[data-rt-custom-select]');
-      const label = wrapper.querySelector('.rt-custom-select-label');
-      const selected = select.options[select.selectedIndex];
-      const hasValue = !!(selected && selected.value);
-
-      if (label) label.textContent = hasValue ? selected.text : 'Urun Secin';
-      if (root) {
-        root.classList.toggle('has-value', hasValue);
-        root.classList.toggle('is-empty', !hasValue);
-        root.querySelectorAll('.rt-custom-select-option').forEach(function(opt) {
-          const active = opt.dataset.value === select.value;
-          opt.classList.toggle('is-active', active);
-          opt.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-      }
-    }
-
-    function init() {
-      document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
-      document.body.classList.remove('modal-open');
-      document.body.style.removeProperty('padding-right');
-      document.body.style.removeProperty('overflow');
-      document.querySelectorAll('.offcanvas-backdrop').forEach(function(el) { el.remove(); });
-
-      const offerTypeModal = document.getElementById('offerTypeModal');
-      if (offerTypeModal) {
-        offerTypeModal.classList.remove('show');
-        offerTypeModal.setAttribute('aria-hidden', 'true');
-        offerTypeModal.style.display = 'none';
-      }
-
-      const modalEl = document.getElementById('pozEntryModal');
-      if (!modalEl) return;
-      if (modalEl.dataset.pozInit === '1') return;
-      modalEl.dataset.pozInit = '1';
-
-      pozModalInstance = new bootstrap.Modal(modalEl, { backdrop: false, keyboard: false });
-
-      if (!backdropObserver) {
-        backdropObserver = new MutationObserver(function() {
-          document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
-          document.body.classList.remove('modal-open');
-          document.body.style.removeProperty('padding-right');
-          document.body.style.removeProperty('overflow');
-        });
-        backdropObserver.observe(document.body, { childList: true, subtree: true });
-      }
-
-      // POZ button â†’ open modal
-      const btnOpen = document.getElementById('btnOpenPozModal');
-      if (btnOpen) {
-        btnOpen.addEventListener('click', function() {
-          editingPozId = null;
-          resetModalForm();
-          clearInlineMessage();
-          setModalMode();
-          pozModalInstance.show();
-
-          // Init custom select once
-          if (!customSelectInited && window.rtCustomSelect) {
-            setTimeout(function() {
-              window.rtCustomSelect.initCustomSelects(document.getElementById('pozModalProductWrapper'));
-              customSelectInited = true;
-            }, 100);
-          }
-        });
-      }
-
-      // Auto-fill unit price when product is selected
-      const productSelect = document.getElementById('pozProductSelect');
-      if (productSelect) {
-        productSelect.addEventListener('change', function() {
-          clearInlineMessage();
-          const selectedOpt = this.options[this.selectedIndex];
-          if (selectedOpt && selectedOpt.dataset.price) {
-            const price = parseFloat(selectedOpt.dataset.price);
-            if (!isNaN(price) && price > 0) {
-              document.getElementById('pozUnitPrice').value = price;
-            }
-          }
-        });
-      }
-
-      // KAYDET button
-      const btnSave = document.getElementById('btnPozSave');
-      if (btnSave) {
-        btnSave.addEventListener('click', function() {
-          ensureProductSelectionSynced();
-          savePoz();
-        });
-      }
-
-      // Ä°PTAL button â†’ close modal
-      const btnCancel = document.getElementById('btnPozCancel');
-      if (btnCancel) {
-        btnCancel.addEventListener('click', function() {
-          pozModalInstance.hide();
-        });
-      }
-
-      // HESAPLA button
-      const btnHesapla = document.getElementById('btnHesapla');
-      if (btnHesapla) {
-        btnHesapla.addEventListener('click', function() {
-        if (pozList.length === 0) {
-          resetModalForm();
-          clearInlineMessage();
-          showInlineMessage('Lutfen en az bir poz ekleyin.', 'danger');
-          pozModalInstance.show();
-          return;
-        }
-          buildHiddenInputs();
-          document.getElementById('pozMainForm').requestSubmit();
-        });
-      }
-
-      // Enter key in modal â†’ save
-      modalEl.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          savePoz();
-        }
-      });
-
-      renderList();
-    }
-
-    // â”€â”€ Save Poz â”€â”€
-    function savePoz() {
-      const productSelect = document.getElementById('pozProductSelect');
-      ensureProductSelectionSynced();
-      const productId = productSelect.value;
-      const wasEditing = !!editingPozId;
-
-      if (!productId) {
-        showInlineMessage('Lutfen bir urun secin.', 'danger');
-        return;
-      }
-
-      const selectedOpt = productSelect.options[productSelect.selectedIndex];
-      const productName = selectedOpt.dataset.name || selectedOpt.text;
-      const quantity = parseFloat(document.getElementById('pozQuantity').value) || 1;
-      const unitPrice = parseFloat(document.getElementById('pozUnitPrice').value) || 0;
-      const discount = parseFloat(document.getElementById('pozDiscount').value) || 0;
-      const description = document.getElementById('pozDescription').value.trim();
-
-      const poz = {
-        id: editingPozId || (Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
-        product_id: productId,
-        product_name: productName,
-        quantity: quantity,
-        unit_price: unitPrice,
-        discount_rate: discount,
-        description: description
-      };
-
-      if (editingPozId) {
-        const idx = pozList.findIndex(function(p) { return p.id === editingPozId; });
-        if (idx >= 0) {
-          pozList[idx] = poz;
-        } else {
-          pozList.push(poz);
-        }
-      } else {
-        pozList.push(poz);
-      }
-      editingPozId = null;
-      setModalMode();
-      renderList();
-      clearInlineMessage();
-      resetModalForm();
-
-      if (wasEditing && pozModalInstance) {
-        pozModalInstance.hide();
-      }
-
-      // Focus product select for next entry
-      setTimeout(function() {
-        const searchInput = document.querySelector('#pozModalProductWrapper .rt-custom-select-search');
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }, 100);
-    }
-
-    // â”€â”€ Reset Modal â”€â”€
-    function resetModalForm() {
-      const productSelect = document.getElementById('pozProductSelect');
-      productSelect.value = '';
-      productSelect.dispatchEvent(new Event('change', { bubbles: true }));
-
-      document.getElementById('pozQuantity').value = '1';
-      document.getElementById('pozUnitPrice').value = '';
-      document.getElementById('pozDiscount').value = '0';
-      document.getElementById('pozDescription').value = '';
-
-      // Reset custom select display
-      const wrapper = document.getElementById('pozModalProductWrapper');
-      if (wrapper) {
-        const label = wrapper.querySelector('.rt-custom-select-label');
-        if (label) label.textContent = 'ÃœrÃ¼n SeÃ§in';
-        const root = wrapper.querySelector('[data-rt-custom-select]');
-        if (root) {
-          root.classList.remove('has-value');
-          root.classList.add('is-empty');
-          root.querySelectorAll('.rt-custom-select-option').forEach(function(opt) {
-            opt.classList.remove('is-active');
-            opt.setAttribute('aria-selected', 'false');
-          });
-        }
-        const search = wrapper.querySelector('.rt-custom-select-search');
-        if (search) search.value = '';
-      }
-      syncCustomSelectUI();
-    }
-
-    // â”€â”€ Render List â”€â”€
-    function renderList() {
-      const container = document.getElementById('pozListContainer');
-      const emptyState = document.getElementById('pozEmptyState');
-      const counter = document.getElementById('pozCounter');
-
-      if (counter) counter.textContent = pozList.length + ' Poz';
-
-      if (pozList.length === 0) {
-        container.innerHTML = '';
-        if (emptyState) emptyState.style.display = '';
-        return;
-      }
-
-      if (emptyState) emptyState.style.display = 'none';
-
-      const isAppending = container.children.length < pozList.length;
-
-      let html = '';
-      pozList.forEach(function(poz, i) {
-        const isNew = isAppending && i === pozList.length - 1;
-        html += '<div class="poz-list-row border-bottom px-4 py-3' + (isNew ? ' poz-list-row-new poz-list-row-flash' : '') + '" data-poz-id="' + poz.id + '">';
-        html += '  <div class="row g-2 align-items-center">';
-        html += '    <div class="col-md-1 text-center d-none d-md-block">';
-        html += '      <span class="badge bg-light text-dark border fw-bold" style="font-size:0.8rem; min-width:28px;">' + (i + 1) + '</span>';
-        html += '    </div>';
-        html += '    <div class="col-12 col-md-4">';
-        html += '      <div class="fw-semibold text-dark" style="font-size:0.85rem;">' + escapeHtml(poz.product_name) + '</div>';
-        if (poz.description) {
-          html += '      <div class="text-muted" style="font-size:0.75rem;">' + escapeHtml(poz.description) + '</div>';
-        }
-        html += '    </div>';
-        html += '    <div class="col-4 col-md-2 text-end">';
-        html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.quantity) + '</span>';
-        html += '    </div>';
-        html += '    <div class="col-4 col-md-2 text-end">';
-        html += '      <span class="fw-semibold" style="font-size:0.85rem;">' + formatNumber(poz.unit_price) + '</span>';
-        html += '    </div>';
-        html += '    <div class="col-2 col-md-1 text-end">';
-        if (poz.discount_rate > 0) {
-          html += '      <span class="text-danger fw-semibold" style="font-size:0.85rem;">%' + formatNumber(poz.discount_rate) + '</span>';
-        } else {
-          html += '      <span class="text-muted" style="font-size:0.85rem;">-</span>';
-        }
-        html += '    </div>';
-        html += '    <div class="col-2 col-md-2 text-end d-flex justify-content-end align-items-center gap-1">';
-        html += '      <button type="button" class="poz-edit-btn" onclick="window.__pozEdit(\'' + poz.id + '\')" title="Duzenle">';
-        html += '        <span class="material-symbols-outlined" style="font-size:18px;">edit</span>';
-        html += '      </button>';
-        html += '      <button type="button" class="poz-delete-btn" onclick="window.__pozDelete(\'' + poz.id + '\')" title="Sil">';
-        html += '        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>';
-        html += '      </button>';
-        html += '    </div>';
-        html += '  </div>';
-        html += '</div>';
-      });
-
-      container.innerHTML = html;
-    }
-
-    // â”€â”€ Delete Poz â”€â”€
-    window.__pozDelete = function(id) {
-      pozList = pozList.filter(function(p) { return p.id !== id; });
-      if (editingPozId === id) {
-        editingPozId = null;
-        setModalMode();
-      }
-      renderList();
-    };
-
-    window.__pozEdit = function(id) {
-      const poz = pozList.find(function(p) { return p.id === id; });
-      if (!poz) return;
-
-      editingPozId = id;
-      setModalMode();
-      clearInlineMessage();
-
-      const productSelect = document.getElementById('pozProductSelect');
-      if (productSelect) {
-        productSelect.value = poz.product_id;
-        productSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-      document.getElementById('pozQuantity').value = poz.quantity;
-      document.getElementById('pozUnitPrice').value = poz.unit_price;
-      document.getElementById('pozDiscount').value = poz.discount_rate;
-      document.getElementById('pozDescription').value = poz.description || '';
-      syncCustomSelectUI();
-      pozModalInstance.show();
-    };
-
-    // â”€â”€ Build hidden inputs for form submit â”€â”€
-    function buildHiddenInputs() {
-      const container = document.getElementById('pozHiddenInputs');
-      container.innerHTML = '';
-      pozList.forEach(function(poz) {
-        container.innerHTML +=
-          '<input type="hidden" name="offer[items][][product_id]" value="' + poz.product_id + '">' +
-          '<input type="hidden" name="offer[items][][quantity]" value="' + poz.quantity + '">' +
-          '<input type="hidden" name="offer[items][][unit_price]" value="' + poz.unit_price + '">' +
-          '<input type="hidden" name="offer[items][][discount_rate]" value="' + poz.discount_rate + '">' +
-          '<input type="hidden" name="offer[items][][description]" value="' + escapeHtml(poz.description) + '">';
-      });
-    }
-
-    // â”€â”€ Helpers â”€â”€
-    function escapeHtml(str) {
-      if (!str) return '';
-      var div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function formatNumber(n) {
-      if (n === null || n === undefined || n === '') return '-';
-      var num = parseFloat(n);
-      if (isNaN(num)) return '-';
-      return num % 1 === 0 ? num.toString() : num.toFixed(2);
-    }
-
-    // â”€â”€ Init â”€â”€
-    document.addEventListener('turbo:load', init);
-    if (document.readyState !== 'loading') init();
-  })();
-</script>

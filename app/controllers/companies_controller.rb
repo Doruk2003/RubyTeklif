@@ -97,7 +97,7 @@
   def restore
     Catalog::UseCases::Companies::Restore.new(client: client).call(id: params[:id], actor_id: current_user.id)
     clear_companies_cache!
-    redirect_to companies_path(scope: "active"), notice: "Müşteri geri yüklendi."
+    redirect_to companies_path(scope: "archived"), notice: "Müşteri geri yüklendi."
   rescue ServiceErrors::Base => e
     report_handled_error(e, source: "companies#restore")
     redirect_to companies_path(scope: "archived"), alert: "Müşteri geri yüklenemedi: #{e.user_message}"

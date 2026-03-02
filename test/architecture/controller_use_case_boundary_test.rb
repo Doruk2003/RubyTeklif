@@ -6,7 +6,7 @@ class ControllerUseCaseBoundaryTest < ActiveSupport::TestCase
     "app/controllers/products_controller.rb" => /Catalog::UseCases::Products::/,
     "app/controllers/currencies_controller.rb" => /Catalog::UseCases::Currencies::/,
     "app/controllers/categories_controller.rb" => /Catalog::UseCases::Categories::/,
-    "app/controllers/offers_controller.rb" => /Sales::UseCases::Offers::/
+    "app/controllers/offers/standart_controller.rb" => /Sales::UseCases::Offers::/
   }.freeze
 
   DISALLOWED_DIRECT_SERVICE_PATTERNS = [

@@ -78,23 +78,3 @@
   </div>
 </section>
 
-<script>
-  document.addEventListener("turbo:load", function () {
-    var button = document.getElementById("toggle-password");
-    var input = document.getElementById("login-password");
-    var openIcon = document.getElementById("eye-open");
-    var closedIcon = document.getElementById("eye-closed");
-    if (!button || !input || !openIcon || !closedIcon) return;
-    if (button.dataset.bound === "1") return;
-    button.dataset.bound = "1";
-
-    button.addEventListener("click", function () {
-      var isPassword = input.type === "password";
-      input.type = isPassword ? "text" : "password";
-      button.setAttribute("aria-pressed", isPassword ? "true" : "false");
-      button.setAttribute("aria-label", isPassword ? "Şifreyi gizle" : "Şifreyi göster");
-      openIcon.classList.toggle("hidden", isPassword);
-      closedIcon.classList.toggle("hidden", !isPassword);
-    });
-  });
-</script>

@@ -9,7 +9,7 @@ module Currencies
 
       filters = []
       filters << "active=eq.true" if active_only
-      path = "currencies?deleted_at=is.null&select=id,code,name,symbol,active&order=code.asc"
+      path = "currencies?deleted_at=is.null&select=id,code,name,symbol,rate_to_try,active&order=code.asc"
       path = "#{path}&#{filters.join('&')}" if filters.any?
 
       cache_key = "currencies/options/v1/user:#{user_id}/active:#{active_only ? 1 : 0}"

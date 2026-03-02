@@ -8,8 +8,8 @@
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
           <%= filter_panel_toggle_button(class_name: "app-header-icon-btn") %>
-          <a href="#" class="btn app-header-icon-btn d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#offerTypeModal" title="Yeni Teklif" data-offer-flow="full" data-offer-type="standart">
-            <span class="material-symbols-outlined fs-5" data-offer-flow="full" data-offer-type="standart">add</span>
+          <a href="#" class="btn app-header-icon-btn d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#offerTypeModal" title="Yeni Teklif" data-offer-type="standart">
+            <span class="material-symbols-outlined fs-5" data-offer-type="standart">add</span>
           </a>
           <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
         </div>
@@ -36,7 +36,7 @@
               </div>
               <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :status, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-                <%= f.select :status, options_for_select([["Tümü", ""]] + [["Süreç İşliyor", "surec_isliyor"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+                <%= f.select :status, options_for_select([["Tümü", ""]] + [["Hazırlanıyor", "taslak"], ["Süreç İşliyor", "surec_isliyor"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
               </div>
               <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <%= f.label :offer_type, "Tür", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
@@ -63,7 +63,7 @@
     <div class="card shadow-sm">
       <div class="card-body p-0">
         <%= app_table_wrapper(class_name: "rt-offers-table-wrap") do %>
-          <table class="table table-hover align-middle mb-0 rt-table rt-pipeline-table">
+          <table class="table table-striped table-hover align-middle mb-0 rt-table rt-pipeline-table">
             <thead>
               <tr>
                 <th>Teklif No</th>
@@ -81,7 +81,7 @@
                 <tr>
                     <td class="fw-semibold"><%= offer["offer_number"].to_s %></td>
                     <td class="text-secondary small"><%= offer["project"].to_s.presence || "-" %></td>
-                    <td><%= offer.dig("companies", "name").to_s.presence || "-" %></td>
+                    <td><%= (@company_name_map || {})[offer["company_id"].to_s].to_s.presence || "-" %></td>
                     <td><%= offer["offer_date"].to_s %></td>
                     <td>
                       <% type = offer["offer_type"].to_s.downcase %>
@@ -101,7 +101,9 @@
                     <% status = offer["status"].to_s.downcase %>
                     <% if offer["deleted_at"].present? %>
                       <span class="badge bg-danger text-white">ARŞİV</span>
-                    <% elsif %w[surec_isliyor taslak beklemede].include?(status) %>
+                    <% elsif status == "taslak" %>
+                      <span class="badge bg-warning text-dark">HAZIRLANIYOR</span>
+                    <% elsif %w[surec_isliyor beklemede].include?(status) %>
                       <span class="badge bg-primary text-white">SÜREÇ İŞLİYOR</span>
                     <% elsif status == "onaylandi" %>
                       <span class="badge bg-success">ONAYLANDI</span>
@@ -195,39 +197,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener("turbo:load", function () {
-    var tableWrap = document.querySelector(".rt-offers-table-wrap");
-    if (!tableWrap) return;
-    if (tableWrap.dataset.menuInit === "1") return;
-    tableWrap.dataset.menuInit = "1";
-
-    var actionMenus = function () {
-      return Array.from(tableWrap.querySelectorAll("details.rt-action-details"));
-    };
-
-    tableWrap.addEventListener("click", function (event) {
-      var clickedMenu = event.target.closest("details.rt-action-details");
-      var clickedSummary = event.target.closest("details.rt-action-details > summary");
-
-      if (!clickedMenu) {
-        actionMenus().forEach(function (menu) { menu.open = false; });
-        return;
-      }
-
-      if (clickedSummary) {
-        actionMenus().forEach(function (menu) {
-          if (menu !== clickedMenu) menu.open = false;
-        });
-      }
-    });
-
-    document.addEventListener("click", function (event) {
-      if (tableWrap.contains(event.target)) return;
-      actionMenus().forEach(function (menu) { menu.open = false; });
-    });
-  });
-</script>
-
-

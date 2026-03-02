@@ -1,281 +1,43 @@
-<style>
-  #offerTypeModal {
-    background: rgba(0, 0, 0, 0.45) !important;
-    z-index: 9999 !important;
-  }
-  #offerTypeModal .modal-dialog {
-    max-width: 600px !important;
-    margin: 1.75rem auto;
-  }
-  #offerTypeModal .modal-content {
-    border: none !important;
-    border-radius: 4px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
-    overflow: hidden;
-  }
-  #offerTypeModal .modal-header {
-    background: #f8f9fa !important;
-    border-bottom: 1px solid #dee2e6 !important;
-    padding: 0.75rem 1.25rem !important;
-  }
-  #offerTypeModal .modal-title {
-    font-size: 1.1rem !important;
-    font-weight: 600 !important;
-    color: #495057 !important;
-    text-transform: capitalize;
-  }
-  #offerTypeModal .modal-body {
-    padding: 1.5rem 1.25rem !important;
-  }
-  #offerTypeModal .step-label {
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    color: #6c757d !important;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-  #offerTypeModal .form-control, #offerTypeModal .form-select {
-    border-radius: 4px !important;
-    border: 1px solid #ced4da !important;
-    padding: 0.6rem 0.75rem !important;
-  }
-  #offerTypeModal .btn-continue {
-    background-color: #00c292 !important;
-    border-color: #00c292 !important;
-    color: #fff !important;
-  }
-  #offerTypeModal .btn-close-modal {
-    background-color: #f46a4e !important;
-    border-color: #f46a4e !important;
-    color: #fff !important;
-  }
-  #offerTypeModal .hidden-step {
-    display: none !important;
-  }
-</style>
 <div class="modal fade" id="offerTypeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header d-flex align-items-center justify-content-between">
-        <h5 class="modal-title mb-0">İşlemler</h5>
+        <h5 class="modal-title mb-0">Islemler</h5>
       </div>
       <div class="modal-body">
-        <!-- Step 1: Offer Type -->
-        <div id="offerStep1">
-          <label class="step-label">Teklif Türü</label>
-          <div class="mb-4">
-            <select class="form-select" id="offerTypeSelect">
-              <option value="standart">Standard Teklif</option>
-              <option value="demonte">Demonte Teklif</option>
-              <option value="montaj">Montaj Teklif</option>
+        <div id="offerTypeInlineMessage" class="alert alert-danger py-2 px-3 mb-3 d-none" role="alert"></div>
+
+        <div class="mb-3">
+          <label class="step-label">Teklif Turu</label>
+          <select class="form-select" id="offerTypeSelect">
+            <option value="standart">Standard Teklif</option>
+            <option value="demonte">Demonte Teklif</option>
+            <option value="montaj">Montaj Teklif</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="step-label">Musteri</label>
+          <div id="customerSelectWrapper">
+            <select class="form-select" id="modalCustomerSelect" data-search="true" data-search-url="/companies/options">
             </select>
           </div>
-          <div class="d-flex gap-2">
-            <button type="button" class="btn btn-danger flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
-              Kapat
-            </button>
-            <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" id="toStep2">
-              Devam Et
-            </button>
-          </div>
         </div>
-        <!-- Step 2: Customer & Project -->
-        <div id="offerStep2" class="hidden-step">
-          <div id="offerTypeInlineMessage" class="alert alert-danger py-2 px-3 mb-3 d-none" role="alert"></div>
-          <div class="mb-3">
-            <label class="step-label">Müşteri</label>
-            <div id="customerSelectWrapper">
-              <select class="form-select" id="modalCustomerSelect" data-search="true" data-search-url="/companies/options">
-              </select>
-            </div>
-          </div>
-          <div class="mb-4">
-            <label class="step-label">Proje</label>
-            <input type="text" class="form-control" id="modalProjectInput" placeholder="Proje Adı Giriniz">
-          </div>
-          <div class="d-flex gap-2">
-            <button type="button" class="btn btn-danger flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
-              Kapat
-            </button>
-            <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" id="confirmOfferCreation">
-              Seç ve Devam Et
-            </button>
-          </div>
+
+        <div class="mb-4">
+          <label class="step-label">Proje</label>
+          <input type="text" class="form-control" id="modalProjectInput" placeholder="Proje Adi Giriniz">
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-danger flex-fill fw-bold py-2 text-uppercase" data-bs-dismiss="modal">
+            Kapat
+          </button>
+          <button type="button" class="btn btn-primary flex-fill fw-bold py-2 text-uppercase" id="confirmOfferCreation">
+            Sec ve Devam Et
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
-<script>
-  (function() {
-    let customerSelectInitialized = false;
-    let currentFlow = "type_only";
-
-    function showOfferTypeMessage(message, type = "danger") {
-      const box = document.getElementById("offerTypeInlineMessage");
-      if (!box) return;
-      box.classList.remove("d-none", "alert-danger", "alert-success");
-      box.classList.add(type === "success" ? "alert-success" : "alert-danger");
-      box.textContent = message;
-    }
-
-    function clearOfferTypeMessage() {
-      const box = document.getElementById("offerTypeInlineMessage");
-      if (!box) return;
-      box.classList.add("d-none");
-      box.textContent = "";
-    }
-
-    function ensureCustomerSelectionSynced() {
-      const customerSelect = document.getElementById("modalCustomerSelect");
-      if (!customerSelect || customerSelect.value) return;
-
-      const wrapper = document.getElementById("customerSelectWrapper");
-      if (!wrapper) return;
-
-      const active = wrapper.querySelector(".rt-custom-select-option.is-active[data-value]");
-      if (active && active.dataset.value) {
-        customerSelect.value = active.dataset.value;
-        customerSelect.dispatchEvent(new Event("change", { bubbles: true }));
-        return;
-      }
-
-      const label = wrapper.querySelector(".rt-custom-select-label");
-      const labelText = label ? label.textContent.trim() : "";
-      if (!labelText || labelText === "Seçin") return;
-
-      const match = Array.from(customerSelect.options).find((opt) => (opt.text || "").trim() === labelText);
-      if (match) {
-        customerSelect.value = match.value;
-        customerSelect.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-    }
-
-    function cleanupModalArtifacts() {
-      document.querySelectorAll(".modal-backdrop").forEach((el) => el.remove());
-      document.body.classList.remove("modal-open");
-      document.body.style.removeProperty("padding-right");
-      document.body.style.removeProperty("overflow");
-    }
-
-    function closeAndVisit(modalEl, url) {
-      const modal = bootstrap.Modal.getInstance(modalEl);
-      if (modal) {
-        modal.hide();
-      }
-      cleanupModalArtifacts();
-      window.location.assign(url);
-    }
-
-    function offerBasePath(type) {
-      return (type === "standart") ? "/offers/standart" : `/offers/${type}`;
-    }
-
-    function initCustomerSelectOnce() {
-      if (customerSelectInitialized) return;
-      if (window.rtCustomSelect) {
-        window.rtCustomSelect.initCustomSelects(document.getElementById("customerSelectWrapper"));
-      }
-      customerSelectInitialized = true;
-    }
-
-    function initOfferModalLogic() {
-      const modalEl = document.getElementById("offerTypeModal");
-      if (!modalEl || modalEl.dataset.logicInit === "1") return;
-      modalEl.dataset.logicInit = "1";
-
-      const step1 = document.getElementById("offerStep1");
-      const step2 = document.getElementById("offerStep2");
-      const typeSelect = document.getElementById("offerTypeSelect");
-      const projectInput = document.getElementById("modalProjectInput");
-      const toStep2Btn = document.getElementById("toStep2");
-      const confirmBtn = document.getElementById("confirmOfferCreation");
-      const customerSelect = document.getElementById("modalCustomerSelect");
-
-      modalEl.addEventListener("show.bs.modal", (event) => {
-        const trigger = event.relatedTarget;
-        const triggerSource = (trigger && trigger.closest)
-          ? trigger.closest("[data-offer-flow], [data-offer-type], [data-offer_flow], [data-offer_type]")
-          : null;
-        const activeSource = (document.activeElement && document.activeElement.closest)
-          ? document.activeElement.closest("[data-offer-flow], [data-offer-type], [data-offer_flow], [data-offer_type]")
-          : null;
-        const source = triggerSource || activeSource || trigger;
-        const sourceData = source && source.dataset ? source.dataset : {};
-        const flowFromTrigger = sourceData.offerFlow || sourceData.offer_flow || "";
-        const offerTypeFromTrigger = sourceData.offerType || sourceData.offer_type || "";
-        const onStandartIndex = /^\/offers\/standart\/?$/.test(window.location.pathname);
-
-        if (flowFromTrigger === "full" || flowFromTrigger === "type_only") {
-          currentFlow = flowFromTrigger;
-        } else {
-          currentFlow = onStandartIndex ? "full" : "type_only";
-        }
-        modalEl.dataset.flow = currentFlow;
-
-        if (offerTypeFromTrigger) {
-          typeSelect.value = offerTypeFromTrigger;
-        }
-
-        projectInput.value = "";
-        clearOfferTypeMessage();
-
-        if (currentFlow === "full") {
-          step1.classList.add("hidden-step");
-          step2.classList.remove("hidden-step");
-          initCustomerSelectOnce();
-          return;
-        }
-
-        step1.classList.remove("hidden-step");
-        step2.classList.add("hidden-step");
-      });
-
-      if (toStep2Btn) {
-        toStep2Btn.addEventListener("click", () => {
-          const type = typeSelect.value;
-          const basePath = offerBasePath(type);
-
-          if (currentFlow === "type_only") {
-            closeAndVisit(modalEl, basePath);
-            return;
-          }
-
-          step1.classList.add("hidden-step");
-          step2.classList.remove("hidden-step");
-          initCustomerSelectOnce();
-        });
-      }
-
-      if (confirmBtn) {
-        confirmBtn.addEventListener("click", () => {
-          const type = typeSelect.value;
-          ensureCustomerSelectionSynced();
-          const customerId = customerSelect.value;
-          const project = projectInput.value;
-
-          if (!customerId) {
-            showOfferTypeMessage("Lutfen bir musteri secin.");
-            return;
-          }
-
-          const basePath = offerBasePath(type);
-          const url = `${basePath}/new?company_id=${customerId}&project=${encodeURIComponent(project)}`;
-          closeAndVisit(modalEl, url);
-        });
-      }
-
-      if (customerSelect) {
-        customerSelect.addEventListener("change", clearOfferTypeMessage);
-      }
-      if (projectInput) {
-        projectInput.addEventListener("input", clearOfferTypeMessage);
-      }
-    }
-
-    document.addEventListener("turbo:load", initOfferModalLogic);
-    if (document.readyState !== "loading") initOfferModalLogic();
-  })();
-</script>

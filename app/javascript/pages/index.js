@@ -1,0 +1,6 @@
+import "pages/offer_type_modal"
+import "pages/offers_standart_new"
+import "pages/action_details_menus"
+import "pages/sessions_new"
+import "pages/agenda"
+import "pages/products_form"
