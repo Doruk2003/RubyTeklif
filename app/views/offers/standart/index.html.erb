@@ -100,7 +100,7 @@
                     <% if offer["deleted_at"].present? %>
                       <span class="badge bg-danger text-white">ARŞİV</span>
                     <% elsif status == "taslak" %>
-                      <span class="text-warning">HAZIRLANIYOR</span>
+                      <span class="text-warning fw-bold">HAZIRLANIYOR</span>
                     <% elsif %w[surec_isliyor beklemede].include?(status) %>
                       <span class="text-info">SÜREÇ İŞLİYOR</span>
                     <% elsif status == "onaylandi" %>
