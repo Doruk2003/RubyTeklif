@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   namespace :offers do
     resources :standart do
       collection do
+        post :calculate
         post :sync_items
       end
       member do

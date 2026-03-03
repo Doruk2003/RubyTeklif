@@ -3504,3 +3504,26 @@ body:has(#pozEntryModal) #offerTypeModal {
 #pozListContainer.table-striped .poz-list-row:nth-of-type(odd) {
   background-color: var(--bs-table-striped-bg, rgba(0, 0, 0, 0.03));
 }
+
+/* From offers/standart/calculate.html.erb */
+.rt-calc-head {
+  background-color: #ef6344;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.95rem 1rem;
+  border-bottom: 0;
+}
+
+.rt-calc-table-head {
+  background-color: #f2f2f2;
+  color: #212529;
+  font-size: 0.9rem;
+}
+
+.rt-calc-summary {
+  background-color: #ef6344;
+  color: #fff;
+  border-top: 0;
+  padding: 0.95rem 1rem;
+}

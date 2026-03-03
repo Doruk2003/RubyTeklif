@@ -118,7 +118,7 @@ class Offers::StandartDraftFlow
     offer_id
   end
 
-  def sync_draft_items!(offer_id:, items:)
+  def sync_draft_items!(offer_id:, items:, update_offer_totals: false)
     oid = offer_id.to_s
     raise ServiceErrors::Validation.new(user_message: "Teklif secimi zorunludur.") if oid.blank?
     ensure_offer_owned!(offer_id: oid)
@@ -127,7 +127,6 @@ class Offers::StandartDraftFlow
     repository = Offers::Repository.new(client: @client)
     product_map = repository.fetch_products(normalized_items.map { |i| i[:product_id] })
     built_items = Offers::ItemBuilder.new(product_map).build(normalized_items)
-    totals = Offers::TotalsCalculator.new.call(built_items)
     now_iso = Time.now.utc.iso8601
 
     @client.patch(
@@ -151,9 +150,33 @@ class Offers::StandartDraftFlow
       @client.post("offer_items", body: item_rows, headers: { "Prefer" => "return=minimal" })
     end
 
+    if update_offer_totals
+      totals = Offers::TotalsCalculator.new.call(built_items)
+      @client.patch(
+        "offers?id=eq.#{Supabase::FilterValue.eq(oid)}&user_id=eq.#{Supabase::FilterValue.eq(@user_id)}&deleted_at=is.null",
+        body: {
+          net_total: totals[:net_total].to_s,
+          vat_total: totals[:vat_total].to_s,
+          gross_total: totals[:gross_total].to_s,
+          updated_at: now_iso
+        },
+        headers: { "Prefer" => "return=minimal" }
+      )
+    end
+
+    { items_count: built_items.size, saved_at: now_iso }
+  end
+
+  def apply_calculation!(offer_id:, totals:, status: "beklemede")
+    oid = offer_id.to_s
+    raise ServiceErrors::Validation.new(user_message: "Teklif secimi zorunludur.") if oid.blank?
+    ensure_offer_owned!(offer_id: oid)
+
+    now_iso = Time.now.utc.iso8601
     @client.patch(
       "offers?id=eq.#{Supabase::FilterValue.eq(oid)}&user_id=eq.#{Supabase::FilterValue.eq(@user_id)}&deleted_at=is.null",
       body: {
+        status: Offers::Status.normalize(status),
         net_total: totals[:net_total].to_s,
         vat_total: totals[:vat_total].to_s,
         gross_total: totals[:gross_total].to_s,
@@ -162,7 +185,7 @@ class Offers::StandartDraftFlow
       headers: { "Prefer" => "return=minimal" }
     )
 
-    { items_count: built_items.size, saved_at: now_iso }
+    { saved_at: now_iso }
   end
 
   private

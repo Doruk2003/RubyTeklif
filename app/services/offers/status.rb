@@ -1,16 +1,18 @@
 module Offers
   module Status
-    ALLOWED = %w[taslak surec_isliyor onaylandi reddedildi].freeze
+    ALLOWED = %w[taslak beklemede onaylandi reddedildi].freeze
     LABELS = {
       "taslak" => "Hazirlaniyor",
-      "surec_isliyor" => "Surec Isliyor",
+      "beklemede" => "Surec Isliyor",
       "onaylandi" => "Onaylandi",
       "reddedildi" => "Red Edildi"
     }.freeze
 
     def self.normalize(value)
       status = value.to_s.downcase
-      ALLOWED.include?(status) ? status : "surec_isliyor"
+      return "beklemede" if status == "surec_isliyor"
+
+      ALLOWED.include?(status) ? status : "beklemede"
     end
   end
 end

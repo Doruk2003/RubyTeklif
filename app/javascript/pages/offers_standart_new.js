@@ -103,6 +103,8 @@
       offerTypeModal.style.display = "none"
     }
 
+    ensureOfferIdField()
+
     const modalEl = document.getElementById("pozEntryModal")
     if (!modalEl) return
     if (modalEl.dataset.pozInit === "1") return
@@ -167,18 +169,18 @@
       })
     }
 
-    const btnHesapla = document.getElementById("btnHesapla")
-    if (btnHesapla) {
-      btnHesapla.addEventListener("click", () => {
+    const mainForm = document.getElementById("pozMainForm")
+    if (mainForm) {
+      mainForm.addEventListener("submit", (event) => {
         if (pozList.length === 0) {
+          event.preventDefault()
           resetModalForm()
           clearInlineMessage()
           showInlineMessage("Lutfen en az bir poz ekleyin.", "danger")
-          pozModalInstance.show()
+          if (pozModalInstance) pozModalInstance.show()
           return
         }
         buildHiddenInputs()
-        document.getElementById("pozMainForm").requestSubmit()
       })
     }
 
@@ -191,6 +193,15 @@
 
     hydrateInitialPozList()
     renderList()
+  }
+
+  function ensureOfferIdField() {
+    const idInput = document.querySelector("#pozMainForm input[name='offer[id]']")
+    if (!idInput || idInput.value.toString().trim() !== "") return
+
+    const url = new URL(window.location.href)
+    const offerId = (url.searchParams.get("offer_id") || "").trim()
+    if (offerId) idInput.value = offerId
   }
 
   function hydrateInitialPozList() {
@@ -329,6 +340,7 @@
     if (pozList.length === 0) {
       container.innerHTML = ""
       if (emptyState) emptyState.style.display = ""
+      buildHiddenInputs()
       return
     }
 
@@ -376,6 +388,7 @@
     })
 
     container.innerHTML = html
+    buildHiddenInputs()
   }
 
   window.__pozDelete = function(id) {

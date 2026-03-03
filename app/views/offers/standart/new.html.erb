@@ -16,7 +16,9 @@
         </div>
         <% filtered_currencies = Array(@currencies).reject { |c| c["code"].to_s.casecmp("TRY").zero? || c["symbol"].to_s == "₺" } %>
         <div class="d-flex flex-wrap align-items-center text-white" style="column-gap:0.6rem; row-gap:0.4rem; font-size:0.85rem;">
-          <span class="material-symbols-outlined text-light" style="font-size:18px;">military_tech</span>
+          <span class="material-symbols-outlined text-light" style="font-size:18px;">event</span>
+          <span class="fw-semibold"><%= @offer["offer_date"].to_s.presence || "-" %></span>
+          <span class="text-white-50">|</span>
           <span class="material-symbols-outlined text-primary" style="font-size:18px;">tag</span>
           <span class="fw-semibold"><%= @offer["offer_number"].to_s %></span>
           <span class="text-white-50">|</span>
@@ -29,12 +31,12 @@
           <span class="material-symbols-outlined text-info" style="font-size:18px;">currency_exchange</span>
           <span class="fw-semibold">
             <% if filtered_currencies.any? %>
-              <%= filtered_currencies.map { |c|
-  symbol = c["symbol"].to_s.presence || c["code"].to_s
-  raw_rate = c["rate_to_try"].to_s
-  rate = raw_rate.present? ? sprintf("%.2f", raw_rate.to_f).sub(/\.00\z/, "") : "-"
-  "#{symbol} : #{rate}"
-}.join(" · ") %>
+                      <%= filtered_currencies.map { |c|
+          symbol = c["symbol"].to_s.presence || c["code"].to_s
+          raw_rate = c["rate_to_try"].to_s
+          rate = raw_rate.present? ? sprintf("%.2f", raw_rate.to_f).sub(/\.00\z/, "") : "-"
+          "#{symbol} : #{rate}"
+        }.join(" · ") %>
             <% else %>
               <span class="text-muted">Kur tanımlı değil</span>
             <% end %>
@@ -104,7 +106,7 @@
         id="btnOpenPozModal">
         POZ EKLE
       </button>
-      <button type="button" class="btn btn-primary py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 w-100" 
+      <button type="submit" form="pozMainForm" class="btn btn-primary py-3 fw-bold text-uppercase d-flex align-items-center justify-content-center gap-2 w-100" 
         style="letter-spacing:0.1em; font-size:0.9rem; height: 50px;" 
         id="btnHesapla">
         HESAPLA
@@ -169,7 +171,7 @@
   </div>
 </div>
 <%# ======================== HIDDEN FORM (for HESAPLA submit) ======================== %>
-<%= form_with url: offers_standart_index_path, method: :post, scope: :offer, local: true, id: "pozMainForm", class: "d-none" do |f| %>
+<%= form_with url: calculate_offers_standart_index_path, method: :post, scope: :offer, local: true, id: "pozMainForm", data: { turbo: false }, html: { novalidate: true } do |f| %>
   <%= f.hidden_field :id, value: @offer["id"] %>
   <%= f.hidden_field :offer_type, value: "standard" %>
   <%= f.hidden_field :company_id, value: @offer["company_id"] %>

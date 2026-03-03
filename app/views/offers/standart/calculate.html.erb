@@ -1,0 +1,129 @@
+<% filtered_currencies = Array(@currencies).reject { |c| c["code"].to_s.casecmp("TRY").zero? || c["symbol"].to_s == "₺" } %>
+<% currency_symbol = filtered_currencies.first&.dig("symbol").to_s.presence || "₺" %>
+<% project_number = @offer["offer_number"].to_s.presence || "-" %>
+<% format_money = lambda { |value|
+  "#{number_with_precision(value.to_d, precision: 2, delimiter: ".", separator: ",")} #{currency_symbol}"
+} %>
+<% total_quantity = defined?(@total_quantity) ? @total_quantity.to_d : @calculated_items.sum { |item| item[:quantity].to_d } %>
+
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm app-header-card">
+      <div class="card-body p-4">
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-4">
+          <div>
+            <div class="fw-semibold text-white"><%= project_number %></div>
+          </div>
+          <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
+            <%= link_to new_offers_standart_path(offer_id: @offer["id"]), class: "btn app-header-icon-btn d-inline-flex align-items-center justify-content-center", data: { tip: "Poz Girisine Don" }, aria: { label: "Poz Girisine Don" } do %>
+              <span class="material-symbols-outlined">arrow_back</span>
+            <% end %>
+            <%= list_nav_button(offers_standart_index_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
+            <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center text-white" style="column-gap:0.6rem; row-gap:0.4rem; font-size:0.85rem;">
+          <span class="material-symbols-outlined text-light" style="font-size:18px;">event</span>
+          <span class="fw-semibold"><%= @offer["offer_date"].to_s.presence || "-" %></span>
+          <span class="text-white-50">|</span>
+          <span class="material-symbols-outlined text-success" style="font-size:18px;">business</span>
+          <span class="fw-semibold"><%= @company_name.to_s %></span>
+          <span class="text-white-50">|</span>
+          <span class="material-symbols-outlined text-warning" style="font-size:18px;">folder</span>
+          <span class="fw-semibold"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></span>
+          <span class="text-white-50">|</span>
+          <span class="material-symbols-outlined text-info" style="font-size:18px;">currency_exchange</span>
+          <span class="fw-semibold">
+            <% if filtered_currencies.any? %>
+              <%= filtered_currencies.map { |c|
+                    symbol = c["symbol"].to_s.presence || c["code"].to_s
+                    raw_rate = c["rate_to_try"].to_s
+                    rate = raw_rate.present? ? sprintf("%.2f", raw_rate.to_f).sub(/\.00\z/, "") : "-"
+                    "#{symbol} : #{rate}"
+                  }.join(" · ") %>
+            <% else %>
+              <span class="text-muted">Kur tanimli degil</span>
+            <% end %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header rt-calc-head">URUN / HIZMETLER</div>
+      <div class="card-body p-0">
+        <div class="row g-0 rt-calc-table-head border-bottom">
+          <div class="col-12 col-md-6 px-3 py-2 fw-semibold">Ürün / Hizmet</div>
+          <div class="col-6 col-md-1 px-3 py-2 fw-semibold text-md-end">Miktar</div>
+          <div class="col-6 col-md-1 px-3 py-2 fw-semibold text-md-end">Tutar</div>
+          <div class="col-6 col-md-1 px-3 py-2 fw-semibold text-md-end">İskonto</div>
+          <div class="col-6 col-md-1 px-3 py-2 fw-semibold text-md-end">Ara Toplam</div>
+          <div class="col-6 col-md-1 px-3 py-2 fw-semibold text-md-end">Kdv</div>
+          <div class="col-6 col-md-1 px-3 py-2 fw-semibold text-md-end">Genel Toplam</div>
+        </div>
+
+        <% @calculated_items.each do |item| %>
+          <% product_name = @product_map.dig(item[:product_id], :name).to_s.presence || item[:description].to_s %>
+          <% vat_amount = item[:line_total].to_d * item[:vat_rate].to_d / 100 %>
+          <% line_gross = item[:line_total].to_d + vat_amount %>
+          <div class="row g-0 border-bottom">
+            <div class="col-12 col-md-6 px-3 py-3">
+              <div class="fw-bold"><%= product_name.upcase %></div>
+              <div class="text-muted small"><%= item[:description].to_s.presence || "-" %></div>
+            </div>
+            <div class="col-6 col-md-1 px-3 py-3 text-md-end"><%= number_with_precision(item[:quantity].to_d, precision: 2, strip_insignificant_zeros: true) %> Adet</div>
+            <div class="col-6 col-md-1 px-3 py-3 text-md-end"><%= format_money.call(item[:unit_price]) %></div>
+            <div class="col-6 col-md-1 px-3 py-3 text-md-end">%<%= number_with_precision(item[:discount_rate].to_d, precision: 8) %></div>
+            <div class="col-6 col-md-1 px-3 py-3 text-md-end"><%= format_money.call(item[:line_total]) %></div>
+            <div class="col-6 col-md-1 px-3 py-3 text-md-end"><%= format_money.call(vat_amount) %></div>
+            <div class="col-6 col-md-1 px-3 py-3 text-md-end fw-semibold"><%= format_money.call(line_gross) %></div>
+          </div>
+        <% end %>
+
+        <div class="p-3 border-bottom">
+          <button type="button" class="btn btn-success w-100 fw-bold py-2 text-uppercase">+ Masraf Ekle</button>
+        </div>
+      </div>
+      <div class="card-footer rt-calc-summary d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+        <div class="fw-semibold">Toplam Ürün Adedi : <%= number_with_precision(total_quantity, precision: 2, strip_insignificant_zeros: true) %></div>
+        <div class="fw-bold text-sm-end">KDV DAHIL GENEL TOPLAM <span class="ms-2"><%= format_money.call(@totals[:gross_total]) %></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-header rt-calc-head">Gecmis</div>
+      <div class="card-body">
+        <% Array(@history_entries).each do |entry| %>
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <span class="material-symbols-outlined text-success">description</span>
+            <div>
+              <div class="fw-semibold"><%= entry[:message] %></div>
+              <div class="small text-muted"><%= l(entry[:at], format: "%d-%m-%Y %H:%M:%S") %> / <%= entry[:actor].to_s.presence || "-" %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header rt-calc-head">Dosyalar</div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Ad</label>
+          <input type="text" class="form-control" placeholder="">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Dosya</label>
+          <input type="file" class="form-control">
+        </div>
+        <button type="button" class="btn btn-success w-100 fw-bold text-uppercase">Dosya Ekle</button>
+      </div>
+    </div>
+  </div>
+</div>

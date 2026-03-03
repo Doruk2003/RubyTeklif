@@ -35,7 +35,7 @@
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg">
               <%= f.label :status, "Durum", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
-              <%= f.select :status, options_for_select([["Tümü", ""]] + [["Hazırlanıyor", "taslak"], ["Süreç İşliyor", "surec_isliyor"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
+              <%= f.select :status, options_for_select([["Tümü", ""]] + [["Hazırlanıyor", "taslak"], ["Süreç İşliyor", "beklemede"], ["Onaylandı", "onaylandi"], ["Red Edildi", "reddedildi"]], params[:status]), {}, class: "form-select form-select-sm", style: "width: 100%;" %>
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg">
               <%= f.label :offer_type, "Tür", class: "form-label text-uppercase small fw-semibold text-secondary mb-1" %>
@@ -94,7 +94,9 @@
                       <span class="text-info fw-normal border"><%= type.capitalize %></span>
                     <% end %>
                   </td>
-                  <td class="text-end fw-bold"><%= offer["gross_total"].to_s %></td>
+                  <% gross_total_value = offer["gross_total"].to_s %>
+                  <% show_total = gross_total_value.present? && gross_total_value != "0" && gross_total_value != "0.0" && gross_total_value != "0.00" %>
+                  <td class="text-end fw-bold"><%= show_total ? gross_total_value : "-" %></td>
                   <td class="rt-col-center">
                     <% status = offer["status"].to_s.downcase %>
                     <% if offer["deleted_at"].present? %>
@@ -126,7 +128,7 @@
                         <% if offer["deleted_at"].blank? && offer["status"].to_s == "taslak" %>
                           <%= link_to "Devam Et", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
                         <% else %>
-                          <%= link_to "Gör", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                          <%= link_to "G�zlem", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <% end %>
                         <% if offer["deleted_at"].present? %>
                           <%= link_to "Geri Yükle",

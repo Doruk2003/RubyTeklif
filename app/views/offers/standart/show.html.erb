@@ -50,11 +50,15 @@
               <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Teklif Türü</div>
               <div class="text-dark">
                 <% type = @offer["offer_type"].to_s.downcase %>
-                <% case type %>
-                <% when "standart", "standard" %><span class="badge bg-light text-dark border">Standart</span>
-                <% when "demonte" %><span class="badge bg-light text-primary border">Demonte</span>
-                <% when "montaj" %><span class="badge bg-light text-success border">Montaj</span>
-                <% else %><span class="badge bg-light text-secondary border"><%= type.capitalize %></span>
+                <% case type
+                   when "standart", "standard" %>
+                  <span class="badge bg-light text-dark border">Standart</span>
+                <% when "demonte" %>
+                  <span class="badge bg-light text-primary border">Demonte</span>
+                <% when "montaj" %>
+                  <span class="badge bg-light text-success border">Montaj</span>
+                <% else %>
+                  <span class="badge bg-light text-secondary border"><%= type.capitalize %></span>
                 <% end %>
               </div>
             </div>
@@ -147,5 +151,4 @@
     </div>
   <% end %>
 </div>
-
 

@@ -33,6 +33,13 @@ class Offers::StandartController < ApplicationController
 
   def show
     @offer = Offers::ShowQuery.new(client: supabase_user_client).call(params[:id])
+    if @offer.nil?
+      flash.now[:alert] = "Teklif bulunamadi."
+    end
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers/standart#show")
+    @offer = nil
+    flash.now[:alert] = e.user_message
   rescue Supabase::Client::ConfigurationError
     @offer = nil
   end
@@ -136,12 +143,69 @@ class Offers::StandartController < ApplicationController
     render :new, status: :unprocessable_entity
   end
 
+  def calculate
+    permitted = offer_params.to_h
+    offer_id = permitted.delete("id").to_s
+    raise ServiceErrors::Validation.new(user_message: "Teklif kimligi bulunamadi. Teklifi yeniden acip tekrar deneyin.") if offer_id.blank?
+    @selected_category_id = permitted.delete("product_category_id").to_s.presence
+    permitted["items"] = Array(permitted["items"]).map { |item| item.to_h.deep_symbolize_keys }
+    payload = Offers::CreateForm.new(permitted).normalized_attributes
+
+    repository = Offers::Repository.new(client: supabase_user_client)
+    @product_map = repository.fetch_products(payload[:items].map { |item| item[:product_id] })
+    @calculated_items = Offers::ItemBuilder.new(@product_map).build(payload[:items])
+    raise ServiceErrors::Validation.new(user_message: "Lutfen en az bir poz ekleyin.") if @calculated_items.empty?
+
+    @totals = Offers::TotalsCalculator.new.call(@calculated_items)
+    @total_quantity = @calculated_items.sum { |item| item[:quantity].to_d }
+    if offer_id.present?
+      persist_payload = payload.merge(status: "beklemede")
+      finalize_existing_offer!(offer_id: offer_id, payload: persist_payload)
+      standart_draft_flow.apply_calculation!(offer_id: offer_id, totals: @totals, status: "beklemede")
+      persist_calculation_snapshot!(offer_id: offer_id, totals: @totals)
+      clear_offer_caches!
+    end
+    @offer = payload.except(:items).stringify_keys
+    @offer["id"] = offer_id
+    @offer["status"] = "beklemede"
+    load_form_data(category_id: @selected_category_id)
+    resolve_company_name
+    @history_entries = [
+      {
+        message: "Proje hesaplandi.",
+        at: Time.current,
+        actor: current_user&.name.to_s
+      }
+    ]
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers/standart#calculate")
+    flash.now[:alert] = e.user_message
+    @offer = payload&.except(:items)&.stringify_keys || {}
+    @offer["id"] = offer_id if defined?(offer_id)
+    @items = payload&.[](:items) || [default_item]
+    load_form_data(category_id: @selected_category_id)
+    resolve_company_name
+    render :new, status: :unprocessable_entity
+  rescue Supabase::Client::ConfigurationError
+    flash.now[:alert] = "Hesaplama sayfasi su anda yuklenemiyor."
+    @offer = payload&.except(:items)&.stringify_keys || {}
+    @offer["id"] = offer_id if defined?(offer_id)
+    @items = payload&.[](:items) || [default_item]
+    @companies = []
+    @products = []
+    @category_options = []
+    @category_labels = {}
+    @currencies = []
+    @company_name = "Yuklenemedi"
+    render :new, status: :unprocessable_entity
+  end
+
   def sync_items
     permitted = sync_items_params.to_h
     offer_id = permitted["offer_id"].to_s
     items = Array(permitted["items"]).map { |item| item.to_h.deep_symbolize_keys }
 
-    sync_result = standart_draft_flow.sync_draft_items!(offer_id: offer_id, items: items)
+    sync_result = standart_draft_flow.sync_draft_items!(offer_id: offer_id, items: items, update_offer_totals: false)
     clear_offer_caches!
 
     render json: { ok: true, items_count: sync_result[:items_count], saved_at: sync_result[:saved_at] }
@@ -234,5 +298,20 @@ class Offers::StandartController < ApplicationController
 
   def clear_offer_caches!
     QueryCacheInvalidator.new.invalidate_offers!(user_id: current_user.id)
+  end
+
+  def persist_calculation_snapshot!(offer_id:, totals:)
+    now_iso = Time.now.utc.iso8601
+    supabase_user_client.patch(
+      "offers?id=eq.#{Supabase::FilterValue.eq(offer_id)}&user_id=eq.#{Supabase::FilterValue.eq(current_user.id)}&deleted_at=is.null",
+      body: {
+        status: "beklemede",
+        net_total: totals[:net_total].to_s,
+        vat_total: totals[:vat_total].to_s,
+        gross_total: totals[:gross_total].to_s,
+        updated_at: now_iso
+      },
+      headers: { "Prefer" => "return=minimal" }
+    )
   end
 end
