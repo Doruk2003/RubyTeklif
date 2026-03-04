@@ -24,7 +24,7 @@ module Offers
         filters << "category_id=eq.#{Supabase::FilterValue.eq(category_value)}"
       end
 
-      path = "products?select=id,name,category_id,categories(name),price&order=name.asc&#{filters.join('&')}"
+      path = "products?select=id,name,category_id,categories(name),price,currencies(symbol,code)&order=name.asc&#{filters.join('&')}"
       category_part = category_value.presence || "all"
       data = Rails.cache.fetch("offers/form/products/v1/user:#{user_id}/category:#{category_part}", expires_in: 1.minute) do
         @client.get(path)

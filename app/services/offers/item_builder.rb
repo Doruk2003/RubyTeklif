@@ -40,7 +40,10 @@ module Offers
         unit_price: unit_price,
         discount_rate: discount_rate,
         line_total: line_total,
-        vat_rate: product[:vat_rate] || decimal(0)
+        vat_rate: product[:vat_rate] || decimal(0),
+        currency_code: product[:currency_code].to_s,
+        currency_symbol: product[:currency_symbol].to_s,
+        currency_rate_to_try: product[:currency_rate_to_try] || decimal(0)
       }
     end
 

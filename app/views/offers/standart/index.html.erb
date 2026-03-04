@@ -96,7 +96,13 @@
                   </td>
                   <% gross_total_value = offer["gross_total"].to_s %>
                   <% show_total = gross_total_value.present? && gross_total_value != "0" && gross_total_value != "0.0" && gross_total_value != "0.00" %>
-                  <td class="text-end fw-bold"><%= show_total ? gross_total_value : "-" %></td>
+                  <% item_currencies = Array(offer["offer_items"]).map { |it| it.dig("products", "currencies", "symbol").to_s.presence || it.dig("products", "currencies", "code").to_s.presence }.compact.uniq %>
+                  <% unit_label = if item_currencies.size > 1
+                                    "Çoklu"
+                                  else
+                                    item_currencies.first.to_s
+                                  end %>
+                  <td class="text-end fw-bold"><%= show_total ? "#{gross_total_value} #{unit_label}".strip : "-" %></td>
                   <td class="rt-col-center">
                     <% status = offer["status"].to_s.downcase %>
                     <% if offer["deleted_at"].present? %>
@@ -128,10 +134,11 @@
                         <% if offer["deleted_at"].blank? && offer["status"].to_s == "taslak" %>
                           <%= link_to "Devam Et", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
                         <% else %>
+                          <%= link_to "D�zenle", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
                           <%= link_to "G�zlem", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <% end %>
                         <% if offer["deleted_at"].present? %>
-                          <%= link_to "Geri Yükle",
+                          <%= link_to "Geri Y�kle",
                                  restore_offers_standart_path(offer["id"]),
                                 data: { turbo_method: :patch, turbo_confirm: "Geri yüklensin mi?" },
                                 class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>

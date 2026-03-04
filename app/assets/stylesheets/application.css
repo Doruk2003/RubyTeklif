@@ -2275,8 +2275,8 @@ select.form-input:focus {
 
 .app-header-card,
 .admin-users-header-card {
-  background: linear-gradient(90deg, #0f172a, #1e293b) !important;
-  border-color: rgba(15, 23, 42, 0.65) !important;
+  background: var(--bs-primary, #0d6efd) !important;
+  border-color: var(--bs-primary, #0d6efd) !important;
 }
 
 .app-header-card .h4,
@@ -3507,7 +3507,7 @@ body:has(#pozEntryModal) #offerTypeModal {
 
 /* From offers/standart/calculate.html.erb */
 .rt-calc-head {
-  background-color: #ef6344;
+  background-color: var(--bs-primary, #0d6efd);
   color: #fff;
   font-size: 1.05rem;
   font-weight: 700;
@@ -3522,8 +3522,93 @@ body:has(#pozEntryModal) #offerTypeModal {
 }
 
 .rt-calc-summary {
-  background-color: #ef6344;
-  color: #fff;
+  background-color: #f2f3f5;
+  color: #111;
   border-top: 0;
   padding: 0.95rem 1rem;
+}
+
+.rt-calc-lines.table-striped .calc-line-row:nth-of-type(odd) {
+  background-color: var(--bs-table-striped-bg, rgba(0, 0, 0, 0.03));
+}
+
+.rt-calc-header-card {
+  background: var(--bs-primary, #0d6efd) !important;
+  border-color: var(--bs-primary, #0d6efd) !important;
+}
+
+.rt-print-dropdown-wrap .rt-print-dropdown-menu {
+  min-width: 160px;
+  width: 160px;
+  padding: 0.15rem 0;
+}
+
+.rt-print-dropdown-wrap .rt-print-dropdown-item {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.55rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.rt-print-dropdown-wrap .rt-print-dropdown-item {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.rt-print-dropdown-wrap .rt-print-dropdown-menu li:last-child .rt-print-dropdown-item {
+  border-bottom: 0;
+}
+
+.rt-calc-modal-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+#offerSettingsModal .modal-content,
+#addExpenseModal .modal-content {
+  border-radius: 4px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.22);
+}
+
+#offerSettingsModal .modal-header,
+#addExpenseModal .modal-header {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.rt-calc-modal-panel {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #dbe4ef;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+#offerSettingsModal .form-control,
+#offerSettingsModal .form-select,
+#addExpenseModal .form-control,
+#addExpenseModal .form-select {
+  min-height: 44px;
+  border-radius: 4px;
+  border-color: #cbd5e1;
+  background-color: #fff;
+}
+
+#offerSettingsModal textarea.form-control,
+#addExpenseModal textarea.form-control {
+  min-height: 88px;
+}
+
+#offerSettingsModal .form-label,
+#addExpenseModal .form-label {
+  margin-bottom: 0.4rem;
+  color: #0f172a;
+}
+
+body:has(#offerSettingsModal.show) .modal-backdrop.show,
+body:has(#addExpenseModal.show) .modal-backdrop.show {
+  background-color: rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 1;
 }

@@ -134,6 +134,8 @@
                 <% @products.each do |p| %>
                   <option value="<%= p["id"] %>"
                           data-price="<%= p["price"] %>"
+                          data-currency-symbol="<%= p.dig("currencies", "symbol").to_s %>"
+                          data-currency-code="<%= p.dig("currencies", "code").to_s %>"
                           data-name="<%= p["name"] %> (<%= p.dig("categories", "name").to_s.presence || @category_labels[p["category_id"].to_s].presence || "-" %>)">
                     <%= p["name"] %> (<%= p.dig("categories", "name").to_s.presence || @category_labels[p["category_id"].to_s].presence || "-" %>)
                   </option>

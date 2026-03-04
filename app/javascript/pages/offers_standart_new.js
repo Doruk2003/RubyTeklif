@@ -224,13 +224,15 @@
     const productSelect = document.getElementById("pozProductSelect")
     pozList = items.map((item, idx) => {
       const productId = (item && item.product_id !== undefined) ? item.product_id.toString() : ""
-      const fromSelect = resolveProductName(productSelect, productId)
+      const productMeta = resolveProductMeta(productSelect, productId)
       const fallbackName = item && item.product_name ? item.product_name.toString() : ""
 
       return {
         id: item && item.id ? item.id.toString() : `db_${idx}`,
         product_id: productId,
-        product_name: fromSelect || fallbackName || `Urun #${productId}`,
+        product_name: productMeta.name || fallbackName || `Urun #${productId}`,
+        currency_symbol: productMeta.currencySymbol || "",
+        currency_code: productMeta.currencyCode || "",
         quantity: parseFloat(item && item.quantity) || 0,
         unit_price: parseFloat(item && item.unit_price) || 0,
         discount_rate: parseFloat(item && item.discount_rate) || 0,
@@ -239,11 +241,15 @@
     })
   }
 
-  function resolveProductName(productSelect, productId) {
-    if (!productSelect || !productId) return ""
+  function resolveProductMeta(productSelect, productId) {
+    if (!productSelect || !productId) return { name: "", currencySymbol: "", currencyCode: "" }
     const option = Array.from(productSelect.options).find((opt) => opt.value === productId)
-    if (!option) return ""
-    return option.dataset.name || option.text || ""
+    if (!option) return { name: "", currencySymbol: "", currencyCode: "" }
+    return {
+      name: option.dataset.name || option.text || "",
+      currencySymbol: option.dataset.currencySymbol || "",
+      currencyCode: option.dataset.currencyCode || ""
+    }
   }
 
   function savePoz() {
@@ -259,6 +265,8 @@
 
     const selectedOpt = productSelect.options[productSelect.selectedIndex]
     const productName = selectedOpt.dataset.name || selectedOpt.text
+    const currencySymbol = selectedOpt.dataset.currencySymbol || ""
+    const currencyCode = selectedOpt.dataset.currencyCode || ""
     const quantity = parseFloat(document.getElementById("pozQuantity").value) || 1
     const unitPrice = parseFloat(document.getElementById("pozUnitPrice").value) || 0
     const discount = parseFloat(document.getElementById("pozDiscount").value) || 0
@@ -268,6 +276,8 @@
       id: editingPozId || (Date.now() + "_" + Math.random().toString(36).substring(2, 6)),
       product_id: productId,
       product_name: productName,
+      currency_symbol: currencySymbol,
+      currency_code: currencyCode,
       quantity: quantity,
       unit_price: unitPrice,
       discount_rate: discount,
@@ -366,7 +376,8 @@
       html += `      <span class="fw-semibold" style="font-size:0.85rem;">${formatNumber(poz.quantity)}</span>`
       html += "    </div>"
       html += "    <div class=\"col-4 col-md-2 text-end\">"
-      html += `      <span class="fw-semibold" style="font-size:0.85rem;">${formatNumber(poz.unit_price)}</span>`
+      const currencyLabel = escapeHtml((poz.currency_symbol || poz.currency_code || "").toString())
+      html += `      <span class="fw-semibold" style="font-size:0.85rem;">${formatNumber(poz.unit_price)}${currencyLabel ? " " + currencyLabel : ""}</span>`
       html += "    </div>"
       html += "    <div class=\"col-2 col-md-1 text-end\">"
       if (poz.discount_rate > 0) {

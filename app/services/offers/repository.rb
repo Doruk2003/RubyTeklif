@@ -15,13 +15,17 @@ module Offers
       return {} if ids.empty?
 
       encoded_ids = ids.join(",")
-      data = @client.get("products?deleted_at=is.null&select=id,name,vat_rate&id=in.(#{encoded_ids})")
+      data = @client.get("products?deleted_at=is.null&select=id,name,vat_rate,category_id,categories(name),currency_id,currencies(code,symbol,rate_to_try)&id=in.(#{encoded_ids})")
       return {} unless data.is_a?(Array)
 
       data.each_with_object({}) do |row, acc|
         acc[row["id"].to_s] = {
           name: row["name"].to_s,
-          vat_rate: decimal(row["vat_rate"])
+          category_name: row.dig("categories", "name").to_s,
+          vat_rate: decimal(row["vat_rate"]),
+          currency_code: row.dig("currencies", "code").to_s,
+          currency_symbol: row.dig("currencies", "symbol").to_s,
+          currency_rate_to_try: decimal(row.dig("currencies", "rate_to_try"))
         }
       end
     end

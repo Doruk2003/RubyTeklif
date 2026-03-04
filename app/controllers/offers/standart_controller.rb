@@ -158,6 +158,7 @@ class Offers::StandartController < ApplicationController
 
     @totals = Offers::TotalsCalculator.new.call(@calculated_items)
     @total_quantity = @calculated_items.sum { |item| item[:quantity].to_d }
+    @grand_totals_by_currency = build_multi_currency_totals(@calculated_items)
     if offer_id.present?
       persist_payload = payload.merge(status: "beklemede")
       finalize_existing_offer!(offer_id: offer_id, payload: persist_payload)
@@ -313,5 +314,45 @@ class Offers::StandartController < ApplicationController
       },
       headers: { "Prefer" => "return=minimal" }
     )
+  end
+
+  def build_multi_currency_totals(items)
+    rows = Array(items)
+    return [] if rows.empty?
+
+    rate_map = {}
+    symbol_map = {}
+    rows.each do |item|
+      code = item[:currency_code].to_s.upcase.presence || "TRY"
+      symbol = item[:currency_symbol].to_s.presence
+      rate = normalize_currency_rate(item[:currency_rate_to_try], code)
+      rate_map[code] ||= rate
+      symbol_map[code] ||= symbol
+    end
+
+    gross_try_total = rows.sum do |item|
+      code = item[:currency_code].to_s.upcase.presence || "TRY"
+      rate = rate_map[code] || BigDecimal("1")
+      line_total = item[:line_total].to_d
+      vat_amount = line_total * item[:vat_rate].to_d / 100
+      (line_total + vat_amount) * rate
+    end
+
+    rate_map.keys.map do |code|
+      rate = rate_map[code]
+      amount = rate.positive? ? (gross_try_total / rate) : BigDecimal("0")
+      {
+        code: code,
+        symbol: symbol_map[code].to_s.presence || code,
+        amount: amount
+      }
+    end
+  end
+
+  def normalize_currency_rate(raw_rate, code)
+    return BigDecimal("1") if code.to_s.upcase == "TRY"
+
+    rate = raw_rate.to_d
+    rate.positive? ? rate : BigDecimal("1")
   end
 end

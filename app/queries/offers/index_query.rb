@@ -49,7 +49,7 @@ module Offers
         date_filter(params),
         status_filter(params)
       ].compact
-      base = "offers?select=id,company_id,project,offer_type,offer_number,offer_date,gross_total,status,deleted_at&order=offer_date.desc"
+      base = "offers?select=id,company_id,project,offer_type,offer_number,offer_date,gross_total,status,deleted_at,offer_items(id,products(currency_id,currencies(code,symbol)))&order=offer_date.desc"
       query = filters.empty? ? base : "#{base}&#{filters.join('&')}"
       "#{query}&limit=#{per_page + 1}&offset=#{(page - 1) * per_page}"
     end
