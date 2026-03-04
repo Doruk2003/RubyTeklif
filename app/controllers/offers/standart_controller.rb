@@ -217,6 +217,25 @@ class Offers::StandartController < ApplicationController
     render json: { ok: false, error: "Taslak kaydi su anda kullanilamiyor." }, status: :service_unavailable
   end
 
+  def add_expense
+    permitted = add_expense_params.to_h
+    result = standart_draft_flow.add_extra_expense!(
+      offer_id: permitted["offer_id"],
+      description: permitted["description"],
+      unit: permitted["unit"],
+      quantity: permitted["quantity"],
+      unit_price: permitted["unit_price"],
+      vat_rate: permitted["vat_rate"]
+    )
+    clear_offer_caches!
+    render json: { ok: true, expense: result }
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers/standart#add_expense")
+    render json: { ok: false, error: e.user_message }, status: :unprocessable_entity
+  rescue Supabase::Client::ConfigurationError
+    render json: { ok: false, error: "Masraf kaydi su anda kullanilamiyor." }, status: :service_unavailable
+  end
+
   private
 
   def offer_params
@@ -235,6 +254,10 @@ class Offers::StandartController < ApplicationController
 
   def sync_items_params
     params.permit(:offer_id, items: %i[product_id description quantity unit_price discount_rate])
+  end
+
+  def add_expense_params
+    params.permit(:offer_id, :description, :unit, :quantity, :unit_price, :vat_rate)
   end
 
   def load_form_data(category_id:)

@@ -10,7 +10,7 @@
             <div id="draftSaveStatus" class="small text-white-50">Taslak kaydı bekleniyor</div>
           </div>
           <div class="d-flex flex-wrap align-items-center gap-2 app-header-actions">
-            <%= list_nav_button(offers_standart_index_path, label: "Listeye DÃ¶n", class_name: "app-header-icon-btn") %>
+            <%= list_nav_button(offers_standart_index_path, label: "Listeye Dön", class_name: "app-header-icon-btn") %>
             <%= home_nav_button(home_path, class_name: "app-header-icon-btn", icon: "home") %>
           </div>
         </div>
@@ -31,7 +31,7 @@
           <span class="material-symbols-outlined text-info" style="font-size:18px;">currency_exchange</span>
           <span class="fw-semibold">
             <% if filtered_currencies.any? %>
-                      <%= filtered_currencies.map { |c|
+              <%= filtered_currencies.map { |c|
           symbol = c["symbol"].to_s.presence || c["code"].to_s
           raw_rate = c["rate_to_try"].to_s
           rate = raw_rate.present? ? sprintf("%.2f", raw_rate.to_f).sub(/\.00\z/, "") : "-"

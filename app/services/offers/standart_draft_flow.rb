@@ -1,3 +1,5 @@
+require "bigdecimal"
+
 class Offers::StandartDraftFlow
   def initialize(client:, user_id:)
     @client = client
@@ -188,6 +190,73 @@ class Offers::StandartDraftFlow
     { saved_at: now_iso }
   end
 
+  def add_extra_expense!(offer_id:, description:, unit:, quantity:, unit_price:, vat_rate:)
+    oid = offer_id.to_s
+    raise ServiceErrors::Validation.new(user_message: "Teklif secimi zorunludur.") if oid.blank?
+    ensure_offer_owned!(offer_id: oid)
+
+    qty = decimal(quantity)
+    price = decimal(unit_price)
+    vat = decimal(vat_rate)
+    raise ServiceErrors::Validation.new(user_message: "Miktar 0'dan buyuk olmalidir.") unless qty.positive?
+    raise ServiceErrors::Validation.new(user_message: "Birim fiyat negatif olamaz.") if price.negative?
+    raise ServiceErrors::Validation.new(user_message: "KDV orani 0-100 arasinda olmalidir.") if vat.negative? || vat > decimal(100)
+
+    item_line_total = qty * price
+    item_vat_total = item_line_total * vat / decimal(100)
+    item_gross_total = item_line_total + item_vat_total
+    anchor_product_id = fetch_anchor_product_id(offer_id: oid)
+    display_description = description.to_s.strip.presence || "Ek Masraf"
+    row_description = build_expense_description(description: display_description, unit: unit, vat_rate: vat)
+    now_iso = Time.now.utc.iso8601
+
+    @client.post(
+      "offer_items",
+      body: {
+        user_id: @user_id,
+        offer_id: oid,
+        product_id: anchor_product_id,
+        description: row_description,
+        quantity: qty.to_s("F"),
+        unit_price: price.to_s("F"),
+        discount_rate: "0",
+        line_total: item_line_total.to_s("F"),
+        created_at: now_iso,
+        updated_at: now_iso
+      },
+      headers: { "Prefer" => "return=minimal" }
+    )
+
+    current_totals = fetch_offer_totals(offer_id: oid)
+    updated_net = current_totals[:net_total] + item_line_total
+    updated_vat = current_totals[:vat_total] + item_vat_total
+    updated_gross = current_totals[:gross_total] + item_gross_total
+    @client.patch(
+      "offers?id=eq.#{Supabase::FilterValue.eq(oid)}&user_id=eq.#{Supabase::FilterValue.eq(@user_id)}&deleted_at=is.null",
+      body: {
+        net_total: updated_net.to_s("F"),
+        vat_total: updated_vat.to_s("F"),
+        gross_total: updated_gross.to_s("F"),
+        updated_at: now_iso
+      },
+      headers: { "Prefer" => "return=minimal" }
+    )
+
+    {
+      description: row_description,
+      display_description: display_description,
+      unit: unit.to_s.presence || "ADET",
+      quantity: qty.to_s("F"),
+      unit_price: price.to_s("F"),
+      vat_rate: vat.to_s("F"),
+      line_total: item_line_total.to_s("F"),
+      vat_total: item_vat_total.to_s("F"),
+      gross_total: item_gross_total.to_s("F"),
+      offer_gross_total: updated_gross.to_s("F"),
+      saved_at: now_iso
+    }
+  end
+
   private
 
   def next_daily_offer_number(date:)
@@ -298,5 +367,47 @@ class Offers::StandartDraftFlow
         discount_rate: item[:discount_rate].to_s
       }
     end.compact
+  end
+
+  def fetch_anchor_product_id(offer_id:)
+    path = "offer_items?offer_id=eq.#{Supabase::FilterValue.eq(offer_id)}" \
+           "&user_id=eq.#{Supabase::FilterValue.eq(@user_id)}" \
+           "&deleted_at=is.null&select=product_id&order=created_at.asc&limit=1"
+    rows = @client.get(path)
+    row = rows.is_a?(Array) ? rows.first : nil
+    product_id = row.is_a?(Hash) ? row["product_id"].to_s : ""
+    return product_id if product_id.present?
+
+    raise ServiceErrors::Validation.new(user_message: "Masraf eklemek icin en az bir teklif kalemi bulunmalidir.")
+  end
+
+  def fetch_offer_totals(offer_id:)
+    path = "offers?id=eq.#{Supabase::FilterValue.eq(offer_id)}" \
+           "&user_id=eq.#{Supabase::FilterValue.eq(@user_id)}" \
+           "&deleted_at=is.null&select=net_total,vat_total,gross_total&limit=1"
+    rows = @client.get(path)
+    row = rows.is_a?(Array) ? rows.first : nil
+    raise ServiceErrors::Validation.new(user_message: "Teklif bulunamadi.") unless row.is_a?(Hash)
+
+    {
+      net_total: decimal(row["net_total"]),
+      vat_total: decimal(row["vat_total"]),
+      gross_total: decimal(row["gross_total"])
+    }
+  end
+
+  def build_expense_description(description:, unit:, vat_rate:)
+    detail = description.to_s.strip.presence || "Ek Masraf"
+    normalized_unit = unit.to_s.strip.upcase.presence || "ADET"
+    normalized_vat = vat_rate.to_s("F")
+    "[EXTRA MASRAF] #{detail} | Birim: #{normalized_unit} | KDV: %#{normalized_vat}"
+  end
+
+  def decimal(value)
+    return BigDecimal("0") if value.nil?
+
+    BigDecimal(value.to_s)
+  rescue ArgumentError
+    BigDecimal("0")
   end
 end

@@ -110,7 +110,7 @@
                     <% elsif status == "taslak" %>
                       <span class="text-warning fw-bold">HAZIRLANIYOR</span>
                     <% elsif %w[surec_isliyor beklemede].include?(status) %>
-                      <span class="text-info">SÜREÇ İŞLİYOR</span>
+                      <span class="text-info">ONAY BEKLİYOR</span>
                     <% elsif status == "onaylandi" %>
                       <span class="text-success">ONAYLANDI</span>
                     <% elsif status == "reddedildi" %>
@@ -134,11 +134,11 @@
                         <% if offer["deleted_at"].blank? && offer["status"].to_s == "taslak" %>
                           <%= link_to "Devam Et", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
                         <% else %>
-                          <%= link_to "D�zenle", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
-                          <%= link_to "G�zlem", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
+                          <%= link_to "Düzenle", new_offers_standart_path(offer_id: offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-primary rt-arrow-hover" %>
+                          <%= link_to "Gözlem", offers_standart_path(offer["id"]), class: "d-block rounded px-3 py-2 text-decoration-none text-body rt-arrow-hover" %>
                         <% end %>
                         <% if offer["deleted_at"].present? %>
-                          <%= link_to "Geri Y�kle",
+                          <%= link_to "Geri Yükle",
                                  restore_offers_standart_path(offer["id"]),
                                 data: { turbo_method: :patch, turbo_confirm: "Geri yüklensin mi?" },
                                 class: "d-block rounded px-3 py-2 text-decoration-none text-success rt-arrow-hover" %>
@@ -157,8 +157,8 @@
                 <tr>
                   <td colspan="6" class="text-center py-5">
                     <div class="mx-auto" style="max-width:420px;">
-                      <div class="fw-semibold mb-1">Henüz kayitli teklif yok</div>
-                      <div class="text-secondary">İlk teklifi olusturmak için yukaridaki butonu kullanin.</div>
+                      <div class="fw-semibold mb-1">Henüz kayıtlı teklif yok</div>
+                      <div class="text-secondary">İlk teklifi oluşturmak için yukarıdaki butonu kullanın.</div>
                     </div>
                   </td>
                 </tr>
