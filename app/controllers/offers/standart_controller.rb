@@ -156,7 +156,7 @@ class Offers::StandartController < ApplicationController
     @calculated_items = Offers::ItemBuilder.new(@product_map).build(payload[:items])
     raise ServiceErrors::Validation.new(user_message: "Lutfen en az bir poz ekleyin.") if @calculated_items.empty?
 
-    @totals = Offers::TotalsCalculator.new.call(@calculated_items)
+    @totals = totals_for_list_persistence(@calculated_items)
     @total_quantity = @calculated_items.sum { |item| item[:quantity].to_d }
     @grand_totals_by_currency = build_multi_currency_totals(@calculated_items)
     if offer_id.present?
@@ -370,6 +370,32 @@ class Offers::StandartController < ApplicationController
         amount: amount
       }
     end
+  end
+
+  def totals_for_list_persistence(items)
+    rows = Array(items)
+    return Offers::TotalsCalculator.new.call(rows) if rows.empty?
+
+    currency_codes = rows.map { |item| item[:currency_code].to_s.upcase.presence || "TRY" }.uniq
+    return Offers::TotalsCalculator.new.call(rows) if currency_codes.size <= 1
+
+    net_try_total = BigDecimal("0")
+    vat_try_total = BigDecimal("0")
+
+    rows.each do |item|
+      code = item[:currency_code].to_s.upcase.presence || "TRY"
+      rate = normalize_currency_rate(item[:currency_rate_to_try], code)
+      line_total = item[:line_total].to_d
+      vat_amount = line_total * item[:vat_rate].to_d / 100
+      net_try_total += (line_total * rate)
+      vat_try_total += (vat_amount * rate)
+    end
+
+    {
+      net_total: net_try_total,
+      vat_total: vat_try_total,
+      gross_total: net_try_total + vat_try_total
+    }
   end
 
   def normalize_currency_rate(raw_rate, code)

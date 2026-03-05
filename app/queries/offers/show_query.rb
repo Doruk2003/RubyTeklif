@@ -27,7 +27,7 @@ module Offers
       item_rows = @client.get(
         "offer_items?offer_id=eq.#{Supabase::FilterValue.eq(oid)}" \
         "&deleted_at=is.null" \
-        "&select=id,description,quantity,unit_price,discount_rate,line_total,products(name,vat_rate)"
+        "&select=id,description,quantity,unit_price,discount_rate,line_total,products(name,vat_rate,categories(name),currencies(code,symbol,rate_to_try))"
       )
       offer["offer_items"] = item_rows.is_a?(Array) ? item_rows : []
       offer

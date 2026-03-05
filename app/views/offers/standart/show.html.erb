@@ -1,3 +1,88 @@
+﻿<%
+  format_amount = lambda do |value|
+    number_with_precision(value.to_d, precision: 2, delimiter: ".", separator: ",")
+  end
+
+  format_date = lambda do |value|
+    raw = value.to_s
+    next "-" if raw.blank?
+    begin
+      Date.parse(raw).strftime("%d.%m.%Y")
+    rescue StandardError
+      raw
+    end
+  end
+
+  currency_for = lambda do |item|
+    symbol = item.dig("products", "currencies", "symbol").to_s.presence
+    code = item.dig("products", "currencies", "code").to_s.upcase.presence
+    symbol.presence || code.presence || "TRY"
+  end
+
+  format_money = lambda do |value, unit|
+    "#{format_amount.call(value)} #{unit}".strip
+  end
+
+  normalize_rate = lambda do |item, code|
+    c = code.to_s.upcase
+    next BigDecimal("1") if %w[TRY TL].include?(c)
+    raw_rate = item.dig("products", "currencies", "rate_to_try").to_d
+    raw_rate.positive? ? raw_rate : BigDecimal("1")
+  end
+
+  all_items = Array(@offer["offer_items"])
+  expense_item = lambda { |item| item["description"].to_s.strip.upcase.start_with?("[EXTRA MASRAF]") }
+  sorted_items = all_items.sort_by { |item| expense_item.call(item) ? 1 : 0 }
+
+  discount_totals_by_currency = Hash.new { |h, k| h[k] = BigDecimal("0") }
+  sorted_items.each do |item|
+    qty = item["quantity"].to_d
+    unit_price = item["unit_price"].to_d
+    discount_rate = item["discount_rate"].to_d
+    discount_amount = (qty * unit_price) * discount_rate / 100
+    unit = currency_for.call(item)
+    discount_totals_by_currency[unit] += discount_amount
+  end
+
+  item_units = sorted_items.map { |item| currency_for.call(item) }.uniq
+  total_unit_label = item_units.size > 1 ? "TL" : item_units.first.to_s.presence || "TRY"
+  discount_label = if discount_totals_by_currency.empty?
+                     "-"
+                   else
+                     discount_totals_by_currency.map { |unit, amount| format_money.call(amount, unit) }.join(" | ")
+                   end
+
+  rate_map = {}
+  symbol_map = {}
+  sorted_items.each do |item|
+    code = item.dig("products", "currencies", "code").to_s.upcase.presence || "TRY"
+    symbol = item.dig("products", "currencies", "symbol").to_s.presence || code
+    rate_map[code] ||= normalize_rate.call(item, code)
+    symbol_map[code] ||= symbol
+  end
+
+  gross_try_total = sorted_items.sum do |item|
+    code = item.dig("products", "currencies", "code").to_s.upcase.presence || "TRY"
+    rate = rate_map[code] || BigDecimal("1")
+    line_total = item["line_total"].to_d
+    vat_amount = line_total * item.dig("products", "vat_rate").to_d / 100
+    (line_total + vat_amount) * rate
+  end
+
+  totals_priority = { "TRY" => 0, "TL" => 0, "USD" => 1, "EUR" => 2 }
+  summary_totals = rate_map.keys.map do |code|
+    rate = rate_map[code]
+    amount = rate.positive? ? (gross_try_total / rate) : BigDecimal("0")
+    {
+      code: code,
+      symbol: symbol_map[code].to_s.presence || code,
+      amount: amount
+    }
+  end.sort_by { |row| [totals_priority.fetch(row[:code].to_s.upcase, 99), row[:code].to_s] }
+
+  summary_totals = [{ code: "TRY", symbol: "TL", amount: @offer["gross_total"].to_d }] if summary_totals.empty?
+%>
+
 <div class="row g-3">
   <div class="col-12">
     <div class="card shadow-sm app-header-card">
@@ -11,14 +96,14 @@
           <% if @offer.present? %>
             <% if @offer["deleted_at"].present? %>
               <%= link_to restore_offers_standart_path(@offer["id"]),
-                    data: { turbo_method: :patch, turbo_confirm: "Geri yükle?", tip: "Geri Yükle" },
+                    data: { turbo_method: :patch, turbo_confirm: "Geri yüklensin mi?", tip: "Geri Yükle" },
                     class: "btn app-header-icon-btn d-inline-flex align-items-center justify-content-center",
                     aria: { label: "Geri Yükle" } do %>
                 <span class="material-symbols-outlined">restore_from_trash</span>
               <% end %>
             <% else %>
               <%= link_to offers_standart_path(@offer["id"]),
-                    data: { turbo_method: :delete, turbo_confirm: "Arşivle?", tip: "Arşivle" },
+                    data: { turbo_method: :delete, turbo_confirm: "Arşivlensin mi?", tip: "Arşivle" },
                     class: "btn app-header-icon-btn d-inline-flex align-items-center justify-content-center",
                     aria: { label: "Arşivle" } do %>
                 <span class="material-symbols-outlined">archive</span>
@@ -79,7 +164,10 @@
             </div>
             <div class="col-6 col-md-3">
               <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Toplam Tutar</div>
-              <div class="h5 fw-bold text-primary mb-0"><%= @offer["gross_total"].to_s %></div>
+              <% summary_totals.each do |row| %>
+                <div class="h6 fw-bold text-primary mb-0"><%= format_money.call(row[:amount], row[:symbol]) %></div>
+              <% end %>
+              <div class="small text-muted mt-1">İskonto: <%= discount_label %></div>
             </div>
             <div class="col-6 col-md-3">
               <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Müşteri</div>
@@ -87,7 +175,7 @@
             </div>
             <div class="col-6 col-md-3">
               <div class="small text-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Tarih</div>
-              <div class="text-dark"><%= @offer["offer_date"].to_s %></div>
+              <div class="text-dark"><%= format_date.call(@offer["offer_date"]) %></div>
             </div>
           </div>
         </div>
@@ -107,29 +195,55 @@
             <table class="table table-hover align-middle mb-0 rt-table">
               <thead>
                 <tr>
-                  <th class="ps-4">Ürün / Açıklama</th>
+                  <th class="ps-4">Ürün / Hizmet</th>
                   <th class="text-end">Miktar</th>
                   <th class="text-end">Birim Fiyat</th>
                   <th class="text-end">İskonto %</th>
+                  <th class="text-end">Döviz</th>
                   <th class="text-end pe-4">Toplam</th>
                 </tr>
               </thead>
               <tbody>
-                <% Array(@offer["offer_items"]).each do |item| %>
+                <% sorted_items.each do |item| %>
+                  <% currency = currency_for.call(item) %>
+                  <% description_text = item["description"].to_s %>
+                  <% is_expense = expense_item.call(item) %>
+                  <% product_name = item.dig("products", "name").to_s.presence || description_text %>
+                  <% category_name = item.dig("products", "categories", "name").to_s.presence %>
+                  <% extra_line_1, extra_line_2 = if is_expense
+                       left, right = description_text.split(" | Birim:", 2)
+                       [left.to_s, right.present? ? "Birim:#{right}" : nil]
+                     else
+                       [nil, nil]
+                     end %>
                   <tr>
                     <td class="ps-4">
-                      <div class="fw-semibold text-dark"><%= item["description"].to_s %></div>
+                      <% if is_expense %>
+                        <div class="fw-semibold text-danger"><%= extra_line_1 %></div>
+                        <% if extra_line_2.present? %>
+                          <div class="small text-danger"><%= extra_line_2 %></div>
+                        <% end %>
+                      <% else %>
+                        <div class="fw-semibold text-dark"><%= product_name.upcase %></div>
+                        <div class="small text-muted">
+                          <% if category_name.present? %>
+                            <span class="fw-semibold">Kategori:</span> <%= category_name %> <span class="mx-1">|</span>
+                          <% end %>
+                          <span class="fw-semibold">Açıklama:</span> <%= description_text.presence || "-" %>
+                        </div>
+                      <% end %>
                     </td>
-                    <td class="text-end"><%= item["quantity"].to_s %></td>
-                    <td class="text-end"><%= item["unit_price"].to_s %></td>
-                    <td class="text-end text-danger"><%= item["discount_rate"].to_s.presence || "0" %>%</td>
-                    <td class="text-end pe-4 fw-bold"><%= item["line_total"].to_s %></td>
+                    <td class="text-end"><%= format_amount.call(item["quantity"]) %></td>
+                    <td class="text-end"><%= format_money.call(item["unit_price"], currency) %></td>
+                    <td class="text-end text-danger"><%= number_with_precision(item["discount_rate"].to_d, precision: 2, delimiter: ".", separator: ",") %>%</td>
+                    <td class="text-end"><%= currency %></td>
+                    <td class="text-end pe-4 fw-bold"><%= format_money.call(item["line_total"], currency) %></td>
                   </tr>
                 <% end %>
 
-                <% if Array(@offer["offer_items"]).empty? %>
+                <% if sorted_items.empty? %>
                   <tr>
-                    <td colspan="5" class="text-center py-5 text-secondary fst-italic">Teklif kalemi bulunmuyor.</td>
+                    <td colspan="6" class="text-center py-5 text-secondary fst-italic">Teklif kalemi bulunmuyor.</td>
                   </tr>
                 <% end %>
               </tbody>
@@ -151,4 +265,3 @@
     </div>
   <% end %>
 </div>
-
