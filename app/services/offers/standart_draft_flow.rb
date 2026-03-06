@@ -89,6 +89,8 @@ class Offers::StandartDraftFlow
         offer_date: normalized[:offer_date],
         status: Offers::Status.normalize(normalized[:status]),
         project: normalized[:project],
+        description: normalized[:description],
+        currency_id: normalized[:currency_id],
         offer_type: normalized[:offer_type],
         net_total: totals[:net_total].to_s,
         vat_total: totals[:vat_total].to_s,
@@ -169,7 +171,7 @@ class Offers::StandartDraftFlow
     { items_count: built_items.size, saved_at: now_iso }
   end
 
-  def apply_calculation!(offer_id:, totals:, status: "beklemede")
+  def apply_calculation!(offer_id:, totals:, attributes: {}, status: "beklemede")
     oid = offer_id.to_s
     raise ServiceErrors::Validation.new(user_message: "Teklif secimi zorunludur.") if oid.blank?
     ensure_offer_owned!(offer_id: oid)
@@ -179,6 +181,10 @@ class Offers::StandartDraftFlow
       "offers?id=eq.#{Supabase::FilterValue.eq(oid)}&user_id=eq.#{Supabase::FilterValue.eq(@user_id)}&deleted_at=is.null",
       body: {
         status: Offers::Status.normalize(status),
+        project: attributes[:project],
+        description: attributes[:description],
+        currency_id: attributes[:currency_id],
+        company_id: attributes[:company_id],
         net_total: totals[:net_total].to_s,
         vat_total: totals[:vat_total].to_s,
         gross_total: totals[:gross_total].to_s,

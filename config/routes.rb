@@ -40,6 +40,7 @@ Rails.application.routes.draw do
         post :calculate
         post :sync_items
         post :add_expense
+        post :update_settings
       end
       member do
         patch :restore

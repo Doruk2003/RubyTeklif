@@ -162,7 +162,17 @@ class Offers::StandartController < ApplicationController
     if offer_id.present?
       persist_payload = payload.merge(status: "beklemede")
       finalize_existing_offer!(offer_id: offer_id, payload: persist_payload)
-      standart_draft_flow.apply_calculation!(offer_id: offer_id, totals: @totals, status: "beklemede")
+      standart_draft_flow.apply_calculation!(
+        offer_id: offer_id,
+        totals: @totals,
+        attributes: {
+          project: payload[:project],
+          company_id: payload[:company_id],
+          description: payload[:description],
+          currency_id: payload[:currency_id]
+        },
+        status: "beklemede"
+      )
       persist_calculation_snapshot!(offer_id: offer_id, totals: @totals)
       clear_offer_caches!
     end
@@ -235,6 +245,43 @@ class Offers::StandartController < ApplicationController
   rescue Supabase::Client::ConfigurationError
     render json: { ok: false, error: "Masraf kaydi su anda kullanilamiyor." }, status: :service_unavailable
   end
+  def update_settings
+    offer_id = params[:offer_id].to_s
+    company_id = params[:company_id].to_s
+    project = params[:project].to_s.strip
+    description = params[:description].to_s.strip
+    currency_id = params[:currency_id].to_s
+
+    raise ServiceErrors::Validation.new(user_message: "Teklif secimi zorunludur.") if offer_id.blank?
+    raise ServiceErrors::Validation.new(user_message: "Musteri secimi zorunludur.") if company_id.blank?
+
+    now_iso = Time.now.utc.iso8601
+    supabase_user_client.patch(
+      "offers?id=eq.#{Supabase::FilterValue.eq(offer_id)}&user_id=eq.#{Supabase::FilterValue.eq(current_user.id)}&deleted_at=is.null",
+      body: {
+        company_id: company_id,
+        project: project.presence || "Belirtilmedi",
+        description: description,
+        currency_id: currency_id.presence || "all",
+        updated_at: now_iso
+      }
+    )
+
+    company_name = begin
+      path = "companies?id=eq.#{Supabase::FilterValue.eq(company_id)}&deleted_at=is.null&select=name&limit=1"
+      rows = supabase_user_client.get(path)
+      rows.is_a?(Array) ? rows.first&.[]("name").to_s : "Bilinmeyen Musteri"
+    end
+
+    clear_offer_caches!
+    render json: { ok: true, company_name: company_name, project: project, description: description, currency_id: currency_id }
+  rescue ServiceErrors::Base => e
+    report_handled_error(e, source: "offers/standart#update_settings")
+    render json: { ok: false, error: e.user_message }, status: :unprocessable_entity
+  rescue StandardError => e
+    report_handled_error(e, source: "offers/standart#update_settings")
+    render json: { ok: false, error: "Ayarlar guncellenemedi." }, status: :service_unavailable
+  end
 
   private
 
@@ -247,6 +294,7 @@ class Offers::StandartController < ApplicationController
       :status,
       :project,
       :offer_type,
+      :description,
       :product_category_id,
       items: %i[product_id description quantity unit_price discount_rate]
     )

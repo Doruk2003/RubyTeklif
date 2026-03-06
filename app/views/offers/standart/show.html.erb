@@ -30,8 +30,8 @@
     raw_rate.positive? ? raw_rate : BigDecimal("1")
   end
 
-  all_items = Array(@offer["offer_items"])
-  expense_item = lambda { |item| item["description"].to_s.strip.upcase.start_with?("[EXTRA MASRAF]") }
+  all_items = Array(@offer&.dig("offer_items")).compact
+  expense_item = lambda { |item| item&.dig("description").to_s.strip.upcase.start_with?("[EXTRA MASRAF]") }
   sorted_items = all_items.sort_by { |item| expense_item.call(item) ? 1 : 0 }
 
   discount_totals_by_currency = Hash.new { |h, k| h[k] = BigDecimal("0") }
@@ -80,7 +80,9 @@
     }
   end.sort_by { |row| [totals_priority.fetch(row[:code].to_s.upcase, 99), row[:code].to_s] }
 
-  summary_totals = [{ code: "TRY", symbol: "TL", amount: @offer["gross_total"].to_d }] if summary_totals.empty?
+  if summary_totals.empty? && @offer.present?
+    summary_totals = [{ code: "TRY", symbol: "TL", amount: @offer["gross_total"].to_d }]
+  end
 %>
 
 <div class="row g-3">

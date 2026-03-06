@@ -8,6 +8,23 @@
   unit = symbol.to_s.presence || "TRY"
   "#{number_with_precision(value.to_d, precision: 2, delimiter: ".", separator: ",")} #{unit}"
 } %>
+<% format_pdf_sym = lambda { |symbol_or_code|
+  case symbol_or_code.to_s.upcase
+  when "TRY", "TL" then "₺"
+  when "USD" then "$"
+  when "EUR", "EURO" then "€"
+  else symbol_or_code
+  end
+} %>
+<% format_pdf_money = lambda { |value, symbol_or_code|
+  sym = format_pdf_sym.call(symbol_or_code)
+  "#{number_with_precision(value.to_d, precision: 0, delimiter: ".", separator: ",")} #{sym}"
+} %>
+<% normalize_rate = lambda { |raw_rate, code|
+  return BigDecimal("1") if code.to_s.upcase == "TRY"
+  rate = raw_rate.to_d
+  rate.positive? ? rate : BigDecimal("1")
+} %>
 <% formatted_offer_date = begin
      raw_date = @offer["offer_date"].to_s
      raw_date.present? ? Date.parse(raw_date).strftime("%d.%m.%Y") : "-"
@@ -79,9 +96,9 @@
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item d-flex align-items-center gap-2 rt-print-dropdown-item" href="#" data-tip="PDF">
+                  <a class="dropdown-item d-flex align-items-center gap-2 rt-print-dropdown-item" href="#" id="btnGeneratePDF">
                     <span class="material-symbols-outlined" style="font-size:18px;">picture_as_pdf</span>
-                    PDF
+                    PDF Oluştur
                   </a>
                 </li>
               </ul>
@@ -97,10 +114,10 @@
           <span class="fw-semibold"><%= formatted_offer_date %></span>
           <span class="text-white-50">|</span>
           <span class="material-symbols-outlined text-success" style="font-size:18px;">business</span>
-          <span class="fw-semibold"><%= @company_name.to_s %></span>
+          <span class="fw-semibold" id="displayCompanyName"><%= @company_name.to_s %></span>
           <span class="text-white-50">|</span>
           <span class="material-symbols-outlined text-warning" style="font-size:18px;">folder</span>
-          <span class="fw-semibold"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></span>
+          <span class="fw-semibold" id="displayProjectName"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></span>
           <span class="text-white-50">|</span>
           <span class="material-symbols-outlined text-info" style="font-size:18px;">currency_exchange</span>
           <span class="fw-semibold">
@@ -205,12 +222,14 @@
 
       <div class="card-footer rt-calc-summary d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
         <div class="fw-semibold">Toplam Ürün Adedi : <%= number_with_precision(total_quantity, precision: 2, strip_insignificant_zeros: true) %></div>
-        <div class="fw-semibold w-100" style="max-width: 420px;">
+        <div class="fw-semibold w-100" style="max-width: 420px;" id="grandTotalsContainer" data-selected-currency="<%= @offer["currency_id"].to_s.presence || "all" %>">
           <% if ordered_grand_totals.any? %>
             <% ordered_grand_totals.each do |row| %>
               <div class="js-grand-total-row d-flex align-items-center justify-content-between gap-3"
                    data-amount="<%= row[:amount].to_d.to_s("F") %>"
-                   data-symbol="<%= row[:symbol].to_s %>">
+                   data-symbol="<%= row[:symbol].to_s %>"
+                   data-currency-code="<%= row[:code].to_s.upcase %>"
+                   data-currency-id="<%= Array(@currencies).find { |c| c["code"].to_s.upcase == row[:code].to_s.upcase }&.[]("id").to_s %>">
                 <span class="text-start">KDV Dahil G.Toplam</span>
                 <span class="js-grand-total-value text-end"><%= format_money.call(row[:amount], row[:symbol]) %></span>
               </div>
@@ -218,7 +237,8 @@
           <% else %>
             <div class="js-grand-total-row d-flex align-items-center justify-content-between gap-3"
                  data-amount="<%= @totals[:gross_total].to_d.to_s("F") %>"
-                 data-symbol="TRY">
+                 data-symbol="TRY"
+                 data-currency-code="TRY">
               <span class="text-start">KDV Dahil G.Toplam</span>
               <span class="js-grand-total-value text-end"><%= format_money.call(@totals[:gross_total], "TRY") %></span>
             </div>
@@ -228,7 +248,7 @@
     </div>
   </div>
 
-  <div class="col-12 col-xl-8">
+  <div class="col-12 col-xl-4">
     <div class="card shadow-sm h-100">
       <div class="card-header fw-semibold rt-calc-head">Geçmiş</div>
       <div class="card-body">
@@ -247,15 +267,24 @@
 
   <div class="col-12 col-xl-4">
     <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold rt-calc-head">AÇIKLAMA</div>
+      <div class="card-body">
+        <div id="displayOfferDescription" class="text-muted" style="white-space: pre-wrap; font-size: 0.9rem;"><%= @offer["description"].to_s.presence || "Henüz bir açıklama eklenmedi." %></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="card shadow-sm h-100">
       <div class="card-header fw-semibold rt-calc-head">Dosyalar</div>
       <div class="card-body">
         <div class="mb-3">
-          <label class="form-label">Ad</label>
-          <input type="text" class="form-control" placeholder="">
+          <label class="poz-modal-label">Ad</label>
+          <input type="text" class="form-control form-control-sm" placeholder="">
         </div>
         <div class="mb-3">
-          <label class="form-label">Dosya</label>
-          <input type="file" class="form-control">
+          <label class="poz-modal-label">Dosya</label>
+          <input type="file" class="form-control form-control-sm">
         </div>
         <button type="button" class="btn btn-warning w-100 fw-bold text-uppercase">Dosya Ekle</button>
       </div>
@@ -263,123 +292,304 @@
   </div>
 </div>
 
-<div class="modal fade" id="offerSettingsModal" tabindex="-1" aria-labelledby="offerSettingsModalLabel" aria-hidden="true">
+<div class="modal fade" id="offerSettingsModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
   <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-info justify-content-center">
-        <h5 class="modal-title fw-semibold text-white" id="offerSettingsModalLabel">TEKLİF PDF AYARLARI</h5>
+    <div class="modal-content" style="border:0.05em; border-radius:4px; box-shadow: 0 10px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);">
+      <div class="modal-header py-3 px-4 btn btn-info" style="border-bottom:none; cursor: default;">
+        <h6 class="modal-title mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600; color:#fff;">
+          TEKLİF PDF AYARLARI
+        </h6>
       </div>
-      <div class="modal-body">
-        <div class="rt-calc-modal-panel">
-          <form id="offerSettingsForm">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Müşteri</label>
-              <select class="form-select" name="company_id">
-                <option value="">Seçiniz</option>
-                <% Array(@companies).each do |company| %>
-                  <% cid = company["id"].to_s %>
-                  <% selected = cid == @offer["company_id"].to_s %>
-                  <option value="<%= cid %>" <%= "selected" if selected %>><%= company["name"].to_s %></option>
-                <% end %>
-              </select>
-            </div>
+      <div class="modal-body p-4">
+        <form id="offerSettingsForm"
+              data-save-url="<%= update_settings_offers_standart_index_path %>"
+              data-offer-id="<%= @offer["id"].to_s %>">
+          <div class="mb-3">
+            <label class="poz-modal-label">Müşteri</label>
+            <select class="form-select form-select-sm" name="company_id" id="modalCompanyId">
+              <option value="">Seçiniz</option>
+              <% Array(@companies).each do |company| %>
+                <% cid = company["id"].to_s %>
+                <% selected = cid == @offer["company_id"].to_s %>
+                <option value="<%= cid %>" <%= "selected" if selected %>><%= company["name"].to_s %></option>
+              <% end %>
+            </select>
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Proje</label>
-              <input type="text" class="form-control" name="project" value="<%= @offer["project"].to_s %>">
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">Proje</label>
+            <input type="text" class="form-control form-control-sm" name="project" id="modalProject" value="<%= @offer["project"].to_s %>">
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Açıklama</label>
-              <textarea class="form-control" name="description" rows="2"></textarea>
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">Açıklama</label>
+            <textarea class="form-control form-control-sm" name="description" id="modalOfferDescription" rows="4"><%= @offer["description"].to_s %></textarea>
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Döviz</label>
-              <select class="form-select" name="currency_id">
-                <% Array(@currencies).each_with_index do |currency, idx| %>
-                  <% selected = idx.zero? %>
-                  <option value="<%= currency["id"].to_s %>" <%= "selected" if selected %>>
-                    <%= [currency["code"].to_s, currency["name"].to_s].reject(&:blank?).join(" - ") %>
-                  </option>
-                <% end %>
-              </select>
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">Döviz</label>
+            <select class="form-select form-select-sm" name="currency_id" id="modalCurrencyId">
+              <option value="all" <%= "selected" if @offer["currency_id"].to_s == "all" || @offer["currency_id"].blank? %>>HEPSİ</option>
+              <% Array(@currencies).each do |currency| %>
+                <% cid = currency["id"].to_s %>
+                <% selected = cid == @offer["currency_id"].to_s %>
+                <option value="<%= cid %>" <%= "selected" if selected %>>
+                  <% 
+                    code = currency["code"].to_s.upcase
+                    symbol = currency["symbol"].to_s
+                    name = currency["name"].to_s.upcase
 
-            <div class="mb-0">
-              <label class="form-label fw-semibold">KDV</label>
-              <select class="form-select" name="has_vat">
-                <option value="true" selected>VAR</option>
-                <option value="false">YOK</option>
-              </select>
-            </div>
-          </form>
-        </div>
+                    if %w[TRY TL].include?(code) || symbol == "₺" || name.include?("TÜRK LİRASI") || code == "KUR-01"
+                      label = "TL"
+                    elsif code == "USD" || symbol == "$" || name.include?("DOLAR") || code == "KUR-02"
+                      label = "USD"
+                    elsif code == "EUR" || symbol == "€" || name.include?("EURO") || code == "KUR-03"
+                      label = "EURO"
+                    else
+                      label = code
+                    end
+                  %>
+                  <%= label %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+
+          <div class="mb-0">
+            <label class="poz-modal-label">KDV</label>
+            <select class="form-select form-select-sm" name="has_vat">
+              <option value="true" selected>VAR</option>
+              <option value="false">YOK</option>
+            </select>
+          </div>
+        </form>
       </div>
-      <div class="modal-footer rt-calc-modal-footer">
-        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">İptal</button>
-        <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Kaydet</button>
+      <div class="modal-footer border-top px-4 py-3 d-flex flex-column gap-2">
+        <button type="button" class="btn btn-primary w-100 fw-bold py-2 text-uppercase" id="btnSaveOfferSettings" data-bs-dismiss="modal" style="letter-spacing:0.05em;">Kaydet</button>
+        <button type="button" class="btn btn-secondary w-100 fw-bold py-2 text-dark text-uppercase" data-bs-dismiss="modal" style="letter-spacing:0.05em;">İptal</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="false">
   <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-info justify-content-center">
-        <h5 class="modal-title fw-semibold text-white" id="addExpenseModalLabel">TEKLİF EXTRA MASRAF GİRİŞİ</h5>
+    <div class="modal-content" style="border:0.05em; border-radius:4px; box-shadow: 0 10px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);">
+      <div class="modal-header py-3 px-4 btn btn-warning" style="border-bottom:none; cursor: default;">
+        <h6 class="modal-title mb-0 d-flex align-items-center gap-2" style="font-size:0.95rem; font-weight:600; color:#fff;">
+          TEKLİF EXTRA MASRAF GİRİŞİ
+        </h6>
       </div>
-      <div class="modal-body">
-        <div class="rt-calc-modal-panel">
-          <form id="addExpenseForm"
-                data-save-url="<%= add_expense_offers_standart_index_path %>"
-                data-offer-id="<%= @offer["id"].to_s %>">
-            <div id="addExpenseFeedback" class="alert d-none py-2 mb-3" role="alert"></div>
+      <div class="modal-body p-4">
+        <form id="addExpenseForm"
+              data-save-url="<%= add_expense_offers_standart_index_path %>"
+              data-offer-id="<%= @offer["id"].to_s %>">
+          <div id="addExpenseFeedback" class="alert d-none py-2 mb-3" role="alert"></div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Açıklama</label>
-              <input type="text" class="form-control" name="description">
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">Açıklama</label>
+            <input type="text" class="form-control form-control-sm" name="description">
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Birim</label>
-              <select class="form-select" name="unit">
-                <option value="adet" selected>ADET</option>
-                <option value="metre">METRE</option>
-                <option value="paket">PAKET</option>
-              </select>
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">Birim</label>
+            <select class="form-select form-select-sm" name="unit">
+              <option value="adet" selected>ADET</option>
+              <option value="metre">METRE</option>
+              <option value="paket">PAKET</option>
+            </select>
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Miktar</label>
-              <input type="number" step="0.0001" min="0" class="form-control" name="quantity" value="1.0000">
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">Miktar</label>
+            <input type="number" step="0.0001" min="0" class="form-control form-control-sm" name="quantity" value="1.0000">
+          </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">B. Fiyat</label>
-              <input type="number" step="0.01" min="0" class="form-control" name="unit_price" value="0.00">
-            </div>
+          <div class="mb-3">
+            <label class="poz-modal-label">B. Fiyat</label>
+            <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="unit_price" value="0.00">
+          </div>
 
-            <div class="mb-0">
-              <label class="form-label fw-semibold">KDV</label>
-              <select class="form-select" name="vat_rate">
-                <option value="20" selected>%20</option>
-                <option value="10">%10</option>
-                <option value="1">%1</option>
-                <option value="0">%0</option>
-              </select>
-            </div>
-          </form>
-        </div>
+          <div class="mb-0">
+            <label class="poz-modal-label">KDV</label>
+            <select class="form-select form-select-sm" name="vat_rate">
+              <option value="20" selected>%20</option>
+              <option value="10">%10</option>
+              <option value="1">%1</option>
+              <option value="0">%0</option>
+            </select>
+          </div>
+        </form>
       </div>
-      <div class="modal-footer rt-calc-modal-footer">
-        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">İptal</button>
-        <button type="button" class="btn btn-primary px-4" id="btnAddExpenseSave">Kaydet</button>
+      <div class="modal-footer border-top px-4 py-3 d-flex flex-column gap-2">
+        <button type="button" class="btn btn-primary w-100 fw-bold py-2 text-uppercase" id="btnAddExpenseSave" style="letter-spacing:0.05em;">Kaydet</button>
+        <button type="button" class="btn btn-secondary w-100 fw-bold py-2 text-dark text-uppercase" data-bs-dismiss="modal" style="letter-spacing:0.05em;">İptal</button>
       </div>
     </div>
   </div>
 </div>
+
+</div>
+
+<%# ======================== PDF EXPORT TEMPLATE (HIDDEN) ======================== %>
+<div id="pdfExportTemplate" style="display: none;">
+  <div class="pdf-container" style="padding: 0; font-family: 'Inter', sans-serif; color: #333; background: transparent; min-height: 1100px;">
+    <!-- Main Content Paper -->
+    <div style="background: #fff; padding: 25px 35px; border-radius: 0; min-height: 1040px; display: flex; flex-direction: column;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px;">
+      <div>
+        <h1 style="margin: 0; color: #1a237e; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">TEKLİF FORMU</h1>
+        <p style="margin: 5px 0 0; color: #666; font-size: 14px;"><%= project_number %></p>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-weight: 700; color: #1a237e; font-size: 20px;">RUBY TEKLİF</div>
+        <p style="margin: 5px 0 0; color: #666; font-size: 12px;">Modern Teklif Çözümleri</p>
+      </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <h6 style="margin: 0 0 10px; color: #1a237e; text-transform: uppercase; font-size: 11px; font-weight: 700;">Müşteri Bilgileri</h6>
+        <div id="pdfDisplayCompany" style="font-weight: 700; font-size: 15px; margin-bottom: 4px;"><%= @company_name.to_s.upcase %></div>
+        <div style="font-size: 13px; color: #555;"><span style="font-weight: 600;">Proje:</span> <span id="pdfDisplayProject"><%= @offer["project"].to_s.presence || "Belirtilmedi" %></span></div>
+      </div>
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: right;">
+        <h6 style="margin: 0 0 10px; color: #1a237e; text-transform: uppercase; font-size: 11px; font-weight: 700;">Teklif Detayları</h6>
+        <div style="font-size: 13px; color: #555; margin-bottom: 4px;"><span style="font-weight: 600;">Tarih:</span> <%= formatted_offer_date %></div>
+        <div style="font-size: 13px; color: #555;"><span style="font-weight: 600;">Durum:</span> <%= @offer["status"].to_s.titleize %></div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed;">
+      <thead>
+      <thead>
+        <tr style="background: #1a237e; border: none;">
+          <th style="padding: 8px 6px; text-align: left; font-size: 8px; font-weight: 600; text-transform: uppercase; width: 38%; color: #ffffff !important; border: none;">Ürün / Hizmet</th>
+          <th style="padding: 8px 6px; text-align: right; font-size: 8px; font-weight: 600; text-transform: uppercase; width: 8%; color: #ffffff !important; border: none;">Miktar</th>
+          <th style="padding: 8px 6px; text-align: right; font-size: 8px; font-weight: 600; text-transform: uppercase; width: 14%; color: #ffffff !important; border: none;">Birim Fiyat</th>
+          <th style="padding: 8px 6px; text-align: right; font-size: 8px; font-weight: 600; text-transform: uppercase; width: 9%; color: #ffffff !important; border: none;">İsk. %</th>
+          <th style="padding: 8px 6px; text-align: right; font-size: 8px; font-weight: 600; text-transform: uppercase; width: 17%; color: #ffffff !important; border: none;">İsk. Tutar</th>
+          <th style="padding: 8px 6px; text-align: right; font-size: 8px; font-weight: 600; text-transform: uppercase; width: 14%; color: #ffffff !important; border: none;">Toplam</th>
+        </tr>
+      </thead>
+      <tbody style="border-top: 10px solid transparent;">
+        <% total_discount_try = BigDecimal("0") %>
+        <% product_items.each_with_index do |item, idx| %>
+          <% 
+            qty = item[:quantity].to_d
+            u_price = item[:unit_price].to_d
+            disc_rate = item[:discount_rate].to_d
+            gross_line_total = qty * u_price
+            disc_amount = gross_line_total * disc_rate / 100
+            
+            rate = normalize_rate.call(item[:currency_rate_to_try], item[:currency_code])
+            total_discount_try += (disc_amount * rate)
+            bg_color = (idx % 2 == 0) ? "#ffffff" : "#fcfcfc"
+          %>
+          <tr style="border-bottom: 1px solid #f2f2f2; background-color: <%= bg_color %>;">
+            <td style="padding: 6px; vertical-align: top;">
+              <div style="font-weight: 700; font-size: 9px; color: #111; line-height: 1.3; margin-bottom: 2px;"><%= (@product_map.dig(item[:product_id], :name) || item[:description]).to_s.upcase %></div>
+              <div style="font-size: 7.5px; color: #666; line-height: 1.2;"><%= item[:description].to_s.presence || "-" %></div>
+            </td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; vertical-align: top;"><%= number_with_precision(qty, precision: 0) %></td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; vertical-align: top; white-space: nowrap;"><%= format_pdf_money.call(u_price, item[:currency_symbol]) %></td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; color: #444; vertical-align: top;"><%= number_with_precision(disc_rate, precision: 2) %></td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; color: #d32f2f; vertical-align: top; white-space: nowrap;"><%= format_pdf_money.call(disc_amount, item[:currency_symbol]) %></td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; font-weight: 700; color: #000; vertical-align: top; white-space: nowrap;"><%= format_pdf_money.call(item[:line_total], item[:currency_symbol]) %></td>
+          </tr>
+        <% end %>
+        <% expense_items.each_with_index do |item, idx| %>
+          <% bg_color = ((product_items.size + idx) % 2 == 0) ? "#ffffff" : "#fcfcfc" %>
+          <tr style="border-bottom: 1px solid #f2f2f2; background-color: <%= bg_color %>;">
+            <td style="padding: 6px; vertical-align: top;">
+              <div style="font-weight: 700; font-size: 9px; color: #333; line-height: 1.3; margin-bottom: 2px;"><%= item[:description].to_s.split(" | Birim:").first.to_s.upcase %></div>
+              <div style="font-size: 7.5px; color: #888; font-weight: 600; line-height: 1.1;">EKSTRA MASRAF</div>
+            </td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; vertical-align: top;"><%= number_with_precision(item[:quantity].to_d, precision: 0) %></td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; vertical-align: top; white-space: nowrap;"><%= format_pdf_money.call(item[:unit_price], item[:currency_symbol]) %></td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; vertical-align: top;">-</td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; vertical-align: top;">-</td>
+            <td style="padding: 6px; text-align: right; font-size: 9px; font-weight: 700; color: #000; vertical-align: top; white-space: nowrap;"><%= format_pdf_money.call(item[:line_total], item[:currency_symbol]) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 40px;">
+      <!-- Description Section -->
+      <div style="flex: 1;">
+        <h6 style="margin: 0 0 10px; color: #1a237e; text-transform: uppercase; font-size: 11px; font-weight: 700;">Açıklamalar</h6>
+        <div id="pdfDisplayDescription" style="font-size: 12px; color: #555; white-space: pre-wrap; line-height: 1.6; background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 6px;">
+          <%= @offer["description"].to_s.presence || "Bu teklif için özel bir açıklama bulunmamaktadır." %>
+        </div>
+      </div>
+
+      <!-- Totals Section -->
+      <div style="width: 280px;">
+        <div style="background: #f1f3f5; color: #333; padding: 15px; border-radius: 6px; border: 1px solid #dee2e6;">
+          <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #ced4da;">
+            <div style="display: flex; justify-content: space-between; font-size: 8px; color: #495057; margin-bottom: 2px;">
+              <span style="font-weight: 600;">Ara Toplam (Brüt)</span>
+              <span><%= format_pdf_money.call(@totals[:net_total] + total_discount_try, "TRY") %></span>
+            </div>
+            <% if total_discount_try > 0 %>
+              <div style="display: flex; justify-content: space-between; font-size: 8px; color: #c92a2a; margin-bottom: 2px;">
+                <span style="font-weight: 600;">Toplam İskonto (-)</span>
+                <span style="font-weight: 700;"><%= format_pdf_money.call(total_discount_try, "TRY") %></span>
+              </div>
+            <% end %>
+            <div style="display: flex; justify-content: space-between; font-size: 8px; color: #495057; margin-bottom: 2px;">
+              <span style="font-weight: 600;">KDV Matrahı</span>
+              <span><%= format_pdf_money.call(@totals[:net_total], "TRY") %></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 8px; color: #495057;">
+              <span style="font-weight: 600;">KDV Toplam</span>
+              <span><%= format_pdf_money.call(@totals[:vat_total], "TRY") %></span>
+            </div>
+          </div>
+          
+          <div id="pdfGrandTotalsContainer">
+            <% ordered_grand_totals.each do |row| %>
+              <% 
+                label_code = row[:code].to_s.upcase
+                display_label = case
+                when %w[TRY TL].include?(label_code) || label_code == "KUR-01" then "TL"
+                when label_code == "USD" || label_code == "KUR-02" then "USD"
+                when label_code == "EUR" || label_code == "KUR-03" then "EURO"
+                else label_code
+                end
+              %>
+              <div class="pdf-grand-total-row" 
+                   data-currency-id="<%= Array(@currencies).find { |c| c["code"].to_s.upcase == row[:code].to_s.upcase }&.[]("id").to_s %>"
+                   style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; background: #e9ecef; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #1a237e;">
+                <span style="font-size: 8px; font-weight: 800; text-transform: uppercase; color: #1a237e;">GENEL TOPLAM (<%= display_label %>)</span>
+                <span style="font-size: 10px; font-weight: 700; color: #000;"><%= format_pdf_money.call(row[:amount], row[:symbol]) %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer / Signature -->
+    <div style="margin-top: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px;">
+      <div style="text-align: center;">
+        <div style="border-bottom: 1px solid #ccc; height: 60px; margin-bottom: 10px;"></div>
+        <div style="font-size: 12px; font-weight: 700; color: #333;">RUBY TEKLİF YETKİLİSİ</div>
+        <div style="font-size: 10px; color: #999;">İmza / Kaşe</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="border-bottom: 1px solid #ccc; height: 60px; margin-bottom: 10px;"></div>
+        <div style="font-size: 12px; font-weight: 700; color: #333;">MÜŞTERİ ONAYI</div>
+        <div style="font-size: 10px; color: #999;">İmza / Kaşe</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
   (() => {
@@ -489,14 +699,37 @@
       }
 
       saveBtn.addEventListener("click", async () => {
-        const description = (form.querySelector("[name='description']")?.value || "").trim() || "Ek Masraf"
+        const descriptionInput = form.querySelector("[name='description']")
+        const unitPriceInput = form.querySelector("[name='unit_price']")
+        
+        const description = (descriptionInput?.value || "").trim()
         const unit = ((form.querySelector("[name='unit']")?.value || "adet").trim() || "adet").toUpperCase()
         const quantity = parseNumber(form.querySelector("[name='quantity']")?.value)
-        const unitPrice = parseNumber(form.querySelector("[name='unit_price']")?.value)
+        const unitPrice = parseNumber(unitPriceInput?.value)
         const vatRate = parseNumber(form.querySelector("[name='vat_rate']")?.value)
 
-        if (quantity <= 0 || unitPrice < 0 || vatRate < 0) {
-          setFeedback("Lütfen geçerli masraf değerleri girin.", "error")
+        let errors = []
+        if (!description) {
+          errors.push("Açıklama")
+          descriptionInput?.classList.add("is-invalid")
+        } else {
+          descriptionInput?.classList.remove("is-invalid")
+        }
+
+        if (unitPrice <= 0) {
+          errors.push("Birim Fiyat (Tutar)")
+          unitPriceInput?.classList.add("is-invalid")
+        } else {
+          unitPriceInput?.classList.remove("is-invalid")
+        }
+
+        if (errors.length > 0) {
+          setFeedback(`Lütfen şu alanları girin: ${errors.join(", ")}`, "error")
+          return
+        }
+
+        if (quantity <= 0 || vatRate < 0) {
+          setFeedback("Lütfen geçerli miktar ve KDV değerleri girin.", "error")
           return
         }
 
@@ -538,12 +771,15 @@
             if (totalValueEl) totalValueEl.textContent = formatMoney(next, symbol)
           })
 
-          const descriptionInput = form.querySelector("[name='description']")
-          const quantityInput = form.querySelector("[name='quantity']")
-          const unitPriceInput = form.querySelector("[name='unit_price']")
-          if (descriptionInput) descriptionInput.value = ""
+          if (descriptionInput) {
+            descriptionInput.value = ""
+            descriptionInput.classList.remove("is-invalid")
+          }
           if (quantityInput) quantityInput.value = "1.0000"
-          if (unitPriceInput) unitPriceInput.value = "0.00"
+          if (unitPriceInput) {
+            unitPriceInput.value = "0.00"
+            unitPriceInput.classList.remove("is-invalid")
+          }
           if (descriptionInput) descriptionInput.focus()
 
           setFeedback("Masraf kalıcı olarak kaydedildi.", "success")
@@ -556,7 +792,168 @@
       })
     }
 
-    document.addEventListener("turbo:load", initExpenseModal)
-    if (document.readyState !== "loading") initExpenseModal()
+    function initSettingsSync() {
+      const saveBtn = document.getElementById("btnSaveOfferSettings")
+      const modalCompanySelect = document.getElementById("modalCompanyId")
+      const modalProjectInput = document.getElementById("modalProject")
+      const modalTextarea = document.getElementById("modalOfferDescription")
+      const modalCurrencySelect = document.getElementById("modalCurrencyId")
+
+      const displayCompany = document.getElementById("displayCompanyName")
+      const displayProject = document.getElementById("displayProjectName")
+      const displayDescription = document.getElementById("displayOfferDescription")
+      const grandTotalsContainer = document.getElementById("grandTotalsContainer")
+
+      const hiddenCompany = document.getElementById("hiddenCompanyId")
+      const hiddenProject = document.getElementById("hiddenProject")
+      const hiddenDescription = document.getElementById("hiddenDescription")
+      const hiddenCurrency = document.getElementById("hiddenCurrencyId")
+
+      if (!saveBtn || !modalCompanySelect || !modalProjectInput || !modalTextarea || !modalCurrencySelect) return
+
+      saveBtn.addEventListener("click", async () => {
+        const payload = {
+          offer_id: document.getElementById("offerSettingsForm").dataset.offerId,
+          company_id: modalCompanySelect.value,
+          project: modalProjectInput.value.trim(),
+          description: modalTextarea.value.trim(),
+          currency_id: modalCurrencySelect.value
+        }
+
+        saveBtn.disabled = true
+        saveBtn.textContent = "Kaydediliyor..."
+
+        try {
+          const csrf = document.querySelector("meta[name='csrf-token']")
+          const response = await fetch(document.getElementById("offerSettingsForm").dataset.saveUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Requested-With": "XMLHttpRequest",
+              "X-CSRF-Token": csrf ? csrf.content : ""
+            },
+            body: JSON.stringify(payload)
+          })
+
+          const data = await response.json()
+          if (!response.ok || !data.ok) throw new Error(data.error || "Ayarlar kaydedilemedi.")
+
+          // Update UI with verified data from server
+          if (displayCompany) displayCompany.textContent = data.company_name
+          if (displayProject) displayProject.textContent = data.project || "Belirtilmedi"
+          if (displayDescription) displayDescription.textContent = data.description || "Henüz bir açıklama eklenmedi."
+
+          // Update PDF Template UI
+          const pdfComp = document.getElementById("pdfDisplayCompany")
+          const pdfProj = document.getElementById("pdfDisplayProject")
+          const pdfDesc = document.getElementById("pdfDisplayDescription")
+          if (pdfComp) pdfComp.textContent = (data.company_name || "").toUpperCase()
+          if (pdfProj) pdfProj.textContent = data.project || "Belirtilmedi"
+          if (pdfDesc) pdfDesc.textContent = data.description || "Bu teklif için özel bir açıklama bulunmamaktadır."
+
+          // Update Currency Visibility
+          if (grandTotalsContainer) {
+            grandTotalsContainer.dataset.selectedCurrency = modalCurrencySelect.value
+            applyCurrencyVisibility()
+          }
+
+          // Update Hidden Form for persistence via "HESAPLA" (just in case)
+          if (hiddenCompany) hiddenCompany.value = data.company_id || modalCompanySelect.value
+          if (hiddenProject) hiddenProject.value = data.project
+          if (hiddenDescription) hiddenDescription.value = data.description
+          if (hiddenCurrency) hiddenCurrency.value = modalCurrencySelect.value
+
+          // Close modal
+          const modalInstance = bootstrap.Modal.getInstance(document.getElementById("offerSettingsModal"))
+          if (modalInstance) modalInstance.hide()
+
+        } catch (error) {
+          alert(error.message)
+        } finally {
+          saveBtn.disabled = false
+          saveBtn.textContent = "Kaydet"
+        }
+      })
+    }
+
+    function applyCurrencyVisibility() {
+      const container = document.getElementById("grandTotalsContainer")
+      if (!container) return
+      const selection = container.dataset.selectedCurrency || "all"
+      const rows = container.querySelectorAll(".js-grand-total-row")
+
+      rows.forEach(row => {
+        if (selection === "all") {
+          row.style.display = "flex"
+          row.classList.remove("d-none-print")
+        } else {
+          const rowCurrencyId = row.dataset.currencyId
+          if (rowCurrencyId === selection) {
+            row.style.display = "flex"
+            row.classList.remove("d-none-print")
+          } else {
+            row.style.display = "none"
+            row.classList.add("d-none-print")
+          }
+        }
+      })
+    }
+
+    function initPDFExport() {
+      const btn = document.getElementById("btnGeneratePDF")
+      if (!btn) return
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault()
+        
+        const element = document.getElementById("pdfExportTemplate").cloneNode(true)
+        element.style.display = "block"
+        
+        // Apply current currency filter to PDF
+        const selection = document.getElementById("grandTotalsContainer")?.dataset.selectedCurrency || "all"
+        const pdfTotalsContainer = element.querySelector("#pdfGrandTotalsContainer")
+        if (pdfTotalsContainer) {
+          const rows = pdfTotalsContainer.querySelectorAll(".pdf-grand-total-row")
+          rows.forEach(row => {
+            if (selection !== "all" && row.dataset.currencyId !== selection) {
+              row.style.display = "none"
+            }
+          })
+        }
+
+        const opt = {
+          margin: 0,
+          filename: `Teklif_${document.querySelector(".app-header-card .fw-semibold").textContent.trim()}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }
+
+        html2pdf().set(opt).from(element).output('bloburl').then((bloburl) => {
+          window.open(bloburl, '_blank')
+        })
+      })
+    }
+
+    document.addEventListener("turbo:load", () => {
+      initExpenseModal()
+      initSettingsSync()
+      applyCurrencyVisibility()
+      initPDFExport()
+    })
+    if (document.readyState !== "loading") {
+      initExpenseModal()
+      initSettingsSync()
+      applyCurrencyVisibility()
+      initPDFExport()
+    }
   })()
 </script>
+
+<style>
+  @media print {
+    .d-none-print {
+      display: none !important;
+    }
+  }
+</style>
