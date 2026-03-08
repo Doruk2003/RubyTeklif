@@ -70,6 +70,6 @@ end
 
 gem "dotenv-rails", "~> 3.2"
 gem "pundit", "~> 2.4"
-gem "sentry-ruby", "~> 5.17"
-gem "sentry-rails", "~> 5.17"
+gem "sentry-ruby", "~> 6.4"
+gem "sentry-rails", "~> 6.4"
 gem "sidekiq", "~> 7.3"
